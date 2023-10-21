@@ -21,6 +21,8 @@ hosts_file_path = "./../conf/Deployments/Host-names/hosts.txt"
 workloads_dir_path = "./workloads"
 config_gen_path = "config_gen.py"
 input_txt_path = "./input.txt"
+metric_sum_file = "./../conf/Status-reporter/sum_metric_list.txt"
+metric_mean_file = "./../conf/Status-reporter/mean_metric_list.txt"
 submit = 'submit'
 max_pre_test_script_failure = 3
 
