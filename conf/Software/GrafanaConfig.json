@@ -1,0 +1,13 @@
+{
+    "api_key" : "YOUR_API_KEY",
+    "URL" : "localhost",
+    "port" : "3000",
+    "uid" : "l9W36T24z",
+    "dashboard_name" : "partial_monitoring" ,
+    "org_id" : "1",
+    "timeVariable" : "10s" ,
+    "DataSource" : "influxdb" ,
+    "picture_width" : "1000",
+    "picture_height" : "500" ,
+    "Time_zone" : "Asia%2FTehran"
+}
