@@ -1,0 +1,2 @@
+netdata.system.cpu.system
+netdata.system.cpu.\\w*

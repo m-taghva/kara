@@ -1,0 +1,2 @@
+netdata.system.cpu.user
+netdata.system.cpu.system
