@@ -248,7 +248,7 @@ def process_on_workloads(workloads_dir_path):
                 subprocess.call(['python3', backup_script_path, '-t', final_workload_name])
 
                 # Construct the status-reporter command with the variables
-                other_script_command = f"python3 status-reporter.py {metric_one_file},{time_file_path},{result_file_path}"
+                other_script_command = f"python3 status-reporter.py {metric_sum_file},{time_file_path},{result_file_path}"
                 #time.sleep(120)
                 subprocess.call(other_script_command, shell=True)
 
