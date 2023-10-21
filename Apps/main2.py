@@ -216,13 +216,14 @@ def process_on_workloads(workloads_dir_path):
             if first_main_launching_time and last_main_completed_time:
                 
                 # Write time of workload in time file
-                time_file_path = os.path.join(result_file_path, 'time')
+                time_file_path = f"{result_file_path}/time.txt"
                 time_file = open(time_file_path, "w")
                 start_time = first_main_launching_time.split('@')[1].strip()
                 end_time = last_main_completed_time.split('@')[1].strip()
-                start_end_time = start_time + ',' + end_time
+                start_end_time = f"{start_time},{end_time}"
                 time_file.write(start_end_time)
                 time_file.close()
+        
 
                 # Start backup phase and its process & get-ring and get-conf to result dir
                 Ring_address = f"{result_path}/{final_workload_name}/Ring_cluster/"
@@ -245,6 +246,11 @@ def process_on_workloads(workloads_dir_path):
                 conf_mv_process = subprocess.run(conf_mv_command, shell=True)
 
                 subprocess.call(['python3', backup_script_path, '-t', final_workload_name])
+
+                # Construct the status-reporter command with the variables
+                other_script_command = f"python3 status-reporter.py {metric_one_file},{time_file_path},{result_file_path}"
+                #time.sleep(120)
+                subprocess.call(other_script_command, shell=True)
 
         except Exception as e:
             print(f"\033[91mAn error occurred for workload {workload}: {str(e)}\033[0m")
