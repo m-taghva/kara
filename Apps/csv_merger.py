@@ -7,7 +7,7 @@ from glob import glob
 # For font style
 BOLD = "\033[1m"
 RESET = "\033[0m"
-YELLOW = "\033[1;33m
+YELLOW = "\033[1;33m"
 
 def extract_string_number_pairs(target_directory):
     # Extract all string:number pairs from the target directory
@@ -103,7 +103,7 @@ def main():
                     csv_writer = csv.writer(output_csv)
                     merge_csv_files(subdirectory_path, csv_writer, extracted_data, first_target_directory, selected_csv)
     print("")
-    print(f"{BOLD}merged CSV file{RESET}{YELLOW}'{output_csv_path}'{RESET}{YELLOW}has been created with the extracted values{RESET}")
+    print(f"{BOLD}merged CSV file{RESET}{YELLOW}'{output_csv_path}'{RESET}{BOLD}has been created with the extracted values{RESET}")
     print("")
     
 if __name__ == "__main__":
