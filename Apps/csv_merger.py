@@ -4,6 +4,11 @@ import csv
 import sys
 from glob import glob
 
+# For font style
+BOLD = "\033[1m"
+RESET = "\033[0m"
+YELLOW = "\033[1;33m
+
 def extract_string_number_pairs(target_directory):
     # Extract all string:number pairs from the target directory
     keys = re.findall("(?<=#)[^:]*(?=:)", target_directory)
@@ -97,8 +102,8 @@ def main():
                 with open(output_csv_path, mode='a', newline='') as output_csv:
                     csv_writer = csv.writer(output_csv)
                     merge_csv_files(subdirectory_path, csv_writer, extracted_data, first_target_directory, selected_csv)
-
-    print(f"New CSV file '{output_csv_path}' has been created with the extracted values.")
-
+    print("")
+    print(f"{YELLOW}merged CSV file '{output_csv_path}' has been created with the extracted values{RESET}")
+    print("")
 if __name__ == "__main__":
     main()
