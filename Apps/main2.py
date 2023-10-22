@@ -5,6 +5,7 @@ import os
 import time
 import shutil
 import csv
+from start_backup_report import perform_backup_and_report
 
 # Getting arguments from send-load.py
 # Arguments are: input file, default file and script file
@@ -16,13 +17,9 @@ cosbench_command = './../../cli.sh'
 archive_path = './../../archive/'
 result_path = './../result/'
 pre_test_script_path = script_file_path
-backup_script_path = './../Backup/backup_script.py'
-hosts_file_path = "./../conf/Deployments/Host-names/hosts.txt"
 workloads_dir_path = "./workloads"
 config_gen_path = "config_gen.py"
 input_txt_path = "./input.txt"
-metric_sum_file = "./../conf/Status-reporter/sum_metric_list.txt"
-metric_mean_file = "./../conf/Status-reporter/mean_metric_list.txt"
 submit = 'submit'
 max_pre_test_script_failure = 3
 
@@ -216,41 +213,16 @@ def process_on_workloads(workloads_dir_path):
             if first_main_launching_time and last_main_completed_time:
                 
                 # Write time of workload in time file
-                time_file_path = f"{result_file_path}/time.txt"
+                time_file_path = f"{result_file_path}/time"
                 time_file = open(time_file_path, "w")
                 start_time = first_main_launching_time.split('@')[1].strip()
                 end_time = last_main_completed_time.split('@')[1].strip()
                 start_end_time = f"{start_time},{end_time}"
                 time_file.write(start_end_time)
                 time_file.close()
-        
 
-                # Start backup phase and its process & get-ring and get-conf to result dir
-                Ring_address = f"{result_path}/{final_workload_name}/Ring_cluster/"
-                os.makedirs(Ring_address, exist_ok=True)
+                perform_backup_and_report(final_workload_name, time_file_path, result_file_path)
 
-                conf_address = f"{result_path}/{final_workload_name}/Config_cluster/"
-                os.makedirs(conf_address, exist_ok=True)
-
-                get_conf_command = f"python3 ./../Codes/get_conf.py -f {hosts_file_path}"
-                get_conf_process = subprocess.run(get_conf_command, shell=True)
-
-                get_ring_command = f"python3 ./../Codes/get_ring.py -f {hosts_file_path}"
-                get_ring_process = subprocess.run(get_ring_command, shell=True)
-
-                # Move all *.conf from . to result
-                ring_mv_command = f"mv *.conf {conf_address}"
-                ring_mv_process = subprocess.run(ring_mv_command, shell=True)
-
-                conf_mv_command = f"mv *.txt {Ring_address}"
-                conf_mv_process = subprocess.run(conf_mv_command, shell=True)
-
-                subprocess.call(['python3', backup_script_path, '-t', final_workload_name])
-
-                # Construct the status-reporter command with the variables
-                other_script_command = f"python3 status-reporter.py {metric_sum_file},{time_file_path},{result_file_path}"
-                #time.sleep(120)
-                subprocess.call(other_script_command, shell=True)
 
         except Exception as e:
             print(f"\033[91mAn error occurred for workload {workload}: {str(e)}\033[0m")
