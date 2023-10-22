@@ -138,7 +138,7 @@ with open(CONFIG_FILE, 'r') as config_file:
                                                 # Construct the curl command for query 2
                                                 query2_curl_command = f'curl -sG "http://{IP_PORT}/query" --data-urlencode "db={DATABASE}" --data-urlencode "q=SELECT {metric_prefix}(\\"value\\") FROM /{metric_name}/ WHERE (\\"host\\" =~ /^{host}$/) AND time >= \'{start_time_utc}\' AND time <= \'{end_time_utc}\' GROUP BY time(10s) fill(none)"'
                                                 query2_output = subprocess.getoutput(query2_curl_command)
-                                                os.system(f"python3 image-renderer.py '{query2_output}' '{host}' '{PARENT_DIR}'")
+                                                os.system(f"python3 image_renderer.py '{query2_output}' '{host}' '{PARENT_DIR}'")
 
                             with open(output_csv_all, 'a') as csv_file:
                                 csv_file.write(line_values + "\n")
