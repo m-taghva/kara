@@ -121,20 +121,17 @@ def process_input_file(file_path_input):
                 else:
                     print("\033[91mBackup failed.\033[0m")
                     sys.exit(1)
-                print()
-
+                    
                 # Tar backup files and delete extra files
                 tar_command = f"tar -cf {Primary_influxdb_address_in_host}/{backup_dir_name}/backup.tar.gz -C {Primary_influxdb_address_in_host}/{backup_dir_name}/backup . "
                 tar_process = subprocess.run(tar_command, shell=True)
                 exit_code = tar_process.returncode
                 if exit_code == 0:
                     #print("\033[92mTar successful.\033[0m")
-                    #print()
                     bar()
                 else:
                     print("\033[91mTar failed.\033[0m")
                     sys.exit(1)
-                    print()
 
                 # Delete backup directory files
                 del_command = f"rm -rf {Primary_influxdb_address_in_host}/{backup_dir_name}/backup/*"
@@ -158,7 +155,6 @@ def process_input_file(file_path_input):
                 else:
                     print("\033[91mMoving files failed.\033[0m")
                     sys.exit(1)
-                    print()
 
 process_input_file(input_file)
 #print(f"*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* END OF BACKUP FOR\033[92m {testDirectory} \033[0m*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
