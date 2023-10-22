@@ -41,5 +41,11 @@ def main(argv):
     run = f"python3 main2.py  {script_file}"
     run_process = subprocess.run(run,shell=True)
 
+    # Check if the subprocess has finished
+    if run_process.returncode == 0:
+       # Run another Python script after workloadgen.py has finished
+       merge = ["python3", "csv-merger.py", "./../result,all_hosts_output.csv"] 
+       subprocess.run(merge, check=True)
+
 if __name__ == "__main__":
     main(sys.argv[1:])
