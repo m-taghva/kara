@@ -223,7 +223,6 @@ def process_on_workloads(workloads_dir_path):
 
                 perform_backup_and_report(final_workload_name, time_file_path, result_file_path)
 
-
         except Exception as e:
             print(f"\033[91mAn error occurred for workload {workload}: {str(e)}\033[0m")
             continue
