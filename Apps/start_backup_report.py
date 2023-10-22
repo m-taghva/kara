@@ -37,6 +37,4 @@ def perform_backup_and_report(final_workload_name, time_file_path, result_file_p
 
     # Construct the status-reporter command with the variables
     other_script_command = f"python3 status_reporter.py {metric_sum_file},{time_file_path},{result_file_path}"
-    subprocess.call(other_script_command, shell=True)
-    merge_csv = ["python3", "csv_merger.py", "./../result,all_hosts_output.csv"]
-    subprocess.run(merge_csv, check=True)    
+    subprocess.call(other_script_command, shell=True) 
