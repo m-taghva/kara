@@ -38,7 +38,7 @@ def main(argv):
             script_file = arg
  
     # Call the main program 
-    run = f"python3 main2.py  {script_file} -p ./../cosbench-xml/workload-gen/all-xml"
+    run = f"python3 main2.py  {script_file}"
     run_process = subprocess.run(run,shell=True)
 
 if __name__ == "__main__":
