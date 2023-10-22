@@ -103,7 +103,8 @@ def main():
                     csv_writer = csv.writer(output_csv)
                     merge_csv_files(subdirectory_path, csv_writer, extracted_data, first_target_directory, selected_csv)
     print("")
-    print(f"{YELLOW}merged CSV file '{output_csv_path}' has been created with the extracted values{RESET}")
+    print(f"{BOLD}merged CSV file{RESET}{YELLOW}{output_csv_path}{RESET}{YELLOW}has been created with the extracted values{RESET}")
     print("")
+    
 if __name__ == "__main__":
     main()
