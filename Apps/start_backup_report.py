@@ -15,7 +15,7 @@ metric_min_file = "./../conf/Status-reporter/min_metric_list.txt"
 def perform_backup_and_report(final_workload_name, time_file_path, result_file_path):
  
     # Construct the status-reporter command with the variables
-    status = f"python3 status_reporter.py {metric_sum_file},{time_file_path},{result_file_path}"
+    status = f"python3 ./../status/status_reporter.py {metric_sum_file},{time_file_path},{result_file_path}"
     subprocess.call(status, shell=True) 
     
     # Start backup phase and its process & get-ring and get-conf to result dir
