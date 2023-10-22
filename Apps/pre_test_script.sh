@@ -1,1 +1,1 @@
-echo hiiiiiiiii
+echo "test script"
