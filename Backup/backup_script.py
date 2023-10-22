@@ -35,7 +35,15 @@ ring_dir_in_result_path = "./../result/"+testDirectory+"/Ring_cluster"
 conf_dir_in_result_path = "./../result/"+testDirectory+"/Config_cluster"
 
 #time defenition
-gmt_offset_seconds = 3 * 3600 + 30 * 60
+def tehran_time_to_utc(tehran_time_str):
+    # Create timezone objects for Tehran and UTC
+    tehran_tz = pytz.timezone('Asia/Tehran')
+    utc_tz = pytz.utc
+    # Parse the input string as a datetime object with the Tehran timezone
+    tehran_time = tehran_tz.localize(tehran_time_str)
+    # Convert the Tehran time to UTC
+    utc_time = tehran_time.astimezone(utc_tz)
+    return utc_time
 
 # Add 1-minute delay
 #time.sleep(60)
@@ -60,13 +68,13 @@ def process_input_file(file_path_input):
                 end_datetime = datetime.datetime.strptime(end_datetime_str, "%Y-%m-%d %H:%M:%S")
                 bar()
 
-                # Add the GMT+03:30 offset to both datetime objects
-                start_datetime_utc = start_datetime - datetime.timedelta(seconds=gmt_offset_seconds)
-                end_datetime_utc = end_datetime - datetime.timedelta(seconds=gmt_offset_seconds)
+                # Convert Tehran time to UTC
+                start_datetime_utc = tehran_time_to_utc(start_datetime)
+                end_datetime_utc = tehran_time_to_utc(end_datetime)
                 bar()
 
-                dir_start_datetime_utc = start_datetime - datetime.timedelta(seconds=gmt_offset_seconds)
-                dir_end_datetime_utc = end_datetime - datetime.timedelta(seconds=gmt_offset_seconds)
+                dir_start_datetime_utc = tehran_time_to_utc(start_datetime)
+                dir_end_datetime_utc = tehran_time_to_utc(end_datetime)
                 bar()
 
                 # Add the specified number of seconds to both datetime objects
