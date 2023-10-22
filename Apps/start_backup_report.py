@@ -36,5 +36,5 @@ def perform_backup_and_report(final_workload_name, time_file_path, result_file_p
     subprocess.call(['python3', backup_script_path, '-t', final_workload_name])
 
     # Construct the status-reporter command with the variables
-    other_script_command = f"python3 status-reporter.py {metric_sum_file},{time_file_path},{result_file_path}"
+    other_script_command = f"python3 status_reporter.py {metric_sum_file},{time_file_path},{result_file_path}"
     subprocess.call(other_script_command, shell=True)
