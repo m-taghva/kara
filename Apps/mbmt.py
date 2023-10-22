@@ -8,19 +8,16 @@ import subprocess
 def usage():
     print("""
     send_load.py [OPTIONS]
-
 Options:
   -s, --script-file <file>    : Path to the script file. (Default: ./pre_test_script.sh)
 
 Description:
   This script sends load to a cluster based on the provided benchmark and default files.
   Script-file is executed before every test.
-
+  
 Example usage:
-
   send_load.py -s /path/to/script.sh    (uses default benchmark and default files)
 """)
-
 
 def main(argv):
     # Default input and default files
