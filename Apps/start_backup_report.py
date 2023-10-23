@@ -12,12 +12,16 @@ metric_mean_file = "./../conf/Status-reporter/mean_metric_list.txt"
 metric_max_file = "./../conf/Status-reporter/max_metric_list.txt"
 metric_min_file = "./../conf/Status-reporter/min_metric_list.txt"
 
-def perform_backup_and_report(final_workload_name, time_file_path, result_file_path):
+def perform_backup_and_report(start_time, end_time, time_file_path, result_file_path):
  
     # Construct the status-reporter command with the variables
     status = f"python3 ./../status/status_reporter.py {metric_sum_file},{time_file_path},{result_file_path}"
     subprocess.call(status, shell=True) 
     
+    # Construct the backup command with the variables
+    backup = f"python3 ./../Backup/backup_script.py -t '{start_time},{end_time}'"
+    subprocess.call(backup, shell=True)
+  
     # Start backup phase and its process & get-ring and get-conf to result dir
     Ring_address = os.path.join(result_path, final_workload_name, 'Ring_cluster')
     os.makedirs(Ring_address, exist_ok=True)
@@ -37,5 +41,3 @@ def perform_backup_and_report(final_workload_name, time_file_path, result_file_p
 
     conf_mv_command = f"mv *.txt {Ring_address}"
     conf_mv_process = subprocess.run(conf_mv_command, shell=True)
-    
-    subprocess.call(['python3', backup_script_path, '-t', final_workload_name])
