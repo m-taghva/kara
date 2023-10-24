@@ -90,12 +90,12 @@ def process_input_file(start_time_str, end_time_str):
         bar()
 
         # Create backup_path
-        backup_path = Backup_dir_in_container + "/" + backup_dir_name
+        backup_path = f"{Backup_dir_in_container}/{backup_dir_name}"
         os.makedirs(backup_path, exist_ok=True)
         bar()
 
         # Perform backup using influxd backup command
-        backup_command = f"sudo ssh -p {Port} {User}@{Influxdb_host_ip} 'sudo docker exec -i -u root {Influxdb_container_name} influxd backup -portable -db {Influxdb_DB_name} -start {start_time_backup} -end {end_time_backup} {backup_path}/backup > /dev/null 2>&1'"
+        backup_command = f"ssh -p {Port} {User}@{Influxdb_host_ip} 'docker exec -i -u root {Influxdb_container_name} influxd backup -portable -db {Influxdb_DB_name} -start {start_time_backup} -end {end_time_backup} {backup_path}/backup > /dev/null 2>&1'"
         backup_process = subprocess.run(backup_command, shell=True)
         exit_code = backup_process.returncode
         if exit_code == 0:
@@ -105,7 +105,7 @@ def process_input_file(start_time_str, end_time_str):
             sys.exit(1)
 
         # Tar backup files and delete extra files
-        tar_command = f"sudo ssh -p {Port} {User}@{Influxdb_host_ip} 'sudo tar -cf {Backup_dir_in_host}/{backup_dir_name}/backup.tar.gz -C {Backup_dir_in_host}/{backup_dir_name}/backup .' "
+        tar_command = f"ssh -p {Port} {User}@{Influxdb_host_ip} 'sudo tar -cf {Backup_dir_in_host}/{backup_dir_name}/backup.tar.gz -C {Backup_dir_in_host}/{backup_dir_name}/backup .' "
         tar_process = subprocess.run(tar_command, shell=True)
         exit_code = tar_process.returncode
         if exit_code == 0:
@@ -115,13 +115,13 @@ def process_input_file(start_time_str, end_time_str):
             sys.exit(1)
 
         # Delete backup directory files
-        del_command = f"sudo ssh -p {Port} {User}@{Influxdb_host_ip} 'sudo rm -rf {Backup_dir_in_host}/{backup_dir_name}/backup'"
+        del_command = f"ssh -p {Port} {User}@{Influxdb_host_ip} 'sudo rm -rf {Backup_dir_in_host}/{backup_dir_name}/backup'"
         del_process = subprocess.run(del_command, shell=True)
         bar()
 
         # Move backup.tar.gz to secondary host and delete original file
         os.makedirs(Backup_dir_in_second_host, exist_ok=True)
-        mv_command = f"sudo scp -3 -r scp://{User}@{Influxdb_host_ip}:{Port}/{Backup_dir_in_host}/{backup_dir_name}  scp://{User}@{Second_host_ip}:{Port}/{Backup_dir_in_second_host}"
+        mv_command = f"scp -3 -r scp://{User}@{Influxdb_host_ip}:{Port}/{Backup_dir_in_host}/{backup_dir_name}  scp://{User}@{Second_host_ip}:{Port}/{Backup_dir_in_second_host}"
         mv_process = subprocess.run(mv_command, shell=True)
         exit_code = mv_process.returncode
         if exit_code == 0:
