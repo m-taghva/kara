@@ -15,14 +15,18 @@ influxdb_conf_file_path = "./../conf/Software/InfluxdbConfig.json"
 # Load the JSON data from the file and define addresses as variables
 with open(influxdb_conf_file_path, 'r') as file:
     json_data = json.load(file)
-Primary_influxdb_in_container_address = json_data['Main_influxdb_in_container_address']
-Primary_influxdb_address_in_host = json_data['Main_influxdb_address_in_host']
-Secondary_influxdb_address_in_host = json_data['Backup_influxdb_address_in_host']
-Primary_influxdb_container_name = json_data['Main_influxdb_container_name']
-Secondary_influxdb_container_name = json_data['Backup_influxdb_container_name']
+Port = int(json_data['Ssh_port_influx_host'])
+User = json_data['User_influxdb_host']
+Influxdb_container_port = int(json_data['Influxdb_container_port'])
+Influxdb_host_ip = json_data['Influxdb_host_ip']
+Second_host_ip = json_data['Second_host_ip']
+Backup_dir_in_container = json_data['Backup_dir_in_container']
+Backup_dir_in_host = json_data['Backup_dir_in_host']
+Backup_dir_in_second_host = json_data['Backup_dir_in_second_host']
+Influxdb_container_name = json_data['Influxdb_container_name']
 Time_add_to_end_of_test = int(json_data['Time_add_to_end_of_test'])
 Time_reduce_from_first_of_test = int(json_data['Time_reduce_from_first_of_test'])
-Main_influxdb_DB_name = json_data['Main_influxdb_DB_name']
+Influxdb_DB_name = json_data['Influxdb_DB_name']
 
 # Command-line argument parsing
 argParser = argparse.ArgumentParser()
@@ -86,13 +90,12 @@ def process_input_file(start_time_str, end_time_str):
         bar()
 
         # Create backup_path
-        backup_path2 = Primary_influxdb_in_container_address + "/" + backup_dir_name
-        backup_path = f"{Primary_influxdb_in_container_address}/{backup_dir_name}"
+        backup_path = Backup_dir_in_container + "/" + backup_dir_name
         os.makedirs(backup_path, exist_ok=True)
         bar()
 
         # Perform backup using influxd backup command
-        backup_command = f"docker exec -it {Primary_influxdb_container_name} influxd backup -portable -db {Main_influxdb_DB_name} -start {start_time_backup} -end {end_time_backup} {backup_path2}/backup > /dev/null 2>&1"
+        backup_command = f"sudo ssh -p {Port} {User}@{Influxdb_host_ip} 'sudo docker exec -i -u root {Influxdb_container_name} influxd backup -portable -db {Influxdb_DB_name} -start {start_time_backup} -end {end_time_backup} {backup_path}/backup > /dev/null 2>&1'"
         backup_process = subprocess.run(backup_command, shell=True)
         exit_code = backup_process.returncode
         if exit_code == 0:
@@ -102,7 +105,7 @@ def process_input_file(start_time_str, end_time_str):
             sys.exit(1)
 
         # Tar backup files and delete extra files
-        tar_command = f"tar -cf {Primary_influxdb_address_in_host}/{backup_dir_name}/backup.tar.gz -C {Primary_influxdb_address_in_host}/{backup_dir_name}/backup . "
+        tar_command = f"sudo ssh -p {Port} {User}@{Influxdb_host_ip} 'sudo tar -cf {Backup_dir_in_host}/{backup_dir_name}/backup.tar.gz -C {Backup_dir_in_host}/{backup_dir_name}/backup .' "
         tar_process = subprocess.run(tar_command, shell=True)
         exit_code = tar_process.returncode
         if exit_code == 0:
@@ -112,13 +115,13 @@ def process_input_file(start_time_str, end_time_str):
             sys.exit(1)
 
         # Delete backup directory files
-        del_command = f"rm -rf {Primary_influxdb_address_in_host}/{backup_dir_name}/backup/*"
+        del_command = f"sudo ssh -p {Port} {User}@{Influxdb_host_ip} 'sudo rm -rf {Backup_dir_in_host}/{backup_dir_name}/backup'"
         del_process = subprocess.run(del_command, shell=True)
         bar()
 
         # Move backup.tar.gz to secondary host and delete original file
-        os.makedirs(Secondary_influxdb_address_in_host, exist_ok=True)
-        mv_command = f"mv -f -u {Primary_influxdb_address_in_host}/{backup_dir_name} {Secondary_influxdb_container_name}"
+        os.makedirs(Backup_dir_in_second_host, exist_ok=True)
+        mv_command = f"sudo scp -3 -r scp://{User}@{Influxdb_host_ip}:{Port}/{Backup_dir_in_host}/{backup_dir_name}  scp://{User}@{Second_host_ip}:{Port}/{Backup_dir_in_second_host}"
         mv_process = subprocess.run(mv_command, shell=True)
         exit_code = mv_process.returncode
         if exit_code == 0:
