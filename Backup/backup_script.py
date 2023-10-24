@@ -95,7 +95,7 @@ def process_input_file(start_time_str, end_time_str):
         bar()
 
         # Perform backup using influxd backup command
-        backup_command = f"ssh -p {Port} {User}@{Influxdb_host_ip} 'docker exec -i -u root {Influxdb_container_name} influxd backup -portable -db {Influxdb_DB_name} -start {start_time_backup} -end {end_time_backup} {backup_path}/backup > /dev/null 2>&1'"
+        backup_command = f"ssh -p {Port} {User}@{Influxdb_host_ip} 'sudo docker exec -i -u root {Influxdb_container_name} influxd backup -portable -db {Influxdb_DB_name} -start {start_time_backup} -end {end_time_backup} {backup_path}/backup > /dev/null 2>&1'"
         backup_process = subprocess.run(backup_command, shell=True)
         exit_code = backup_process.returncode
         if exit_code == 0:
