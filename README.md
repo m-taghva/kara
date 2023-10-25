@@ -40,4 +40,7 @@ this project is related to https://github.com/alireza-hdri/ClusterBench and http
        - how to use backup script:
        - add new same users in influx host and your server : # adduser
        - edit sudoers file in both servers and add new user to it after %sudo group :  user1   ALL=(ALL) NOPASSWD: ALL
-       - 
+       - switch to new user for influx host server and create ssh key: ssh-keygen (make sure new key just for new user and his .ssh directory)
+       - copy public key to your server: ssh-copy-id -p <port> user@ip
+       - now change setting inside BackupConfig.json
+       - run backup like this: # ptython3 backup_script.py -t 'start time(y-m-d h-m-s),end time(y-m-d h-m-s)' 
