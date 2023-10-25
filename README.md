@@ -6,12 +6,10 @@ this project is related to https://github.com/alireza-hdri/ClusterBench and http
 <img src="MBMT.png" width="1450" height="709"/>
 
 
-
-
     - Install dependencies:
        # apt install jq / yum install jq 
         # pip install pytz datetime matplotlib pandas tqdm  alive_progress
-       ======================================================
+       =====================Status-Reporter==================
        - put your time range inside (time_rangs_taimestamp.txt) like this format: 2023-07-31 09:30:00,2023-07-31 10:30:00
        - write ip and port of influxdb and you data base name and target servers inside (status.conf) like this format: IP:port,DB name,host name:alias (can include # for comment)
        - aliases are used in csv file column
@@ -19,11 +17,10 @@ this project is related to https://github.com/alireza-hdri/ClusterBench and http
        - write your metric file like this: netdata.system.cpu.system (measurment line by line - you can use regex by \\w* in names) (can include # for comment)
        - your metric file prefix can use as expressions
        - you need to give time and metric files and customize path to query_result for saving outputs.
-       ======================================================
        - after complete all files start app with this command:
-           (optional) #./status-reporter.sh metric_list.txt,time.txt,path to query_result
+           (optional) # python3 status-reporter.py metric_list.txt,time.txt,path to query_result
            # python3 regex.py mean_metric_list,sum_metric_list, ... ,time_ranges_utc.txt,path to query_result
-       ======================================================
+       ======================Analyzer========================
        - analyzer can work separately and manually :
            # python3 analyzer.py /csv-path  transformation-directory
        - in analyzer you can do sum or avg on csv columns and make new csv with transformation.
@@ -31,12 +28,12 @@ this project is related to https://github.com/alireza-hdri/ClusterBench and http
        - first line of these files is operastin-new column name like : sum-my.cpu
        - other lines are selected columns.
        - new file is made in input csv directory and name is orginal csv name-transformation directory.csv
-       ======================================================
+       =====================Csv-Merger========================
        - csv-merger.py is a experimental script and just use in some situations.
        - usage:
            # python3 csv-merger.py <path to parent of all query_results>
        - it can include directory name in to the merged of all csv.
-       ======================================================
+       =======================Backup==========================
        - how to use backup script:
        - add new same users in influx host and your server : # adduser
        - edit sudoers file in both servers and add new user to it after %sudo group :  user1   ALL=(ALL) NOPASSWD: ALL
