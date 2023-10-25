@@ -9,7 +9,7 @@ import time
 import pytz
 from alive_progress import alive_bar
 
-# Specify address to InfluxDBConfig.json file
+# Specify address to BackupConfig.json file
 influxdb_conf_file_path = "./../conf/Backup/BackupConfig.json"
 
 # Load the JSON data from the file and define addresses as variables
@@ -19,10 +19,10 @@ Port = int(json_data['Ssh_port_influx_host'])
 User = json_data['User_influxdb_host']
 Influxdb_container_port = int(json_data['Influxdb_container_port'])
 Influxdb_host_ip = json_data['Influxdb_host_ip']
-Second_host_ip = json_data['Second_host_ip']
 Backup_dir_in_container = json_data['Backup_dir_in_container']
 Backup_dir_in_host = json_data['Backup_dir_in_host']
 Backup_dir_in_second_host = json_data['Backup_dir_in_second_host']
+New_location_backup_in_host = json_data['New_location_backup_in_host']
 Influxdb_container_name = json_data['Influxdb_container_name']
 Time_add_to_end_of_test = int(json_data['Time_add_to_end_of_test'])
 Time_reduce_from_first_of_test = int(json_data['Time_reduce_from_first_of_test'])
