@@ -10,7 +10,7 @@ this project is related to https://github.com/alireza-hdri/ClusterBench and http
 
     - Install dependencies:
        # apt install jq / yum install jq 
-        # pip install pytz datetime matplotlib pandas tqdm  
+        # pip install pytz datetime matplotlib pandas tqdm  alive_progress
        ======================================================
        - put your time range inside (time_rangs_taimestamp.txt) like this format: 2023-07-31 09:30:00,2023-07-31 10:30:00
        - write ip and port of influxdb and you data base name and target servers inside (status.conf) like this format: IP:port,DB name,host name:alias (can include # for comment)
