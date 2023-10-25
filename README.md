@@ -36,3 +36,8 @@ this project is related to https://github.com/alireza-hdri/ClusterBench and http
        - usage:
            # python3 csv-merger.py <path to parent of all query_results>
        - it can include directory name in to the merged of all csv.
+       ======================================================
+       - how to use backup script:
+       - add new same users in influx host and your server : # adduser
+       - edit sudoers file in both servers and add new user to it after %sudo group :  user1   ALL=(ALL) NOPASSWD: ALL
+       - 
