@@ -16,7 +16,7 @@ YELLOW = "\033[1;33m"
 START_TIME_SUM = 60
 END_TIME_SUBTRACT = 60
 
-CONFIG_FILE = "status.conf"  # config file for ip:port, db name, host name:alias Change this to your file path
+CONFIG_FILE = "./../conf/Status-reporter/status.conf"  # config file for ip:port, db name, host name:alias Change this to your file path
 
 # Parse command-line arguments
 parser = argparse.ArgumentParser(description="Your script description here.")
