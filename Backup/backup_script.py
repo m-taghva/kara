@@ -21,7 +21,7 @@ Influxdb_container_port = int(json_data['Influxdb_container_port'])
 Influxdb_host_ip = json_data['Influxdb_host_ip']
 Backup_dir_in_container = json_data['Backup_dir_in_container']
 Backup_dir_in_host = json_data['Backup_dir_in_host']
-Backup_dir_in_second_host = json_data['Backup_dir_in_second_host']
+Backup_dir_in_your_server = json_data['Backup_dir_in_your_server']
 New_location_backup_in_host = json_data['New_location_backup_in_host']
 Influxdb_container_name = json_data['Influxdb_container_name']
 Time_add_to_end_of_test = int(json_data['Time_add_to_end_of_test'])
@@ -131,9 +131,9 @@ def process_input_file(start_time_str, end_time_str):
             sys.exit(1)        
 
         # Move backup.tar.gz to secondary host and delete original file
-        os.makedirs(Backup_dir_in_second_host, exist_ok=True)
-        subprocess.run(f"sudo mkdir -p {Backup_dir_in_second_host} && sudo chmod -R 777 {Backup_dir_in_second_host}", shell=True)
-        mv_command = f"scp -r -P {Port} {User}@{Influxdb_host_ip}:{New_location_backup_in_host}  {Backup_dir_in_second_host} > /dev/null 2>&1"
+        os.makedirs(Backup_dir_in_your_server, exist_ok=True)
+        subprocess.run(f"sudo mkdir -p {Backup_dir_in_your_server} && sudo chmod -R 777 {Backup_dir_in_your_server}", shell=True)
+        mv_command = f"scp -r -P {Port} {User}@{Influxdb_host_ip}:{New_location_backup_in_host}  {Backup_dir_in_your_server} > /dev/null 2>&1"
         mv_process = subprocess.run(mv_command, shell=True)
         exit_code = mv_process.returncode
         if exit_code == 0:
