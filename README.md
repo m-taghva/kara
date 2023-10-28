@@ -6,6 +6,9 @@ this project is related to https://github.com/alireza-hdri/ClusterBench and http
 <img src="MBMT.png" width="1450" height="709"/>
 
 
+    
+    # Attention ! after clone repository, please remove (.placeholder) files inside ./result/ and Testlist_Work/workloads/ 
+    
     - Install dependencies:
        # apt install jq / yum install jq 
         # pip install pytz datetime matplotlib pandas tqdm  alive_progress
