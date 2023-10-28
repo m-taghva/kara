@@ -1,6 +1,5 @@
 import sys
 import subprocess
-import generate_xml
 import os
 import time
 import shutil
