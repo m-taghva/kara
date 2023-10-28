@@ -1,1 +1,0 @@
-this file is for saving Ring dir inside git , do not change or remove it , this is not handy !
