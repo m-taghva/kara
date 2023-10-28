@@ -4,6 +4,13 @@ import sys
 import getopt
 import os
 import subprocess
+import shutil
+
+# Defining paths
+metric_sum_file = "./../conf/Status-reporter/sum_metric_list.txt"
+metric_mean_file = "./../conf/Status-reporter/mean_metric_list.txt"
+metric_max_file = "./../conf/Status-reporter/max_metric_list.txt"
+metric_min_file = "./../conf/Status-reporter/min_metric_list.txt"
 
 def usage():
     print("""
@@ -35,14 +42,24 @@ def main(argv):
             script_file = arg
  
     # Call the main program 
-    run = f"python3 main2.py  {script_file}"
-    run_process = subprocess.run(run,shell=True)
+    work = f"python3 workloadgen.py  {script_file}"
+    work_process = subprocess.run(work,shell=True)
 
     # Check if the subprocess has finished
-    if run_process.returncode == 0:
-       # Run another Python script after workloadgen.py has finished
-       merge = ["python3", "./../status/csv-merger.py", "./../result,all_hosts_output.csv"]
-       subprocess.run(merge, check=True)
+    if work_process.returncode == 0:
+        # Run another Python script after workloadgen.py has finished
+        merge = ["python3", "./../status/csv_merger.py", "./../result,all_hosts_output.csv"]
+        subprocess.run(merge, check=True)
+
+def perform_backup_and_report(start_time, end_time, time_file_path, result_file_path):
+ 
+     # Construct the status-reporter command with the variables
+     status = f"python3 ./../status/status_reporter.py {metric_sum_file},{time_file_path},{result_file_path}"
+     subprocess.call(status, shell=True) 
+    
+     # Construct the backup command with the variables
+     backup = f"python3 ./../Backup/backup_script.py -t '{start_time},{end_time}'"
+     subprocess.call(backup, shell=True)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
