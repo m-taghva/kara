@@ -5,7 +5,7 @@
     "Influxdb_host_ip": "192.238.140.150",
     "Backup_dir_in_container": "/var/lib/influxdb/MBT_BACKUP",
     "Backup_dir_in_host": "/root/monster/hayoola-mc/influxdb-data/MBT_BACKUP",
-    "Backup_dir_in_second_host": "/tmp/influxdb-backup",
+    "Backup_dir_in_your_server": "/tmp/influxdb-backup",
     "New_location_backup_in_host": "/tmp/MBT_BACKUP_DST",
     "Influxdb_container_name": "influxdb",
     "Time_add_to_end_of_test": 600,
