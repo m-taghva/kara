@@ -28,7 +28,7 @@ Example usage:
 
 def main(argv):
     # Default input and default files
-    script_file = "./pre_test_script.sh"
+    script_file = "./Testlist_Work/pre_test_script.sh"
 
     # Parse command line arguments
     try:
