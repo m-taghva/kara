@@ -18,7 +18,7 @@ result_path = './../result/'
 pre_test_script_path = script_file_path
 workloads_dir_path = "./workloads"
 config_gen_path = "config_gen.py"
-input_txt_path = "./input.txt"
+input_txt_path = "./input"
 submit = 'submit'
 max_pre_test_script_failure = 3
 
