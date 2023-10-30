@@ -48,7 +48,7 @@ def main(argv):
     # Check if the subprocess has finished
     if work_process.returncode == 0:
         # Run another Python script after workloadgen.py has finished
-        merge = ["python3", "./Status/csv_merger.py", "./../result,all_hosts_output.csv"]
+        merge = ["python3", "./../Status/csv_merger.py", "./../result,all_hosts_output.csv"]
         subprocess.run(merge, check=True)
 
 def perform_backup_and_report(start_time, end_time, time_file_path, result_file_path):
