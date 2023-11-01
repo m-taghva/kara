@@ -54,7 +54,7 @@ def main(argv):
 def perform_backup_and_report(start_time, end_time, time_file_path, result_file_path):
  
      # Construct the status-reporter command with the variables
-     status = f"python3 ./../Status/status_reporter.py {metric_sum_file},{time_file_path},{result_file_path}"
+     status = f"python3 ./../Status/status_reporter.py -m {metric_sum_file} -t '{start_time},{end_time}' -d {result_file_path}"
      subprocess.call(status, shell=True) 
     
      # Construct the backup command with the variables
