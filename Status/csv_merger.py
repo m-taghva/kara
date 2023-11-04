@@ -42,15 +42,21 @@ def merge_csv_files(target_directory_path, output_csv_writer, extracted_data, fi
     for i, csv_file_path in enumerate(csv_file_paths):
         headers, input_data = read_csv_data(csv_file_path)
         if i == 0 and target_directory_path == first_target_directory:
-            # Write the header row with the extracted strings and original headers for the first target directory
-            header_row = list(extracted_data.keys()) + headers
+            # Write the header row with the extracted strings, original headers, and "CSV File Name" as the first column for the first target directory
+            header_row = ["Time Ranges"] + list(extracted_data.keys()) + headers
             output_csv_writer.writerow(header_row)
-        concatenated_data.extend(input_data)
+        for row in input_data:
+            # Get the CSV file name without the ".csv" extension
+            csv_file_name = os.path.basename(csv_file_path)
+            csv_name_without_extension = os.path.splitext(csv_file_name)[0]
+            # Append the CSV file name without extension as the first column
+            row = [csv_name_without_extension] + row
+            concatenated_data.append(row)
 
     # Write the data to the output CSV
     extracted_numbers = list(extracted_data.values())
     for row in concatenated_data:
-        output_csv_writer.writerow(extracted_numbers + row)
+        output_csv_writer.writerow([csv_name_without_extension] + extracted_numbers + row)
 
 def main():
     # Check if the correct number of command-line arguments is provided
