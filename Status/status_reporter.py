@@ -45,9 +45,9 @@ os.makedirs(OUTPUT_PARENT_DIR, exist_ok=True)
 # Generate CSV file name based on the time range
 time_range_parts = time_range.split(',')
 start_time, end_time = time_range_parts[0], time_range_parts[1]
-start_time_csv = start_time.replace(" ", "-").replace(":", "")
-end_time_csv = end_time.replace(" ", "-").replace(":", "")
-csv_file_name = f"{start_time_csv}-{end_time_csv}.csv"
+start_time_csv = start_time.replace(" ", "-")
+end_time_csv = end_time.replace(" ", "-")
+csv_file_name = f"{start_time_csv}_{end_time_csv}.csv"
 output_csv_all = os.path.join(OUTPUT_PARENT_DIR, csv_file_name)
 
 # Initialize the CSV file with the header
