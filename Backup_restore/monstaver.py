@@ -10,7 +10,7 @@ import pytz
 from alive_progress import alive_bar
 
 # Specify address to BackupConfig.json file
-influxdb_conf_file_path = "./../conf/Backup/BackupConfig.json"
+influxdb_conf_file_path = "./../conf/Backup_Restore/BackupRestore.json"
 
 # Load the JSON data from the file and define addresses as variables
 with open(influxdb_conf_file_path, 'r') as file:
