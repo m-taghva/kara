@@ -47,7 +47,7 @@ def tehran_time_to_utc(tehran_time_str):
 
 # Function to process the input file
 def process_input_file(start_time_str, end_time_str):
-    with alive_bar(13, title=f'\033[1mProcessing Test\033[0m:\033[92m{start_time_str}-{end_time_str}\033[0m') as bar:
+    with alive_bar(12, title=f'\033[1mProcessing Test\033[0m:\033[92m{start_time_str}-{end_time_str}\033[0m') as bar:
         # Convert start and end datetime strings to datetime objects
         start_datetime = datetime.datetime.strptime(start_time_str, "%Y-%m-%d %H:%M:%S")
         end_datetime = datetime.datetime.strptime(end_time_str, "%Y-%m-%d %H:%M:%S")
@@ -56,10 +56,6 @@ def process_input_file(start_time_str, end_time_str):
         # Convert Tehran time to UTC
         start_datetime_utc = tehran_time_to_utc(start_datetime)
         end_datetime_utc = tehran_time_to_utc(end_datetime)
-        bar()
-
-        dir_start_datetime_utc = tehran_time_to_utc(start_datetime)
-        dir_end_datetime_utc = tehran_time_to_utc(end_datetime)
         bar()
 
         # Add the specified number of seconds to both datetime objects
