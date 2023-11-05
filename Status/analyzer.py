@@ -61,6 +61,3 @@ print(f"Final Analyzed CSV file: {final_output_csv_path}")
 intermediate_csv_path = os.path.join(os.path.dirname(csv_original), "intermediate.csv")
 if os.path.exists(intermediate_csv_path):
     os.remove(intermediate_csv_path)
-    #print(f"Intermediate CSV file removed: {intermediate_csv_path}")
-#else:
-    #print("Intermediate CSV file does not exist.")
