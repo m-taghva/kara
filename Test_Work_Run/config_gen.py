@@ -7,13 +7,13 @@ def replace_tags(input_text,conf_name):
     global conf_number
     currentTag = re.search("#\d+{", input_text)
     if currentTag:
-        TagReg = currentTag.group() + "[^}]+}[^#]*#"
-        for i in range(len(re.search(TagReg, input_text).group().split('}')[0].split(','))):
+        TagRegex = currentTag.group() + "[^}]+}[^#]*#"
+        for i in range(len(re.search(TagRegex, input_text).group().split('}')[0].split(','))):
             newInput = input_text
             tagName=""
-            for similarTag in re.findall(TagReg, input_text):
+            for similarTag in re.findall(TagRegex, input_text):
                 similarTagList = similarTag.split('{')[1].split('}')[0].split(',')
-                newInput = re.sub(TagReg, similarTagList[i], newInput, 1)
+                newInput = re.sub(TagRegex, similarTagList[i], newInput, 1)
                 tagName += ("#" + re.search("(?<=})[^#]*(?=#)", similarTag).group() +":"+ str(similarTagList[i]))
             replace_tags(newInput,conf_name+tagName)
     else:
