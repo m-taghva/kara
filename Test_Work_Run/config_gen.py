@@ -2,39 +2,36 @@ import re
 import string
 import random
 
-filename = 0
-def replace_tags(input_text,wname):
-    global filename
+conf_number = 0
+def replace_tags(input_text,conf_name):
+    global conf_number
     currentTag = re.search("#\d+{", input_text)
     if currentTag:
         TagReg = currentTag.group() + "[^}]+}[^#]*#"
-        irep = re.search(TagReg, input_text).group().split('}')[0].split(',')
-        for i in range(len(irep)):
-            newFile = input_text
-            tname=""
-            for j in re.findall(currentTag.group(), input_text):
-                rep = re.search(TagReg, newFile)
-                repList = rep.group().split('{')[1].split('}')[0].split(',')
-                newFile = re.sub(TagReg, repList[i], newFile, 1)
-                tname += ("#" + re.search("}[^#]*#", rep.group()).group().split('}')[1].split('#')[0] +":"+ str(repList[i]))
-            replace_tags(newFile,wname+tname)
+        for i in range(len(re.search(TagReg, input_text).group().split('}')[0].split(','))):
+            newInput = input_text
+            tagName=""
+            for similarTag in re.findall(TagReg, input_text):
+                similarTagList = similarTag.split('{')[1].split('}')[0].split(',')
+                newInput = re.sub(TagReg, similarTagList[i], newInput, 1)
+                tagName += ("#" + re.search("(?<=})[^#]*(?=#)", similarTag).group() +":"+ str(similarTagList[i]))
+            replace_tags(newInput,conf_name+tagName)
     else:
-        filename += 1
-        currenctVar = re.search("\?\d+L\d+[sd]", input_text)
-        replace_vars(input_text,"{:04}".format(filename)+wname)
+        conf_number += 1
+        replace_vars(input_text,"{:04}".format(conf_number)+conf_name)
 
-def replace_vars(input_text,wname):
+def replace_vars(input_text,conf_name):
     currenctVar = re.search("\?\d+L\d+[sd]", input_text)
     if currenctVar:
         if currenctVar.group()[-1]=='s':
-            replace_vars(input_text.replace(currenctVar.group(), str(''.join(random.choices(string.ascii_uppercase + string.digits, k=int(currenctVar.group().split('L')[1].split('s')[0]))))),wname)
+            replace_vars(input_text.replace(currenctVar.group(), str(''.join(random.choices(string.ascii_uppercase + string.digits, k=int(currenctVar.group().split('L')[1].split('s')[0]))))),conf_name)
         else:
-            replace_vars(input_text.replace(currenctVar.group(), str(''.join(random.choices(string.digits, k=int(currenctVar.group().split('L')[1].split('d')[0]))))),wname)
+            replace_vars(input_text.replace(currenctVar.group(), str(''.join(random.choices(string.digits, k=int(currenctVar.group().split('L')[1].split('d')[0]))))),conf_name)
     else:
-        with open(f"./workloads/{wname}#.xml", 'w') as outfile:
+        with open(f"./workloads/{conf_name}#.xml", 'w') as outfile:
             outfile.write(input_text)
 
 # Read the input file
-with open('input', 'r') as infile:
-    input_text = infile.read()
+with open('input.txt', 'r') as inputFile:
+    input_text = inputFile.read()
 replace_tags(input_text,"")
