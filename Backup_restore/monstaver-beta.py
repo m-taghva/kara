@@ -8,7 +8,7 @@ import yaml
 from alive_progress import alive_bar
 
 # Specify address to BackupConfig.json file
-config_file = "./../conf/Backup/monstaver.yml"
+config_file = "./../conf/Backup_Restore/monstaver-conf-beta.yml"
 
 def load_config(config_file):
     with open(config_file, "r") as stream:
