@@ -186,43 +186,43 @@ def process_input_file(start_time_str, end_time_str):
           port = value['port']
           print(user + "," + ip + "," + str(port))
    
-          get_conf_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > Backup_dir_in_your_server/{container_name}-object-server.conf"
+          get_conf_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {Backup_dir_in_your_server}/{container_name}-object-server.conf"
           get_conf_process = subprocess.run(get_conf_command, shell=True)
           bar()
           if get_conf_process.returncode == 1:
              print("\033[91mFailure in getting object-server.conf\033[0m")
              
-          get_conf_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/container-server.conf > Backup_dir_in_your_server/{container_name}-container-server.conf"
+          get_conf_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/container-server.conf > {Backup_dir_in_your_server}/{container_name}-container-server.conf"
           get_conf_process = subprocess.run(get_conf_command, shell=True)
           bar()
           if get_conf_process.returncode == 1:
              print("\033[91mFailure in getting container-server.conf\033[0m")
           
-          get_conf_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/account-server.conf > Backup_dir_in_your_server/{container_name}-account-server.conf"
+          get_conf_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/account-server.conf > {Backup_dir_in_your_server}/{container_name}-account-server.conf"
           get_conf_process = subprocess.run(get_conf_command, shell=True)
           bar()
           if get_conf_process.returncode == 1:
              print("\033[91mFailure in getting account-server.conf\033[0m")
              
-          get_conf_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/proxy-server.conf > Backup_dir_in_your_server/{container_name}-proxy-server.conf"
+          get_conf_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/proxy-server.conf > {Backup_dir_in_your_server}/{container_name}-proxy-server.conf"
           get_conf_process = subprocess.run(get_conf_command, shell=True)
           bar()
           if get_conf_process.returncode == 1:
              print("\033[91mFailure in getting proxy-server.conf\033[0m")
             
-          get_conf_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/account.builder > Backup_dir_in_your_server/{container_name}-account-ring.txt"
+          get_conf_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/account.builder > {Backup_dir_in_your_server}/{container_name}-account-ring.txt"
           get_conf_process = subprocess.run(get_conf_command, shell=True)
           bar()
           if get_conf_process.returncode == 1:
              print("\033[91mFailure in getting account-ring\033[0m")
              
-          get_conf_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/container.builder > Backup_dir_in_your_server/{container_name}-container-ring.txt"
+          get_conf_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/container.builder > {Backup_dir_in_your_server}/{container_name}-container-ring.txt"
           get_conf_process = subprocess.run(get_conf_command, shell=True)
           bar()
           if get_conf_process.returncode == 1:
              print("\033[91mFailure in getting container-ring\033[0m")
 
-          get_conf_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/object.builder > Backup_dir_in_your_server/{container_name}-object-ring.txt"
+          get_conf_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/object.builder > {Backup_dir_in_your_server}/{container_name}-object-ring.txt"
           get_conf_process = subprocess.run(get_conf_command, shell=True)
           bar()
           if get_conf_process.returncode == 1:
