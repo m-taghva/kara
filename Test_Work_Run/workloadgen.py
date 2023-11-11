@@ -4,7 +4,7 @@ import os
 import time
 import shutil
 import csv
-from mbmt import perform_backup_and_report
+from mpk import perform_backup_and_report
 
 # Getting arguments from send-load.py
 # Arguments are: input file, default file and script file
