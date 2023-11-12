@@ -5,7 +5,7 @@ import re
 import csv
 import shutil
 import time
-import mpk as perform_backup_and_report
+from mpk import perform_backup_and_report
 
 if len(sys.argv) != 2:
     print("Usage: python script.py path_to_xml_file,output_path")
