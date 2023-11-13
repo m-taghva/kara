@@ -151,4 +151,4 @@ copy_file(archive_path + archive_workload_dir_name + '/workload.log', result_pat
 copy_file(archive_path + archive_workload_dir_name + '/workload-config.xml', result_path + '/workload-config.xml', 3)
 copy_file(archive_path + archive_workload_dir_name + '/' + archive_workload_dir_name + '.csv', result_path + '/' + archive_workload_dir_name + '.csv', 3)
 
-#perform_backup_and_report(start_time, end_time, time_file_path, result_path)
+perform_backup_and_report(start_time, end_time, result_path)
