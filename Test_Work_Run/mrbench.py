@@ -131,7 +131,7 @@ archive_workload_dir_name = f"{workload_id}-swift-sample"   #for example: w123-s
 workload_dir_name = workload_config_path.split('/')[-1].replace('.xml','')
 workload_dir_name = create_test_dir(output_path,workload_dir_name)
 print(f"\033[1mWorkload Info:\033[0m ID: {workload_id} Name: {workload_dir_name}")
-result_path = output_path + workload_dir_name
+result_path = f"{output_path}/{workload_dir_name}"
 
 # save time
 # TODO: save time using "cli.sh info" command
