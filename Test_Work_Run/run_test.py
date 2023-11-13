@@ -25,7 +25,7 @@ workload_config_path, output_path = paths
 
 print("")
 print(f"{YELLOW}========================================{RESET}")
-print("Processing input file ...")
+print("Processing input file")
 
 cosbenchBin = shutil.which("cosbench")
 if not(cosbenchBin):
@@ -121,8 +121,8 @@ def copy_file(archive_file_path,result_file_path,max):
     
 #submit workload
 # TODO: check active workloads  
-print("Sending workload ...")
-print("Please wait until the test is finished ...")
+print("Sending workload")
+print("Please wait until the test is finished ... (you can check Cosbench web console)")
 workload_id = submit(workload_config_path) 
 # TODO: if workload_id exists 
 archive_workload_dir_name = f"{workload_id}-swift-sample"   #for example: w123-swift-sample 
