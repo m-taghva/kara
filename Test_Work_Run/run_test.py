@@ -7,6 +7,11 @@ import shutil
 import time
 from mpk import perform_backup_and_report
 
+# For font style
+BOLD = "\033[1m"
+RESET = "\033[0m"
+YELLOW = "\033[1;33m"
+
 if len(sys.argv) != 2:
     print("Usage: python script.py path_to_xml_file,output_path")
     sys.exit(1)
@@ -17,6 +22,9 @@ if len(paths) != 2:
     print("Error: Please provide both path to XML file and output path separated by a comma.")
     sys.exit(1)
 workload_config_path, output_path = paths
+
+print("")
+print(f"{YELLOW}========================================{RESET}")
 print("Processing input file ...")
 
 cosbenchBin = shutil.which("cosbench")
