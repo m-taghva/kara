@@ -25,6 +25,7 @@ workload_config_path, output_path = paths
 
 print("")
 print(f"{YELLOW}========================================{RESET}")
+print("")
 print("Processing input file")
 
 cosbenchBin = shutil.which("cosbench")
