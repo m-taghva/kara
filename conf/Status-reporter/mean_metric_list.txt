@@ -1,2 +1,2 @@
-netdata.system.cpu.system
-netdata.system.cpu.\\w*
+netdata.system.cpu.iowait
+netdata.system.cpu.idle
