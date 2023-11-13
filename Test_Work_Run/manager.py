@@ -31,11 +31,11 @@ def perform_backup_and_report(start_time, end_time, result_path):
     subprocess.call(status, shell=True) 
  
     # Run another Python script after run_test.py has finished
-    merge = ["python3", "./../Status/csv_merger-git2.py", f"{result},*.csv"]
+    merge = ["python3", "./../Status/csv_merger.py", f"{result},*.csv"]
     subprocess.run(merge, check=True)
 
     # Construct the backup command with the variables
-    backup = f"python3 ./../Backup_restore/monstaver-beta9.py -t '{start_time},{end_time}' -d"
+    backup = f"python3 ./../Backup_restore/monstaver.py -t '{start_time},{end_time}' -d"
     subprocess.call(backup, shell=True)
 
 def main(argv):
@@ -56,7 +56,7 @@ def main(argv):
                 sys.exit(1)
 
     # Run config_gen.py
-    config_gen = f"python3 ./config_gen2.py {input_txt},{output_xml}"
+    config_gen = f"python3 ./config_gen.py {input_txt},{output_xml}"
     config_gen_process = subprocess.run(config_gen, shell=True)
     
     # Check if config_gen.py finished successfully
