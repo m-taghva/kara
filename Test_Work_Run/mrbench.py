@@ -144,7 +144,6 @@ start_end_time = f"{start_time},{end_time}"
 time_file.write(start_end_time)
 time_file.close()
 
-
 # copy files
 time.sleep(5)
 print("Copying Cosbench source files ...")
