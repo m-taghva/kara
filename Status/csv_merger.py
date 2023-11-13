@@ -49,14 +49,9 @@ def merge_csv_files(target_directory_path, output_csv_writer, extracted_data, fi
             # Get the CSV file name without the ".csv" extension
             csv_file_name = os.path.basename(csv_file_path)
             csv_name_without_extension = os.path.splitext(csv_file_name)[0]
-            # Append the CSV file name without extension as the first column
-            row = [csv_name_without_extension] + row
-            concatenated_data.append(row)
-
-    # Write the data to the output CSV
-    extracted_numbers = list(extracted_data.values())
-    for row in concatenated_data:
-        output_csv_writer.writerow([csv_name_without_extension] + extracted_numbers + row)
+            # Write the data to the output CSV
+            extracted_numbers = list(extracted_data.values())
+            output_csv_writer.writerow([csv_name_without_extension] + extracted_numbers + row)
 
 def main():
     # Check if the correct number of command-line arguments is provided
