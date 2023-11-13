@@ -144,8 +144,9 @@ start_end_time = f"{start_time},{end_time}"
 time_file.write(start_end_time)
 time_file.close()
 
-time.sleep(5)
+
 # copy files
+time.sleep(5)
 print("Copying Cosbench source files ...")
 copy_file(archive_path + archive_workload_dir_name + '/workload.log', result_path + '/workload.log', 3)
 copy_file(archive_path + archive_workload_dir_name + '/workload-config.xml', result_path + '/workload-config.xml', 3)
