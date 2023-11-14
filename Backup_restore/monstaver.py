@@ -164,95 +164,95 @@ with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start
             print("\033[91mRemove time dir inside container failed.\033[0m")
             sys.exit(1)
 
-        #copy other files
-        input_paths = data_loaded['default_section']['input_paths']
-        for path in input_paths:
-            other_dir = f"sudo cp -rp {path} {backup_dir}/{time_dir}/other_info/"
-            other_dir_process = subprocess.run(other_dir, shell=True)
-            if other_dir_process.returncode == 0:
-                bar()
-            else:
-                print("\033[91mCopy paths failed.\033[0m")
-                sys.exit(1)  
-
-        # copy ring and config to output
-        for key,value in data_loaded['swift_section'].items():
-            container_name = key
-            user = value['user']
-            ip = value['ip']
-            port = value['port']
-   
-            get_conf_one_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {backup_dir}/{time_dir}/swift/{container_name}-object-server.conf"
-            get_conf_one_process = subprocess.run(get_conf_one_command, shell=True)
-            if get_conf_one_process.returncode== 0:
-                bar()
-            else:
-                print("\033[91mFailure in getting object-server.conf\033[0m")
-                sys.exit(1) 
-    
-            get_conf_two_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/container-server.conf > {backup_dir}/{time_dir}/swift/{container_name}-container-server.conf"
-            get_conf_two_process = subprocess.run(get_conf_two_command, shell=True)
-            if get_conf_two_process.returncode== 0:
-                bar()
-            else: 
-                print("\033[91mFailure in getting container-server.conf\033[0m")
-                sys.exit(1)
- 
-            get_conf_three_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/account-server.conf > {backup_dir}/{time_dir}/swift/{container_name}-account-server.conf"
-            get_conf_three_process = subprocess.run(get_conf_three_command, shell=True)
-            if get_conf_three_process.returncode== 0:
-                bar()
-            else: 
-                print("\033[91mFailure in getting account-server.conf\033[0m")
-                sys.exit(1)
- 
-            get_conf_four_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/proxy-server.conf > {backup_dir}/{time_dir}/swift/{container_name}-proxy-server.conf"
-            get_conf_four_process = subprocess.run(get_conf_four_command, shell=True)
-            if get_conf_four_process.returncode== 0:
-                bar()
-            else: 
-                print("\033[91mFailure in getting proxy-server.conf\033[0m")
-                sys.exit(1)
-
-            get_conf_five_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/account.builder > {backup_dir}/{time_dir}/swift/{container_name}-account-ring.txt"
-            get_conf_five_process = subprocess.run(get_conf_five_command, shell=True)
-            if get_conf_five_process.returncode== 0:
-                bar()
-            else: 
-                print("\033[91mFailure in getting account-ring\033[0m")
-                sys.exit(1)
-
-            get_conf_six_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/container.builder > {backup_dir}/{time_dir}/swift/{container_name}-container-ring.txt"
-            get_conf_six_process = subprocess.run(get_conf_six_command, shell=True)
-            if get_conf_six_process.returncode== 0:
-                bar()
-            else:  
-                print("\033[91mFailure in getting container-ring\033[0m")
-                sys.exit(1)
-            
-            get_conf_seven_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/object.builder > {backup_dir}/{time_dir}/swift/{container_name}-object-ring.txt"
-            get_conf_seven_process = subprocess.run(get_conf_seven_command, shell=True)
-            if get_conf_seven_process.returncode== 0:
-                bar()
-            else: 
-                print("\033[91mFailure in getting object-ring\033[0m")
-                sys.exit(1)
-                
-        # tar all result inside output dir
-        tar_output = f"sudo tar -C {backup_dir} -cf {backup_dir}/{time_dir}.tar.gz {time_dir}"
-        tar_output_process = subprocess.run(tar_output, shell=True)
-        if tar_output_process.returncode == 0:
+    #copy other files
+    input_paths = data_loaded['default_section']['input_paths']
+    for path in input_paths:
+        other_dir = f"sudo cp -rp {path} {backup_dir}/{time_dir}/other_info/"
+        other_dir_process = subprocess.run(other_dir, shell=True)
+        if other_dir_process.returncode == 0:
             bar()
         else:
-            print("\033[91mTar time dir inside output dir failed.\033[0m")
+            print("\033[91mCopy paths failed.\033[0m")
+            sys.exit(1)  
+
+    # copy ring and config to output
+    for key,value in data_loaded['swift_section'].items():
+        container_name = key
+        user = value['user']
+        ip = value['ip']
+        port = value['port']
+   
+        get_conf_one_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {backup_dir}/{time_dir}/swift/{container_name}-object-server.conf"
+        get_conf_one_process = subprocess.run(get_conf_one_command, shell=True)
+        if get_conf_one_process.returncode== 0:
+            bar()
+        else:
+            print("\033[91mFailure in getting object-server.conf\033[0m")
+            sys.exit(1) 
+    
+        get_conf_two_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/container-server.conf > {backup_dir}/{time_dir}/swift/{container_name}-container-server.conf"
+        get_conf_two_process = subprocess.run(get_conf_two_command, shell=True)
+        if get_conf_two_process.returncode== 0:
+            bar()
+        else: 
+            print("\033[91mFailure in getting container-server.conf\033[0m")
+            sys.exit(1)
+ 
+        get_conf_three_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/account-server.conf > {backup_dir}/{time_dir}/swift/{container_name}-account-server.conf"
+        get_conf_three_process = subprocess.run(get_conf_three_command, shell=True)
+        if get_conf_three_process.returncode== 0:
+            bar()
+        else: 
+            print("\033[91mFailure in getting account-server.conf\033[0m")
+            sys.exit(1)
+ 
+        get_conf_four_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/proxy-server.conf > {backup_dir}/{time_dir}/swift/{container_name}-proxy-server.conf"
+        get_conf_four_process = subprocess.run(get_conf_four_command, shell=True)
+        if get_conf_four_process.returncode== 0:
+            bar()
+        else: 
+            print("\033[91mFailure in getting proxy-server.conf\033[0m")
             sys.exit(1)
 
-        # delete orginal time dir inside output dir use -d switch        
-        if args.delete:
-           time_del = f"sudo rm -rf {backup_dir}/{time_dir}"
-           time_del_process = subprocess.run(time_del, shell=True)
-           if time_del_process.returncode == 0:
-               time.sleep(1)
-           else:
-               print("\033[91mRemove time dir inside output dir failed.\033[0m")
-               sys.exit(1)
+        get_conf_five_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/account.builder > {backup_dir}/{time_dir}/swift/{container_name}-account-ring.txt"
+        get_conf_five_process = subprocess.run(get_conf_five_command, shell=True)
+        if get_conf_five_process.returncode== 0:
+            bar()
+        else: 
+            print("\033[91mFailure in getting account-ring\033[0m")
+            sys.exit(1)
+
+        get_conf_six_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/container.builder > {backup_dir}/{time_dir}/swift/{container_name}-container-ring.txt"
+        get_conf_six_process = subprocess.run(get_conf_six_command, shell=True)
+        if get_conf_six_process.returncode== 0:
+            bar()
+        else:  
+            print("\033[91mFailure in getting container-ring\033[0m")
+            sys.exit(1)
+            
+        get_conf_seven_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/object.builder > {backup_dir}/{time_dir}/swift/{container_name}-object-ring.txt"
+        get_conf_seven_process = subprocess.run(get_conf_seven_command, shell=True)
+        if get_conf_seven_process.returncode== 0:
+            bar()
+        else: 
+            print("\033[91mFailure in getting object-ring\033[0m")
+            sys.exit(1)
+                
+    # tar all result inside output dir
+    tar_output = f"sudo tar -C {backup_dir} -cf {backup_dir}/{time_dir}.tar.gz {time_dir}"
+    tar_output_process = subprocess.run(tar_output, shell=True)
+    if tar_output_process.returncode == 0:
+        bar()
+    else:
+        print("\033[91mTar time dir inside output dir failed.\033[0m")
+        sys.exit(1)
+
+    # delete orginal time dir inside output dir use -d switch        
+    if args.delete:
+       time_del = f"sudo rm -rf {backup_dir}/{time_dir}"
+       time_del_process = subprocess.run(time_del, shell=True)
+       if time_del_process.returncode == 0:
+            time.sleep(1)
+       else:
+            print("\033[91mRemove time dir inside output dir failed.\033[0m")
+            sys.exit(1)
