@@ -41,7 +41,7 @@ def tehran_time_to_utc(tehran_time_str):
     utc_time = tehran_time.astimezone(utc_tz)
     return utc_time
 
-total_steps = 7 + (len(data_loaded['influxdb_section']) * 8 + len(data_loaded['default_section']['input_paths']) + len(data_loaded['swift_section']) * 7)
+total_steps = 8 + (len(data_loaded['influxdb_section']) * 7 + len(data_loaded['default_section']['input_paths']) + len(data_loaded['swift_section']) * 7)
 with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start_time_str}-{end_time_str}\033[0m') as bar:
 
     def convert_time():
