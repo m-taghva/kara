@@ -47,8 +47,10 @@ def submit(workload_file_path):
     # Extract ID of workload
     output_lines = Cos_bench_command.stdout.splitlines()
     match = re.search('(?<=ID:\s)(w\d+)', output_lines[0])
+    file_name = workload_file_path.split('/')[-1].replace('.xml','')
     if match:
         workload_id = match.group()
+        print(f"\033[1mWorkload Info:\033[0m ID: {workload_id} Name: {file_name}")
     else:
         print("\033[91mStarting workload failed.\033[0m")
         # TODO: error handling
@@ -130,7 +132,6 @@ archive_workload_dir_name = f"{workload_id}-swift-sample"   #for example: w123-s
 #create directory for  workload results
 workload_dir_name = workload_config_path.split('/')[-1].replace('.xml','')
 workload_dir_name = create_test_dir(output_path,workload_dir_name)
-print(f"\033[1mWorkload Info:\033[0m ID: {workload_id} Name: {workload_dir_name}")
 result_path = f"{output_path}/{workload_dir_name}"
 
 # save time
