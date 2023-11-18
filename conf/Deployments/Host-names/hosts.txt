@@ -1,2 +1,0 @@
-root,10.105.10.80,storage,S1
-root,10.105.10.80,storage,S2
