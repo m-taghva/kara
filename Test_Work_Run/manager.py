@@ -65,7 +65,7 @@ def main(argv):
         sys.exit(1)
 
     # Process XML files in the ./workloads directory
-    for xml_file in os.listdir(output_xml):
+    for xml_file in sorted(os.listdir(output_xml)):
         if xml_file.endswith(".xml"):
             xml_file_path = os.path.join(output_xml, xml_file)
 
