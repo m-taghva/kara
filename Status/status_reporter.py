@@ -15,7 +15,6 @@ YELLOW = "\033[1;33m"
 START_TIME_SUM = 60
 END_TIME_SUBTRACT = 60
 CONFIG_FILE = "./../conf/Status-reporter/status.conf"
-transformation_dir = "./../conf/Status-reporter/transformation-cpu"
 
 # Parse command-line arguments
 parser = argparse.ArgumentParser(description="Your script description here.")
@@ -91,11 +90,6 @@ with open(CONFIG_FILE, 'r') as config_file:
 with open(output_csv_all, 'a') as csv_file:
     for line in output_csv_str:
         csv_file.write(line + "\n")
-        
-# analyzer
-print("")
-os.system(f"python3 ./../Status/status_analyzer.py '{output_csv_all}' '{transformation_dir}'") 
-
 print("")
 print(f"{BOLD}Done! Csv and Images are saved in the {RESET}{YELLOW}'{OUTPUT_PARENT_DIR}'{RESET}{BOLD} directory{RESET}")
 print("")
