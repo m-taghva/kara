@@ -27,11 +27,11 @@ Example usage:
 
 def perform_backup_and_report(start_time, end_time, result_path):
     # Construct the status-reporter command with the variables
-    status = f"python3 ./../Status/status_reporter.py -m {metric_sum_file} -t '{start_time},{end_time}' -d {result_path}"
+    status = f"python3 ./../Status/status_reporter.py -m {metric_sum_file},{metric_mean_file} -t '{start_time},{end_time}' -d {result_path}"
     subprocess.call(status, shell=True) 
  
     # Run another Python script after run_test.py has finished
-    merge = ["python3", "./../Status/csv_merger.py", f"{result},*.csv"]
+    merge = ["python3", "./../Status/csv_merger.py", f"{result},*-transformation-*.csv"]
     subprocess.run(merge, check=True)
 
     # Construct the backup command with the variables
