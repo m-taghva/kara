@@ -13,6 +13,7 @@ input_txt = "./input.txt"
 output_xml = "./workloads"
 result = "./../result"
 script_file = "./pre_test_script.sh"
+transformation_dir = "./../conf/Status-reporter/transformation-cpu"
 
 def usage():
     print("""
@@ -29,10 +30,6 @@ def perform_backup_and_report(start_time, end_time, result_path):
     # Construct the status-reporter command with the variables
     status = f"python3 ./../Status/status_reporter.py -m {metric_sum_file},{metric_mean_file} -t '{start_time},{end_time}' -d {result_path}"
     subprocess.call(status, shell=True) 
- 
-    # Run another Python script after run_test.py has finished
-    merge = ["python3", "./../Status/csv_merger.py", f"{result},*-transformation-*.csv"]
-    subprocess.run(merge, check=True)
 
     # Construct the backup command with the variables
     backup = f"python3 ./../Backup_restore/monstaver.py -t '{start_time},{end_time}' -d"
@@ -78,6 +75,11 @@ def main(argv):
             # Call the main program for each XML file
             work = f"python3 ./mrbench.py {xml_file_path},{result}"
             work_process = subprocess.run(work, shell=True)
+            
+    # Run transformation and aggregation script after all has finished
+    merge = ["python3", "./../Status/csv_merger.py", f"{result},*.csv"]
+    subprocess.run(merge, check=True)
+    os.system(f"python3 ./../Status/status_analyzer.py '{result}/*-merge.csv' '{transformation_dir}'")
     
 if __name__ == "__main__":
     main(sys.argv[1:])
