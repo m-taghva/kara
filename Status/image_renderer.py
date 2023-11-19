@@ -38,7 +38,11 @@ if not os.path.exists(server_dir):
     os.makedirs(server_dir)
 
 # Calculate the total number of time series
-total_series = sum(len(entry["series"]) for entry in data["results"])
+try:
+    total_series = sum(len(entry["series"]) for entry in data["results"])
+except (KeyError, TypeError):
+    # Handle the exception silently (no print or logging)
+    pass
 
 # Initialize the tqdm progress bar
 pbar = tqdm(total=total_series, desc="Generating Image")
