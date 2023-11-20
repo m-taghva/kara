@@ -17,7 +17,7 @@ END_TIME_SUBTRACT = 60
 CONFIG_FILE = "./../conf/Status-reporter/status.conf"
 
 # Parse command-line arguments
-parser = argparse.ArgumentParser(description="Your script description here.")
+parser = argparse.ArgumentParser(description="Influxdb Status-reporter")
 parser.add_argument("-t", "--time", help="Time range in the format 'start_time,end_time' (e.g., 'Y-M-D h:m:s,Y-M-D h:m:s')", required=True)
 parser.add_argument("-m", "--metric_file", help="Comma-separated list of metric file paths")
 parser.add_argument("-d", "--path_dir", help="Path to the parent directory")
