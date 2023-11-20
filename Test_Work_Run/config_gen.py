@@ -3,6 +3,7 @@ import string
 import random
 import sys
 import os
+import argparse
 
 conf_number = 0
 def replace_tags(input_text, conf_name):
@@ -30,15 +31,17 @@ def replace_vars(input_text, conf_name):
         else:
             replace_vars(input_text.replace(currentVar.group(),str(''.join(random.choices(string.digits,k=int(currentVar.group().split('L')[1].split('d')[0]))))),conf_name)
     else:
-        with open(os.path.join(output_directory, f"{conf_name}#.xml"), 'w') as outfile:
+        with open(os.path.join(output_directory, f"{conf_name}#"), 'w') as outfile:
             outfile.write(input_text)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python script.py input_file,output_directory")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description='Generate configuration files.')
+    parser.add_argument('-i', '--input', help='Input file path', required=True)
+    parser.add_argument('-o', '--output', help='Output directory', required=True)
+    args = parser.parse_args()
 
-    input_file_path, output_directory = sys.argv[1].split(',')
+    input_file_path = args.input
+    output_directory = args.output
 
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
