@@ -58,7 +58,6 @@ def main():
     parser = argparse.ArgumentParser(description='Merge CSV files with extracted values.')
     parser.add_argument('-i', '--input_directory', required=True, help='Path to the directory containing CSV files')
     parser.add_argument('-c', '--selected_csv', required=True, help='Name of the selected CSV file or "*.csv"')
-
     args = parser.parse_args()
 
     input_directory = args.input_directory.strip()
