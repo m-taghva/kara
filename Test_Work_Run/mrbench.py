@@ -22,7 +22,6 @@ def submit(workload_file_path, output_path):
         return -1
     archive_path = os.readlink(cosbenchBin).split("cli.sh")[0]+"archive/"
 
-    print("Sending workload ...")
     # Start workload
     Cos_bench_command = subprocess.run(["cosbench", "submit", workload_file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     if Cos_bench_command.returncode == 1:
@@ -55,7 +54,6 @@ def submit(workload_file_path, output_path):
     # run other functions 
     save_time(f"{archive_path}{archive_workload_dir_name}/{archive_workload_dir_name}.csv", result_path)
     copy_bench_files(archive_path, archive_workload_dir_name, result_path)
-
 
 def create_test_dir(result_path,workload_name):
     result_file_path = os.path.join(result_path, workload_name)
@@ -92,7 +90,6 @@ def save_time(file, result_path):
             start_end_time = f"{start_time},{end_time}"
             time_file.write(start_end_time)
             time_file.close()
-            #return start_time,end_time
             print(f"Start Time: {start_time}")
             print(f"End Time: {end_time}")     
            
@@ -104,7 +101,7 @@ def copy_bench_files(archive_path, archive_workload_dir_name, result_path):
     # copy files
     time.sleep(5)
     copylistfiles = ["/workload.log","/workload-config.xml",'/'+ archive_workload_dir_name + '.csv']
-    print("Copying Cosbench source files ...")
+    print("Copy Cosbench Source Files ...")
     for fileName in copylistfiles:
         archive_file_path = archive_path + archive_workload_dir_name +fileName
         retry=3
