@@ -2,6 +2,7 @@ import os
 import re
 import csv
 import sys
+import argparse
 from glob import glob
 
 # For font style
@@ -54,22 +55,14 @@ def merge_csv_files(target_directory_path, output_csv_writer, extracted_data, fi
             output_csv_writer.writerow([csv_name_without_extension] + extracted_numbers + row)
 
 def main():
-    # Check if the correct number of command-line arguments is provided
-    if len(sys.argv) != 2:
-        print("Usage: python script.py <path to directory containing CSV files>,<csv name or *.csv>")
-        exit(1)
+    parser = argparse.ArgumentParser(description='Merge CSV files with extracted values.')
+    parser.add_argument('-i', '--input_directory', required=True, help='Path to the directory containing CSV files')
+    parser.add_argument('-c', '--selected_csv', required=True, help='Name of the selected CSV file or "*.csv"')
 
-    # Get the command-line argument containing directory paths
-    input_paths = sys.argv[1].split(',')
+    args = parser.parse_args()
 
-    # Verify if two paths are provided
-    if len(input_paths) != 2:
-        print("Usage: python script.py <path to directory containing CSV files>,<csv name or *.csv>")
-        exit(1)
-
-    # Get the path to the directory containing CSV files from the user
-    input_directory = input_paths[0].strip()
-    selected_csv = input_paths[1].strip()
+    input_directory = args.input_directory.strip()
+    selected_csv = args.selected_csv.strip()
 
     # Verify if the input directory exists
     if not os.path.isdir(input_directory):
