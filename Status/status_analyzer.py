@@ -1,5 +1,6 @@
 import os
 import sys
+import argparse
 import pandas as pd
 
 # For font style
@@ -25,12 +26,13 @@ def process_csv_file(csv_data, operation, new_column_name, selected_columns):
     return csv_data
 
 # Get CSV and transformation directory addresses from command-line arguments
-if len(sys.argv) != 3:
-    print("Usage: python analyzer.py csv_file_path transformation_directory")
-    sys.exit(1)
+parser = argparse.ArgumentParser(description='Merge CSV files with extracted values.')
+parser.add_argument('-c', '--csv_org', required=True, help='Path to the original CSV files')
+parser.add_argument('-d', '--transformation_dir', required=True, help='Path to transformation directory')
+args = parser.parse_args()
 
-csv_original = sys.argv[1]
-transformation_directory = sys.argv[2]
+csv_original = args.csv_org.strip()
+transformation_directory = args.transformation_dir.strip()
 
 # Initialize CSV data
 csv_intermediate = pd.read_csv(csv_original)
