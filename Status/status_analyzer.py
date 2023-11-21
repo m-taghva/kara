@@ -2,6 +2,11 @@ import os
 import sys
 import pandas as pd
 
+# For font style
+BOLD = "\033[1m"
+RESET = "\033[0m"
+YELLOW = "\033[1;33m"
+
 # Read operation and new column name from the txt file
 def read_txt_file(file_path):
     with open(file_path, 'r') as txt_file:
@@ -55,7 +60,7 @@ csv_final = csv_intermediate[keep_columns]
 final_output_csv_name = f"{os.path.splitext(os.path.basename(csv_original))[0]}-{os.path.basename(transformation_directory)}.csv"
 final_output_csv_path = os.path.join(os.path.dirname(csv_original), final_output_csv_name)
 csv_final.to_csv(final_output_csv_path, index=False)
-print(f"Final Analyzed CSV file: {final_output_csv_path}")
+print(f"{BOLD}Final Analyzed CSV file:{RESET}{YELLOW}{final_output_csv_path}{RESET}")
 
 # Remove the intermediate CSV file
 intermediate_csv_path = os.path.join(os.path.dirname(csv_original), "intermediate.csv")
