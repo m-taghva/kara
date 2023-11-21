@@ -94,11 +94,12 @@ def main(argv):
         # run monstaver script 
         backup = f"python3 ./../Backup_restore/monstaver.py -t '{start_time},{end_time}' -d"
         subprocess.call(backup, shell=True)
-
-    # Run another Python script after all has finished
-    merge = ["python3", "./../Status/csv_merger.py", f"{result_path},*.csv"]
-    subprocess.run(merge, check=True)
-    os.system(f"python3 ./../Status/status_analyzer.py '{result_path}/*-merge.csv' '{transformation_dir}'")
+        
+    # Run analyzer and merger script after all has finished
+    merger = f"python3 ./../Status/csv_merger.py -i {result_path} -c *.csv"
+    subprocess.call(merger, shell=True)
+    analyzer = f"python3 ./../Status/status_analyzer.py -c {result_path}/*-merge.csv -d {transformation_dir}"
+    subprocess.call(analyzer, shell=True)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
