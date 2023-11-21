@@ -61,6 +61,7 @@ final_output_csv_name = f"{os.path.splitext(os.path.basename(csv_original))[0]}-
 final_output_csv_path = os.path.join(os.path.dirname(csv_original), final_output_csv_name)
 csv_final.to_csv(final_output_csv_path, index=False)
 print(f"{BOLD}Final Analyzed CSV file:{RESET}{YELLOW}{final_output_csv_path}{RESET}")
+print("")
 
 # Remove the intermediate CSV file
 intermediate_csv_path = os.path.join(os.path.dirname(csv_original), "intermediate.csv")
