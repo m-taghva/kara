@@ -30,7 +30,7 @@ path_dir = args.path_dir if args.path_dir else "."
 
 print("")
 print(f"{YELLOW}========================================{RESET}")
-
+print("")
 # Function to convert Tehran timestamp to UTC
 def convert_tehran_to_utc(tehran_timestamp, add_seconds):
     tehran_timestamp_seconds = int(datetime.strptime(tehran_timestamp, "%Y-%m-%d %H:%M:%S").timestamp())
