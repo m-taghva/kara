@@ -101,4 +101,4 @@ def main(argv):
     os.system(f"python3 ./../Status/status_analyzer.py '{result_path}/*-merge.csv' '{transformation_dir}'")
 
 if __name__ == "__main__":
-     main(sys.argv[1:])
+    main(sys.argv[1:])
