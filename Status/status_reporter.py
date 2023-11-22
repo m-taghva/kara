@@ -75,7 +75,7 @@ for time_range in time_ranges:
         PORT = values['port']
         DATABASE = values['database']
         HOST = values['host']
-        ALIAS = values['alias']
+        ALIAS = values['alias'] if values['alias'] and len(values['alias']) > 1 else HOST
         start_time_utc = convert_tehran_to_utc(start_time, START_TIME_SUM)
         end_time_utc = convert_tehran_to_utc(end_time, -END_TIME_SUBTRACT)
         output_csv_str.append(ALIAS)  # value of CSV rows
