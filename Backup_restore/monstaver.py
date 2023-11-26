@@ -16,10 +16,18 @@ with open(config_file, "r") as stream:
         print(f"Error loading the configuration: {exc}")
         sys.exit(1)
 
+def tehran_time_to_utc(tehran_time_str):
+    tehran_tz = pytz.timezone('Asia/Tehran')
+    utc_tz = pytz.utc
+    tehran_time = tehran_tz.localize(tehran_time_str)
+    utc_time = tehran_time.astimezone(utc_tz)
+    return utc_time
+
 # Command-line argument parsing
 argParser = argparse.ArgumentParser()
 argParser.add_argument("-t", "--time", help="Start and end times for backup (format: 'start_time,end_time')")
 argParser.add_argument("-d", "--delete", action="store_true", help="Delete the original time dir inside output dir")
+argParser.add_argument("-i", "--inputs", help="Input paths for copying to result")
 args = argParser.parse_args()
 
 # Check if the user provided the -t option
@@ -27,21 +35,24 @@ if args.time:
     time_range = args.time
 else:
     # Use the default time from the config file
-    time_range = data_loaded['default_section'].get('time')
+    time_range = data_loaded['default'].get('time')
+
+total_steps = 8 + (len(data_loaded['influxdbs']) * 6 + sum([len(data.get("db", [])) for config in data_loaded.get("influxdbs", {}).values() for data in config.values() if isinstance(data, dict)]) + len(data_loaded['swift']) * 7)
+
+if args.inputs:
+    input_paths = args.inputs.split(',')
+    total_steps += len(input_paths)
+elif data_loaded['default'].get('input_paths'):
+    input_paths = data_loaded['default']['input_paths']
+    total_steps += len(input_paths)
+else:
+    input_paths = []
 
 # Split the time_range into start_time and end_time
 start_time_str, end_time_str = time_range.split(',')
-margin_start, margin_end = map(int, data_loaded['default_section'].get('time_margin').split(','))
-backup_dir = data_loaded['default_section'].get('backup_output')
+margin_start, margin_end = map(int, data_loaded['default'].get('time_margin').split(','))
+backup_dir = data_loaded['default'].get('backup_output')
 
-def tehran_time_to_utc(tehran_time_str):
-    tehran_tz = pytz.timezone('Asia/Tehran')
-    utc_tz = pytz.utc
-    tehran_time = tehran_tz.localize(tehran_time_str)
-    utc_time = tehran_time.astimezone(utc_tz)
-    return utc_time
-    
-total_steps = 8 + (len(data_loaded['influxdb_section']) * 6 + sum([len(data_loaded["influxdb_section"][x]["db_name"]) for x in data_loaded["influxdb_section"]]) + len(data_loaded['default_section']['input_paths']) + len(data_loaded['swift_section']) * 7)
 with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start_time_str}-{end_time_str}\033[0m') as bar:
 
     def convert_time():
@@ -94,24 +105,28 @@ with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start
     subprocess.run(f"sudo chmod -R 777 {backup_dir}", shell=True)
     bar()
 
-    for influxdb_container_name,value in data_loaded['influxdb_section'].items(): 
-        host_port = value['port']
-        host_user = value['user']
-        host_ip = value['ip']
-        container_data_path = value['container_data_path']
-        for db_name in value['db_name']:        
-            # Perform backup using influxd backup command
-            backup_command = f"ssh -p {host_port} {host_user}@{host_ip} 'sudo docker exec -i -u root {influxdb_container_name} influxd backup -portable -db {db_name} -start {start_time} -end {end_time} {container_data_path}/{time_dir}/{influxdb_container_name}/{db_name} > /dev/null 2>&1'"
-            backup_process = subprocess.run(backup_command, shell=True)
-            if backup_process.returncode == 0:
-                bar()
-            else:
-                print("\033[91mBackup failed.\033[0m")
-                sys.exit(1)
+    for mc_server,config in data_loaded.get('influxdbs', {}).items(): 
+        ip_influxdb = config.get('ip')
+        ssh_port = config.get('ssh_port')
+        ssh_user = config.get('ssh_user')
+        for data_key, data_config in config.items():
+            if isinstance(data_config, dict) and all(key in data_config for key in ['influx_port', 'influx_name', 'influx_volume', 'db']):
+               influxdb_container_name = data_config.get('influx_name')
+               influx_port = data_config.get('influx_port')
+               container_data_path = data_config.get('influx_volume') 
+               for db_name in data_config.get('db', []):       
+                   # Perform backup using influxd backup command
+                   backup_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {influxdb_container_name} influxd backup -portable -db {db_name} -start {start_time} -end {end_time} {container_data_path}/{time_dir}/{influxdb_container_name}/{db_name} > /dev/null 2>&1'"
+                   backup_process = subprocess.run(backup_command, shell=True)
+                   if backup_process.returncode == 0:
+                      bar()
+                   else:
+                      print("\033[91mBackup failed.\033[0m")
+                      sys.exit(1)
         
         # New_location_backup_in_host = value['temporary_location_backup_host']
         tmp_backup = "/tmp/influxdb-backup-tmp"
-        mkdir_command = f"ssh -p {host_port} {host_user}@{host_ip} 'sudo mkdir -p {tmp_backup} && sudo chmod -R 777 {tmp_backup}'"
+        mkdir_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo mkdir -p {tmp_backup} && sudo chmod -R 777 {tmp_backup}'"
         mkdir_process = subprocess.run(mkdir_command, shell=True)
         if mkdir_process.returncode == 0:
             bar()
@@ -120,7 +135,7 @@ with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start
             sys.exit(1)
 
         # copy backup to temporary dir 
-        cp_command = f"ssh -p {host_port} {host_user}@{host_ip} 'sudo docker cp {influxdb_container_name}:{container_data_path}/{time_dir}/{influxdb_container_name} {tmp_backup}'"
+        cp_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker cp {influxdb_container_name}:{container_data_path}/{time_dir}/{influxdb_container_name} {tmp_backup}'"
         cp_process = subprocess.run(cp_command, shell=True)
         if cp_process.returncode == 0:
             bar()
@@ -129,7 +144,7 @@ with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start
             sys.exit(1)
 
         # tar all backup
-        tar_command = f"ssh -p {host_port} {host_user}@{host_ip} 'sudo tar -cf {tmp_backup}/{influxdb_container_name}.tar.gz -C {tmp_backup}/{influxdb_container_name}/ .'"
+        tar_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo tar -cf {tmp_backup}/{influxdb_container_name}.tar.gz -C {tmp_backup}/{influxdb_container_name}/ .'"
         tar_process = subprocess.run(tar_command, shell=True)
         if tar_process.returncode == 0:
             bar()
@@ -138,7 +153,7 @@ with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start
             sys.exit(1)
 
         # move tar file to dbs dir inside your server
-        mv_command = f"scp -r -P {host_port} {host_user}@{host_ip}:{tmp_backup}/*.tar.gz {backup_dir}/{time_dir}/dbs/ > /dev/null 2>&1"
+        mv_command = f"scp -r -P {ssh_port} {ssh_user}@{ip_influxdb}:{tmp_backup}/*.tar.gz {backup_dir}/{time_dir}/dbs/ > /dev/null 2>&1"
         mv_process = subprocess.run(mv_command, shell=True)
         if mv_process.returncode == 0:
             bar()
@@ -147,7 +162,7 @@ with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start
             sys.exit(1)
 
         # remove temporary location of backup in host
-        del_command_tmp_loc = f"ssh -p {host_port} {host_user}@{host_ip} 'sudo rm -rf {tmp_backup}'"
+        del_command_tmp_loc = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo rm -rf {tmp_backup}'"
         del_process = subprocess.run(del_command_tmp_loc, shell=True)
         if del_process.returncode == 0:
             bar()
@@ -156,7 +171,7 @@ with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start
             sys.exit(1)
 
         # delete {time_dir} inside container
-        del_time_cont = f"ssh -p {host_port} {host_user}@{host_ip} 'sudo docker exec {influxdb_container_name} rm -rf {container_data_path}'"
+        del_time_cont = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec {influxdb_container_name} rm -rf {container_data_path}'"
         del_time_process = subprocess.run(del_time_cont, shell=True)
         if del_process.returncode == 0:
             bar()
@@ -164,23 +179,26 @@ with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start
             print("\033[91mRemove time dir inside container failed.\033[0m")
             sys.exit(1)
 
-    #copy other files
-    input_paths = data_loaded['default_section']['input_paths']
-    for path in input_paths:
-        other_dir = f"sudo cp -rp {path} {backup_dir}/{time_dir}/other_info/"
-        other_dir_process = subprocess.run(other_dir, shell=True)
-        if other_dir_process.returncode == 0:
-            bar()
-        else:
-            print("\033[91mCopy paths failed.\033[0m")
-            sys.exit(1)  
+    if input_paths:
+        #copy other files
+        for path in input_paths:
+           other_dir = f"sudo cp -rp {path} {backup_dir}/{time_dir}/other_info/"
+           other_dir_process = subprocess.run(other_dir, shell=True)
+           if other_dir_process.returncode == 0:
+               bar()
+           else:
+               print("\033[91mCopy paths failed.\033[0m")
+               sys.exit(1)  
+    else:
+        if bar is not None:
+            bar(total_steps - len(input_paths))        
 
     # copy ring and config to output
-    for key,value in data_loaded['swift_section'].items():
+    for key,value in data_loaded['swift'].items():
         container_name = key
-        user = value['user']
-        ip = value['ip']
-        port = value['port']
+        user = value['ssh_user']
+        ip = value['ip_swift']
+        port = value['ssh_port']
    
         get_conf_one_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {backup_dir}/{time_dir}/swift/{container_name}-object-server.conf"
         get_conf_one_process = subprocess.run(get_conf_one_command, shell=True)
