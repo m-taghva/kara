@@ -26,12 +26,19 @@ Example usage:
               manager.py -s /path/to/script.sh
 """)
 
+# Extract start and end times from the "time" file
 def extract_time_range(time_file_path):
-    # Extract start and end times from the "time" file
     with open(time_file_path, 'r') as time_file:
         content = time_file.read().strip()  
         start_time, end_time = content.split(',')
         return start_time, end_time
+
+# cleanup output_config_gen dir for new template
+def cleanup_output_config_gen(output_config_gen):
+    for filename in os.listdir(output_config_gen):
+        if "#" in filename:
+            file_path = os.path.join(output_config_gen, filename)
+            os.remove(file_path)
 
 def main(argv):
     global script_file
@@ -50,6 +57,9 @@ def main(argv):
             if not os.path.isfile(script_file):
                 print(f"Error: The specified script file '{script_file}' does not exist. Exiting.")
                 sys.exit(1)
+                
+    # Cleanup the output_config_gen directory
+    cleanup_output_config_gen(output_config_gen)
     
     # Run config_gen.py
     config_gen = f"python3 ./config_gen.py -i {input_config_gen} -o {output_config_gen}"
@@ -92,7 +102,7 @@ def main(argv):
         subprocess.call(status, shell=True)
 
         # run monstaver script 
-        backup = f"python3 ./../Backup_restore/monstaver.py -t '{start_time},{end_time}' -d"
+        backup = f"python3 ./../Backup_restore/monstaver.py -i {result_path}/{config_file} -t '{start_time},{end_time}' -d"
         subprocess.call(backup, shell=True)
         
     # Run analyzer and merger script after all has finished
