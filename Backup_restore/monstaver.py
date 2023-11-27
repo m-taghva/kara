@@ -34,19 +34,15 @@ args = argParser.parse_args()
 if args.time:
     time_range = args.time
 else:
-    # Use the default time from the config file
     time_range = data_loaded['default'].get('time')
 
-total_steps = 8 + (len(data_loaded['influxdbs']) * 6 + sum([len(data.get("db", [])) for config in data_loaded.get("influxdbs", {}).values() for data in config.values() if isinstance(data, dict)]) + len(data_loaded['swift']) * 7)
-
+# Check if the user provided the -i option
 if args.inputs:
     input_paths = args.inputs.split(',')
-    total_steps += len(input_paths)
-elif data_loaded['default'].get('input_paths'):
-    input_paths = data_loaded['default']['input_paths']
-    total_steps += len(input_paths)
 else:
-    input_paths = []
+    input_paths = data_loaded['default']['input_paths']
+
+total_steps = 8 + (len(data_loaded['influxdbs']) * 6 + sum([len(data.get("db", [])) for config in data_loaded.get("influxdbs", {}).values() for data in config.values() if isinstance(data, dict)]) + len(data_loaded['swift']) * 7)
 
 # Split the time_range into start_time and end_time
 start_time_str, end_time_str = time_range.split(',')
@@ -179,19 +175,15 @@ with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start
             print("\033[91mRemove time dir inside container failed.\033[0m")
             sys.exit(1)
 
-    if input_paths:
-        #copy other files
-        for path in input_paths:
-           other_dir = f"sudo cp -rp {path} {backup_dir}/{time_dir}/other_info/"
-           other_dir_process = subprocess.run(other_dir, shell=True)
-           if other_dir_process.returncode == 0:
-               bar()
-           else:
-               print("\033[91mCopy paths failed.\033[0m")
-               sys.exit(1)  
-    else:
-        if bar is not None:
-            bar(total_steps - len(input_paths))        
+    #copy other files
+    for path in input_paths:
+        other_dir = f"sudo cp -rp {path} {backup_dir}/{time_dir}/other_info/"
+        other_dir_process = subprocess.run(other_dir, shell=True)
+        if other_dir_process.returncode == 0:
+            time.sleep(1)
+        else:
+            print("\033[91mCopy paths failed.\033[0m")
+            sys.exit(1)  
 
     # copy ring and config to output
     for key,value in data_loaded['swift'].items():
