@@ -33,13 +33,6 @@ def extract_time_range(time_file_path):
         start_time, end_time = content.split(',')
         return start_time, end_time
 
-# cleanup output_config_gen dir for new template
-def cleanup_output_config_gen(output_config_gen):
-    for filename in os.listdir(output_config_gen):
-        if "#" in filename:
-            file_path = os.path.join(output_config_gen, filename)
-            os.remove(file_path)
-
 def main(argv):
     global script_file
 
@@ -57,9 +50,6 @@ def main(argv):
             if not os.path.isfile(script_file):
                 print(f"Error: The specified script file '{script_file}' does not exist. Exiting.")
                 sys.exit(1)
-                
-    # Cleanup the output_config_gen directory
-    cleanup_output_config_gen(output_config_gen)
     
     # Run config_gen.py
     config_gen = f"python3 ./config_gen.py -i {input_config_gen} -o {output_config_gen}"
