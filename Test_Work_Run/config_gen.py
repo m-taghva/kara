@@ -5,6 +5,13 @@ import sys
 import os
 import argparse
 
+# cleanup output dir for new template
+def cleanup_output_config_gen(output_directory):
+    for filename in os.listdir(output_directory):
+        if "#" in filename:
+            file_path = os.path.join(output_directory, filename)
+            os.remove(file_path)
+
 conf_number = 0
 def replace_tags(input_text, conf_name):
     global conf_number
@@ -45,6 +52,9 @@ if __name__ == "__main__":
 
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
+        
+    # Cleanup the output directory
+    cleanup_output_config_gen(output_directory)
 
     with open(input_file_path, 'r') as inputFile:
         input_text = inputFile.read()
