@@ -39,8 +39,10 @@ else:
 # Check if the user provided the -i option
 if args.inputs:
     input_paths = args.inputs.split(',')
-else:
+elif data_loaded['default'].get('input_paths'):
     input_paths = data_loaded['default']['input_paths']
+else:
+    input_paths = []
 
 total_steps = 8 + (len(data_loaded['influxdbs']) * 6 + sum([len(data.get("db", [])) for config in data_loaded.get("influxdbs", {}).values() for data in config.values() if isinstance(data, dict)]) + len(data_loaded['swift']) * 7)
 
