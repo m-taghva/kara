@@ -88,11 +88,11 @@ def main(argv):
         start_time, end_time = extract_time_range(time_file_path)
 
         # run status-reporter script 
-        status = f"python3 ./../Status/status_reporter.py -m {metric_sum_file},{metric_mean_file} -t '{start_time},{end_time}' -d {result_path}/{config_file}"
+        status = f"python3 ./../Status/status_reporter.py -t '{start_time},{end_time}' -o {result_path}/{config_file}"
         subprocess.call(status, shell=True)
 
         # run monstaver script 
-        backup = f"python3 ./../Backup_restore/monstaver.py -i {result_path}/{config_file} -t '{start_time},{end_time}' -d"
+        backup = f"python3 ./../Backup_restore/monstaver.py -i {result_path}/{config_file} -t '{start_time},{end_time}' -r"
         subprocess.call(backup, shell=True)
         
     # Run analyzer and merger script after all has finished
