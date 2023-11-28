@@ -26,7 +26,7 @@ def tehran_time_to_utc(tehran_time_str):
 # Command-line argument parsing
 argParser = argparse.ArgumentParser()
 argParser.add_argument("-t", "--time", help="Start and end times for backup (format: 'start_time,end_time')")
-argParser.add_argument("-d", "--delete", action="store_true", help="Delete the original time dir inside output dir")
+argParser.add_argument("-r", "--delete", action="store_true", help="Remove the original time dir inside output dir")
 argParser.add_argument("-i", "--inputs", help="Input paths for copying to result")
 args = argParser.parse_args()
 
