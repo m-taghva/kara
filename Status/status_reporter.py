@@ -92,39 +92,34 @@ csvi = 0
 # Loop through each combination of time range, host, IP, PORT, and execute the curl command
 for mc_server, config in data_loaded.get('influxdbs', {}).items():
     ip = config.get('ip')
-    for data_key, data_config in config.items():
-        if isinstance(data_config, dict) and 'influx_port' in data_config:
-           influx_port = data_config.get('influx_port')
-           databases = data_config.get('databases', []) 
-           for db_info in databases:
-               for db_name, db_data in db_info.items():
-                   hostls = db_data.get('hostls', [])
-                   for host in hostls:
-                       host_name, alias = host.split(',')
-                       alias = alias if alias and len(alias) > 1 else host_name
-                       start_time_utc = convert_tehran_to_utc(start_time, START_TIME_SUM)
-                       end_time_utc = convert_tehran_to_utc(end_time, -END_TIME_SUBTRACT)
-                       output_csv_str.append(alias)  # value inside the first column of csv
-                       csvi += 1
-                       for metric_file, metric_operation in metric_operation_mapping.items():
-                           if os.path.isfile(metric_file):
-                              metrics = get_metrics_from_file(metric_file)
-                              for metric_name in metrics:
-                                  metric_name = metric_name.strip()
-                                  if csvi == 1:
-                                     metric_name = metric_name.replace(" ", "")
-                                     output_csv_str[0] += f",{metric_operation}_{metric_name.replace('netdata.', '')}"
-                                  # Construct the curl command for query 1
-                                  query1_curl_command = f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "db={db_name}" --data-urlencode "q=SELECT {metric_operation}(\\"value\\") FROM \\"{metric_name}\\" WHERE (\\"host\\" =~ /^{host_name}$/) AND time >= \'{start_time_utc}\' AND time <= \'{end_time_utc}\' fill(none)"'
-                                  query_result = subprocess.getoutput(query1_curl_command)
-                                  values = json.loads(query_result).get('results', [{}])[0].get('series', [{}])[0].get('values', [])
-                                  values = [str(v[1]) for v in values]
-                                  output_csv_str[csvi] += "," + ",".join(values)
-                                  print(f"{BOLD}Add metrics to CSV, please wait ...{RESET}")
-                                  # Construct the curl command for query 2
-                                  query2_curl_command = f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "db={db_name}" --data-urlencode "q=SELECT {metric_operation}(\\"value\\") FROM /{metric_name}/ WHERE (\\"host\\" =~ /^{host_name}$/) AND time >= \'{start_time_utc}\' AND time <= \'{end_time_utc}\' GROUP BY time({TIME_GROUP}s) fill(none)"'
-                                  query2_output = subprocess.getoutput(query2_curl_command)
-                                  os.system(f"python3 ./../Status/image_renderer.py '{query2_output}' '{host_name}' '{path_dir}'")
+    influx_port = config.get('influx_port')
+    for db_name, db_data in config.get('databases', {}).items():
+        hostls = db_data.get('hostls', {})
+        for host_name, alias in hostls.items():
+            alias = alias if alias and len(alias) > 1 else host_name
+            start_time_utc = convert_tehran_to_utc(start_time, START_TIME_SUM)
+            end_time_utc = convert_tehran_to_utc(end_time, -END_TIME_SUBTRACT)
+            output_csv_str.append(alias)  # value inside the first column of csv
+            csvi += 1
+            for metric_file, metric_operation in metric_operation_mapping.items():
+                if os.path.isfile(metric_file):
+                    metrics = get_metrics_from_file(metric_file)
+                    for metric_name in metrics:
+                        metric_name = metric_name.strip()
+                        if csvi == 1:
+                            metric_name = metric_name.replace(" ", "")
+                            output_csv_str[0] += f",{metric_operation}_{metric_name.replace('netdata.', '')}"
+                            # Construct the curl command for query 1
+                        query1_curl_command = f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "db={db_name}" --data-urlencode "q=SELECT {metric_operation}(\\"value\\") FROM \\"{metric_name}\\" WHERE (\\"host\\" =~ /^{host_name}$/) AND time >= \'{start_time_utc}\' AND time <= \'{end_time_utc}\' fill(none)"'
+                        query_result = subprocess.getoutput(query1_curl_command)
+                        values = json.loads(query_result).get('results', [{}])[0].get('series', [{}])[0].get('values', [])
+                        values = [str(v[1]) for v in values]
+                        output_csv_str[csvi] += "," + ",".join(values)
+                        print(f"{BOLD}Add metrics to CSV, please wait ...{RESET}")
+                        # Construct the curl command for query 2
+                        query2_curl_command = f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "db={db_name}" --data-urlencode "q=SELECT {metric_operation}(\\"value\\") FROM /{metric_name}/ WHERE (\\"host\\" =~ /^{host_name}$/) AND time >= \'{start_time_utc}\' AND time <= \'{end_time_utc}\' GROUP BY time({TIME_GROUP}s) fill(none)"'
+                        query2_output = subprocess.getoutput(query2_curl_command)
+                        os.system(f"python3 ./../Status/image_renderer.py '{query2_output}' '{host_name}' '{path_dir}'")
 # Write the CSV file for each time range
 with open(output_csv, 'a') as csv_file:
     for line in output_csv_str:
