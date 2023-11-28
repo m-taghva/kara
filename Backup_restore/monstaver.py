@@ -44,7 +44,7 @@ elif data_loaded['default'].get('input_paths'):
 else:
     input_paths = []
 
-total_steps = 8 + (len(data_loaded['influxdbs']) * 6 + sum([len(data.get("db", [])) for config in data_loaded.get("influxdbs", {}).values() for data in config.values() if isinstance(data, dict)]) + len(data_loaded['swift']) * 7)
+total_steps = 8 + (len(data_loaded['influxdbs']) * 6 +  sum([len(data_loaded["influxdbs"][x]["databases"]) for x in data_loaded["influxdbs"]]) + len(data_loaded['swift']) * 7)
 
 # Split the time_range into start_time and end_time
 start_time_str, end_time_str = time_range.split(',')
@@ -102,25 +102,23 @@ with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start
     os.makedirs(f"{backup_dir}/{time_dir}/other_info", exist_ok=True)
     subprocess.run(f"sudo chmod -R 777 {backup_dir}", shell=True)
     bar()
-
-    for mc_server,config in data_loaded.get('influxdbs', {}).items(): 
+    
+    database_names = [ db_name for config in data_loaded.get('influxdbs', {}).values() if isinstance(config, dict) and 'databases' in config for db_name in config['databases'].keys() ]
+    for mc_server, config in data_loaded.get('influxdbs', {}).items(): 
         ip_influxdb = config.get('ip')
         ssh_port = config.get('ssh_port')
         ssh_user = config.get('ssh_user')
-        for data_key, data_config in config.items():
-            if isinstance(data_config, dict) and all(key in data_config for key in ['influx_port', 'influx_name', 'influx_volume', 'db']):
-               influxdb_container_name = data_config.get('influx_name')
-               influx_port = data_config.get('influx_port')
-               container_data_path = data_config.get('influx_volume') 
-               for db_name in data_config.get('db', []):       
-                   # Perform backup using influxd backup command
-                   backup_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {influxdb_container_name} influxd backup -portable -db {db_name} -start {start_time} -end {end_time} {container_data_path}/{time_dir}/{influxdb_container_name}/{db_name} > /dev/null 2>&1'"
-                   backup_process = subprocess.run(backup_command, shell=True)
-                   if backup_process.returncode == 0:
-                      bar()
-                   else:
-                      print("\033[91mBackup failed.\033[0m")
-                      sys.exit(1)
+        container_name = config.get('container_name')
+        influx_volume = config.get('influx_volume')
+        for db_name in config.get('databases', []):
+            # Perform backup using influxd backup command
+            backup_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd backup -portable -db {db_name} -start {start_time} -end {end_time} {influx_volume}/{time_dir}/{container_name}/{db_name} > /dev/null 2>&1'"
+            backup_process = subprocess.run(backup_command, shell=True)
+            if backup_process.returncode == 0:
+                 bar()
+            else:
+                 print("\033[91mBackup failed.\033[0m")
+                 sys.exit(1)
         
         # New_location_backup_in_host = value['temporary_location_backup_host']
         tmp_backup = "/tmp/influxdb-backup-tmp"
@@ -133,7 +131,7 @@ with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start
             sys.exit(1)
 
         # copy backup to temporary dir 
-        cp_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker cp {influxdb_container_name}:{container_data_path}/{time_dir}/{influxdb_container_name} {tmp_backup}'"
+        cp_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker cp {container_name}:{influx_volume}/{time_dir}/{container_name} {tmp_backup}'"
         cp_process = subprocess.run(cp_command, shell=True)
         if cp_process.returncode == 0:
             bar()
@@ -142,7 +140,7 @@ with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start
             sys.exit(1)
 
         # tar all backup
-        tar_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo tar -cf {tmp_backup}/{influxdb_container_name}.tar.gz -C {tmp_backup}/{influxdb_container_name}/ .'"
+        tar_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo tar -cf {tmp_backup}/{container_name}.tar.gz -C {tmp_backup}/{container_name}/ .'"
         tar_process = subprocess.run(tar_command, shell=True)
         if tar_process.returncode == 0:
             bar()
@@ -169,7 +167,7 @@ with alive_bar(total_steps, title=f'\033[1mProcessing Test\033[0m:\033[92m{start
             sys.exit(1)
 
         # delete {time_dir} inside container
-        del_time_cont = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec {influxdb_container_name} rm -rf {container_data_path}'"
+        del_time_cont = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec {container_name} rm -rf {influx_volume}'"
         del_time_process = subprocess.run(del_time_cont, shell=True)
         if del_process.returncode == 0:
             bar()
