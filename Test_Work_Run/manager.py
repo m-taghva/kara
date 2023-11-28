@@ -5,10 +5,6 @@ import subprocess
 import time
 
 # Defining paths
-metric_sum_file = "./../conf/Status-reporter/sum_metric_list.txt"
-metric_mean_file = "./../conf/Status-reporter/mean_metric_list.txt"
-metric_max_file = "./../conf/Status-reporter/max_metric_list.txt"
-metric_min_file = "./../conf/Status-reporter/min_metric_list.txt"
 input_config_gen = "./input.txt"
 output_config_gen = "./workloads"
 result_path = "./../result"
