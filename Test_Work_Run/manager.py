@@ -94,7 +94,12 @@ def main(argv):
     # Run analyzer and merger script after all has finished
     merger = f"python3 ./../Status/csv_merger.py -i {result_path} -c *.csv"
     subprocess.call(merger, shell=True)
-    time.sleep(10)
+    
+    if merger_process.returncode != 0:
+        print("Error in merger.py Exiting.")
+        sys.exit(1)
+    time.sleep(5)
+    
     analyzer = f"python3 ./../Status/status_analyzer.py -c {result_path}/*-merge.csv -d {transformation_dir}"
     subprocess.call(analyzer, shell=True)
 
