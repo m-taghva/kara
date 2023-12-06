@@ -47,6 +47,7 @@ parser = argparse.ArgumentParser(description="Influxdb Status-reporter")
 parser.add_argument("-t", "--time", help="Time range in the format 'start_time,end_time' (e.g., 'Y-M-D h:m:s,Y-M-D h:m:s')")
 parser.add_argument("-m", "--metric_file", help="Comma-separated list of metric file paths")
 parser.add_argument("-o", "--path_dir", help="Path to the parent directory")
+parser.add_argument("--img", action="store_true", help="Create images and graphs")
 args = parser.parse_args()
 # Extract arguments
 metric_files = args.metric_file.split(',') if args.metric_file else []
