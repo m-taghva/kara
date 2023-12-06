@@ -118,9 +118,10 @@ for mc_server, config in data_loaded.get('influxdbs', {}).items():
                         output_csv_str[csvi] += "," + ",".join(values)
                         print(f"{BOLD}Add metrics to CSV, please wait ...{RESET}")
                         # Construct the curl command for query 2
-                        query2_curl_command = f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "db={db_name}" --data-urlencode "q=SELECT {metric_operation}(\\"value\\") FROM /{metric_name}/ WHERE (\\"host\\" =~ /^{host_name}$/) AND time >= \'{start_time_utc}\' AND time <= \'{end_time_utc}\' GROUP BY time({TIME_GROUP}s) fill(none)"'
-                        query2_output = subprocess.getoutput(query2_curl_command)
-                        os.system(f"python3 ./../Status/image_renderer.py '{query2_output}' '{host_name}' '{path_dir}'")
+                        if args.img:
+                           query2_curl_command = f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "db={db_name}" --data-urlencode "q=SELECT {metric_operation}(\\"value\\") FROM /{metric_name}/ WHERE (\\"host\\" =~ /^{host_name}$/) AND time >= \'{start_time_utc}\' AND time <= \'{end_time_utc}\' GROUP BY time({TIME_GROUP}s) fill(none)"'
+                           query2_output = subprocess.getoutput(query2_curl_command)
+                           os.system(f"python3 ./../Status/image_renderer.py '{query2_output}' '{host_name}' '{path_dir}'")
 # Write the CSV file for each time range
 with open(output_csv, 'a') as csv_file:
     for line in output_csv_str:
