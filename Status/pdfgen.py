@@ -12,20 +12,25 @@ def add_images_to_pdf(pdf_path, image_paths, csv_paths):
     for csv_path in csv_paths:
         try:
             with open(csv_path, 'r') as csv_file:
+                # Extract the CSV file name without the extension
+                file_name = csv_path.split('/')[-1].split('.')[0]
+                # Add file name as header
+                c.drawString(10, 760, f"CSV File: {file_name}")
+                c.drawString(10, 750 , "-" * 80)  # Add a separator line
                 # Create a CSV reader
                 csv_reader = csv.DictReader(csv_file)
                 # Calculate the total height of the CSV content
                 total_height = sum(12 * len(row) + 12 for row in csv_reader)
                 # Set the initial y-coordinate for the first row
-                y_coordinate = 770
-                pages_needed = math.ceil(total_height / 750)  # Round up to the nearest whole page
+                y_coordinate = 730
+                pages_needed = math.ceil(total_height / 730)  # Round up to the nearest whole page
                 # Reset the CSV reader to read the file again
                 csv_file.seek(0)
                 csv_reader = csv.DictReader(csv_file)
                 # Iterate through each row in the CSV file
                 for page in range(pages_needed):
                     # Iterate through each row on the current page
-                    for _ in range(25):  # Assuming 25 rows fit on one page, adjust as needed
+                    for _ in range(10):  # Assuming 25 rows fit on one page, adjust as needed
                         try:
                             row = next(csv_reader)
                             for key, value in row.items():
@@ -39,7 +44,7 @@ def add_images_to_pdf(pdf_path, image_paths, csv_paths):
                     # Check if a new page is needed
                     if page < pages_needed - 1:
                         c.showPage()
-                        y_coordinate = 770  # Reset the y-coordinate for the next page
+                        y_coordinate = 730  # Reset the y-coordinate for the next page
                 # Add a new page for each CSV file
                 c.showPage()
         except Exception as e:
