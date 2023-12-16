@@ -30,7 +30,7 @@ def add_images_to_pdf(pdf_path, image_paths, csv_paths):
                 # Iterate through each row in the CSV file
                 for page in range(pages_needed):
                     # Iterate through each row on the current page
-                    for _ in range(10):  # Assuming 25 rows fit on one page, adjust as needed
+                    for _ in range(10):  # Assuming n rows fit on one page, adjust as needed
                         try:
                             row = next(csv_reader)
                             for key, value in row.items():
