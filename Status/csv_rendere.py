@@ -39,4 +39,4 @@ def create_image_from_dataframe(df):
 
 if __name__ == "__main__":
     # Replace 'input.csv' with your CSV file and 'output.png' with the desired image file name
-    csv_to_image('./out/query_results/2023-07-31-09:30:00_2023-07-31-10:00:00.csv', 'myout.png')
+    csv_to_image('/path/to/csv', 'image.png')
