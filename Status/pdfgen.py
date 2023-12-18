@@ -15,15 +15,16 @@ def add_images_to_pdf(pdf_path, image_paths, csv_paths):
                 # Extract the CSV file name without the extension
                 file_name = csv_path.split('/')[-1].split('.')[0]
                 # Add file name as header
-                c.drawString(10, 760, f"CSV File: {file_name}")
-                c.drawString(10, 750 , "-" * 80)  # Add a separator line
+                c.drawString(10, 770, f"csv file name: {file_name}")
+                c.drawString(10, 760, "-" * 80)  # Add a separator line
+                c.drawString(250, 740, "Extracted Value of csv file")
                 # Create a CSV reader
                 csv_reader = csv.DictReader(csv_file)
                 # Calculate the total height of the CSV content
                 total_height = sum(12 * len(row) + 12 for row in csv_reader)
                 # Set the initial y-coordinate for the first row
-                y_coordinate = 730
-                pages_needed = math.ceil(total_height / 730)  # Round up to the nearest whole page
+                y_coordinate = 720
+                pages_needed = math.ceil(total_height / 720)  # Round up to the nearest whole page
                 # Reset the CSV reader to read the file again
                 csv_file.seek(0)
                 csv_reader = csv.DictReader(csv_file)
@@ -44,7 +45,7 @@ def add_images_to_pdf(pdf_path, image_paths, csv_paths):
                     # Check if a new page is needed
                     if page < pages_needed - 1:
                         c.showPage()
-                        y_coordinate = 730  # Reset the y-coordinate for the next page
+                        y_coordinate = 720  # Reset the y-coordinate for the next page
                 # Add a new page for each CSV file
                 c.showPage()
         except Exception as e:
@@ -52,6 +53,7 @@ def add_images_to_pdf(pdf_path, image_paths, csv_paths):
     # Add images to the PDF
     for image_path in image_paths:
         try:
+            c.drawString(250, 740, "Graph of csv value")
             # Draw the image on the PDF
             c.drawInlineImage(image_path, 10, 200)  # Adjust the coordinates as needed
             # Add a new page for each image
