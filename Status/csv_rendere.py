@@ -32,8 +32,7 @@ def create_image_from_dataframe(df):
     # Draw the data rows
     for row in range(num_rows):
         for col, value in enumerate(df.iloc[row]):
-            draw.rectangle([col * cell_width, (row + 1) * cell_height, (col + 1) * cell_width, (row + 2) * cell_height],
-                           outline='black', fill='white')
+            draw.rectangle([col * cell_width, (row + 1) * cell_height, (col + 1) * cell_width, (row + 2) * cell_height],outline='black', fill='white')
             draw.text((col * cell_width + 5, (row + 1) * cell_height + 5), str(value), font=font, fill='black')
     return image
 
