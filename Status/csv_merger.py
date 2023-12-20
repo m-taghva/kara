@@ -70,3 +70,4 @@ def main():
     print(f"\n{BOLD}Merged CSV file{RESET}{YELLOW}'{output_csv_path}'{RESET}{BOLD}has been created with the extracted values{RESET}\n")
 
 if __name__ == "__main__":
+   main()
