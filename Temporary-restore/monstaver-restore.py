@@ -14,11 +14,23 @@ with open(config_file, "r") as stream:
 
 # Process given directory name as an arqument
 argParser = argparse.ArgumentParser()
-argParser.add_argument("-d", "--directoryname", help="Directory Name (Directory which contain *.tar,gz)")
+argParser.add_argument("-bl", "--backup_location", help="Backup Location (Path to backup file)")
 args = argParser.parse_args()
-directoryname = args.directoryname
-print()
-print(f"*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* START OF RESTORE FOR\033[92m {directoryname} \033[0m*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
+backup_location = args.backup_location
+
+# If backup location is not provided, find it for the first instance in the configuration
+if not backup_location:
+    backup_location_found = False
+    for mc_server, config in data_loaded.get('influxdbs', {}).items():
+        backup_location = config.get('backup_location')
+        backup_location_found = True
+        break
+    if not backup_location_found:
+        print("Error: No instance found in the configuration.")
+        sys.exit(1)
+    if not backup_location:
+        print("Error: Backup location not found for the instance in the configuration.")
+        sys.exit(1)
 
 for mc_server, config in data_loaded.get('influxdbs', {}).items(): 
     ip_influxdb = config.get('ip')
@@ -29,6 +41,9 @@ for mc_server, config in data_loaded.get('influxdbs', {}).items():
     influx_mount_point = config.get('influx_mount_point')
     database = config.get('database')
     second_db = config.get('second_db')
+
+    print()
+    print(f"*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* START OF RESTORE FOR\033[92m {mc_server}-{second_db} \033[0m*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
 
     # Drop second_db
     drop_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} \"sudo docker exec -i -u root {container_name} influx -execute 'drop database {second_db}'\""
@@ -54,7 +69,7 @@ for mc_server, config in data_loaded.get('influxdbs', {}).items():
        print()
 
     # Ensure the target restore directory exists
-    create_dir_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} mkdir -p {influx_mount_point}/MPK_RESTORE/{directoryname}/backup_tar && sudo docker exec -i -u root {container_name} mkdir -p {influx_mount_point}/MPK_RESTORE/{directoryname}/backup_untar'"
+    create_dir_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} mkdir -p {influx_mount_point}/MPK_RESTORE/{mc_server}-{second_db}/backup_tar && sudo docker exec -i -u root {container_name} mkdir -p {influx_mount_point}/MPK_RESTORE/{mc_server}-{second_db}/backup_untar'"
     create_dir_process = subprocess.run(create_dir_command, shell=True)
     create_dir_exit_code = create_dir_process.returncode
     if create_dir_exit_code == 0:
@@ -66,7 +81,7 @@ for mc_server, config in data_loaded.get('influxdbs', {}).items():
        sys.exit(1)
 
     # Copy backup file to container mount point
-    copy_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker cp {backup_location} {container_name}:{influx_mount_point}/MPK_RESTORE/{directoryname}/backup_tar'"
+    copy_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker cp {backup_location} {container_name}:{influx_mount_point}/MPK_RESTORE/{mc_server}-{second_db}/backup_tar'"
     copy_process = subprocess.run(copy_command, shell=True)
     exit_code = copy_process.returncode
     if exit_code == 0:
@@ -77,7 +92,7 @@ for mc_server, config in data_loaded.get('influxdbs', {}).items():
        print()
     
     # Extract the backup.tar.gz
-    extract_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} tar -xf {influx_mount_point}/MPK_RESTORE/{directoryname}/backup_tar/{container_name}.tar.gz -C {influx_mount_point}/MPK_RESTORE/{directoryname}/backup_untar/'"
+    extract_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} tar -xf {influx_mount_point}/MPK_RESTORE/{mc_server}-{second_db}/backup_tar/{container_name}.tar.gz -C {influx_mount_point}/MPK_RESTORE/{mc_server}-{second_db}/backup_untar/'"
     extract_process = subprocess.run(extract_command, shell=True)
     exit_code = extract_process.returncode
     if exit_code == 0:
@@ -93,14 +108,13 @@ for mc_server, config in data_loaded.get('influxdbs', {}).items():
        output_bytes = subprocess.check_output(check_command, shell=True)
        output = output_bytes.decode('utf-8')
     except subprocess.CalledProcessError as e:
-       # Handle any errors or exceptions here
        print(f"\033[91mChecking command failed with error : \033[0m: {e}")
        print()
        output = None
 
-    # Print the captured output and check for "opentsdb"
+    # Restore backup to temporay database
     if output is not None and database in output:
-       restore_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd restore -portable -db {database} -newdb tempdb {influx_mount_point}/MPK_RESTORE/{directoryname}/backup_untar/{database} > /dev/null 2>&1'"
+       restore_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd restore -portable -db {database} -newdb tempdb {influx_mount_point}/MPK_RESTORE/{mc_server}-{second_db}/backup_untar/{database} > /dev/null 2>&1'"
        restore_process = subprocess.run(restore_command, shell=True)
        restore_exit_code = restore_process.returncode
        if restore_exit_code == 0:
@@ -134,8 +148,12 @@ for mc_server, config in data_loaded.get('influxdbs', {}).items():
           print("\033[91mDropping temporary database failed.\033[0m")
           print()
 
+       print(f"*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* END OF RESTORE FOR\033[92m {mc_server}-{second_db} \033[0m*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
+       print()
+
+    # If main database does not exist 
     elif output is not None and database not in output:
-         restore_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd restore -portable -db {database} {influx_mount_point}/MPK_RESTORE/{directoryname}/backup_untar'"
+         restore_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd restore -portable -db {database} {influx_mount_point}/MPK_RESTORE/{mc_server}-{second_db}/backup_untar'"
          restore_process = subprocess.run(restore_command, shell=True)
          restore_exit_code = restore_process.returncode
          if restore_exit_code == 1:
@@ -145,5 +163,3 @@ for mc_server, config in data_loaded.get('influxdbs', {}).items():
             print("\033[92mBackup restored successfully(First Time Backup!).\033[0m")
     else:
          print("error") 
-print(f"*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* END OF RESTORE FOR\033[92m {directoryname} \033[0m*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
-print()
