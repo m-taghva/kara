@@ -52,14 +52,6 @@ def main(metric_file=None, path_dir=".", time_range=None, img=False):
     output_parent_dir= os.path.join(path_dir, "query_results")
     os.makedirs(output_parent_dir, exist_ok=True)
 
-    # Check if the time option is provided
-    if time_range:
-       time_range = args.time_range
-    else:
-       # Read time range from the configuration file
-       data_loaded = load_config(CONFIG_FILE)
-       time_range = data_loaded.get('time', [])[0]
-
     # Split time_range and generate output_csv
     time_range_parts = time_range.split(',')
     start_time, end_time = time_range_parts[0], time_range_parts[1]
@@ -140,4 +132,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Call your main function with the provided arguments
-    main(metric_file=args.metric_file.split(',') if args.metric_file else [] , path_dir=args.path_dir if args.path_dir else ".", time_range=args.time_range, img=args.img)   
+    main(metric_file=args.metric_file.split(',') if args.metric_file else [] , path_dir=args.path_dir if args.path_dir else ".", time_range = args.time_range if args.time_range else load_config(CONFIG_FILE).get('time', [])[0], img=args.img)   
