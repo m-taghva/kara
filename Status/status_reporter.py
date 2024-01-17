@@ -17,8 +17,8 @@ END_TIME_SUBTRACT = 10  # decrease your report end time
 TIME_GROUP = 10  # time group for query 2
 CONFIG_FILE = "./../conf/Status-reporter/status.conf"
 
-def load_config(config_file):
-    with open(config_file, "r") as stream:
+def load_config(CONFIG_FILE):
+    with open(CONFIG_FILE, "r") as stream:
         try:
             data_loaded = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
