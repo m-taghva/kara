@@ -13,7 +13,6 @@ YELLOW = "\033[1;33m"
 
 print("")
 print(f"{YELLOW}========================================{RESET}")
-print("")
 
 def submit(workload_file_path, output_path):
     cosbenchBin = shutil.which("cosbench")
