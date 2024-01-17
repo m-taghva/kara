@@ -3,16 +3,22 @@ import sys
 import getopt
 import subprocess
 import time
+sys.path.append('./../Status/')
+sys.path.append('./../Backup_restore/')
+import mrbench
+import config_gen
+import status_reporter
+import monstaver
 
 # Defining paths
 input_config_gen = "./input.txt"
 output_config_gen = "./workloads"
-result_path = "./../result"
+result_path = "./../results"
 script_file = "./pre_test_script.sh"
 transformation_dir = "./../conf/Status-reporter/transformation-cpu"
 
 def usage():
-    print("""
+   print("""
    manager.py [OPTIONS]
 
 Options:
@@ -21,13 +27,6 @@ Options:
 Example usage:
               manager.py -s /path/to/script.sh
 """)
-
-# Extract start and end times from the "time" file
-def extract_time_range(time_file_path):
-    with open(time_file_path, 'r') as time_file:
-        content = time_file.read().strip()  
-        start_time, end_time = content.split(',')
-        return start_time, end_time
 
 def main(argv):
     global script_file
@@ -46,16 +45,10 @@ def main(argv):
             if not os.path.isfile(script_file):
                 print(f"Error: The specified script file '{script_file}' does not exist. Exiting.")
                 sys.exit(1)
-    
-    # Run config_gen.py
-    config_gen = f"python3 ./config_gen.py -i {input_config_gen} -o {output_config_gen}"
-    config_gen_process = subprocess.run(config_gen, shell=True)
-    
-    # Check if config_gen.py finished successfully
-    if config_gen_process.returncode != 0:
-        print("Error in config_gen.py. Exiting.")
-        sys.exit(1)
-    
+
+    # RUN congig_gen
+    config_gen.main(input_config_gen, output_config_gen)
+
     # Process config files in the output_config_gen directory
     for config_file in sorted(os.listdir(output_config_gen)):
         config_file_path = os.path.join(output_config_gen, config_file)
@@ -66,36 +59,20 @@ def main(argv):
             print(f"Error in {script_file}. Exiting.")
             sys.exit(1)
 
-        # Call the main program for each XML file
-        mrbench = f"python3 ./mrbench.py -i {config_file_path} -o {result_path}"
-        mrbench_process = subprocess.run(mrbench, shell=True)
-
-        # Check if mrbench.py finished successfully
-        if mrbench_process.returncode != 0:
-            print(f"Error in mrbench.py for {config_file_path}. Exiting.")
-            sys.exit(1)
-
-        # Extract start and end times from the "time" file
-        time_file_path = os.path.join(result_path, config_file, "time")
-
-        # Wait for the "time" file to be created 
-        time.sleep(5)
-
-        start_time, end_time = extract_time_range(time_file_path)
+        # RUN mrbench
+        start_time, end_time, result_file_path = mrbench.main(config_file_path, result_path)
 
         # run status-reporter script 
-        status = f"python3 ./../Status/status_reporter.py -t '{start_time},{end_time}' -o {result_path}/{config_file}"
-        subprocess.call(status, shell=True)
+        status_reporter.main(path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)
 
         # run monstaver script 
-        backup = f"python3 ./../Backup_restore/monstaver.py -i {result_path}/{config_file} -t '{start_time},{end_time}' -r"
-        subprocess.call(backup, shell=True)
-        
+        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True)
+
     # Run analyzer and merger script after all has finished
     merger = f"python3 ./../Status/csv_merger.py -i {result_path} -c *.csv"
     subprocess.call(merger, shell=True)
     
-    if merger_process.returncode != 0:
+    if merger.returncode != 0:
         print("Error in merger.py Exiting.")
         sys.exit(1)
     time.sleep(5)
