@@ -56,9 +56,9 @@ def create_test_dir(result_path, workload_name):
     result_file_path = os.path.join(result_path, workload_name)
     if os.path.exists(result_file_path):
         i = 1
-        while os.path.exists(result_file_path + f"({i})"):
+        while os.path.exists(result_file_path + f"_{i}"):
             i += 1
-        result_file_path += f"({i})"
+        result_file_path += f"_{i}"
     os.mkdir(result_file_path)
     return result_file_path
 
