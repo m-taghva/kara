@@ -29,7 +29,6 @@ Example usage:
 
 def main(argv):
     global script_file
-
     # Parse command line arguments
     try:
         opts, args = getopt.getopt(argv, "hs:", ["script-file="])
