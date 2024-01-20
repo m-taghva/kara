@@ -64,9 +64,9 @@ def main(argv):
         monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True)
 
     # run analyzer and merger script after all has finished
-    analyzer_merger.main_m(merge=True, input_directory=result_path, selected_csv="*.csv")
+    analyzer_merger.main_m(input_directory=result_path, selected_csv="*.csv")
     time.sleep(10)
-    analyzer_merger.main_a(analyze=True, csv_original=result_path + "/*-merge.csv", transformation_directory=transformation_dir)
+    analyzer_merger.main_a(csv_original=result_path + "/*-merge.csv", transformation_directory=transformation_dir)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
