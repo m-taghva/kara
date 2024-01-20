@@ -21,10 +21,8 @@ transformation_dir = "./../conf/Status-reporter/transformation-cpu"
 def usage():
    print("""
    manager.py [OPTIONS]
-
 Options:
         -s, --script-file <file> : Path to the script file. (Default: ./pre_test_script.sh)
-  
 Example usage:
               manager.py -s /path/to/script.sh
 """)
@@ -38,7 +36,6 @@ def main(argv):
     except getopt.GetoptError:
         usage()
         sys.exit(1)
-
     for opt, arg in opts:
         if opt in ("-s", "--script-file"):
             script_file = arg
@@ -48,12 +45,11 @@ def main(argv):
                 sys.exit(1)
 
     # RUN congig_gen
-    config_gen_two.main(input_config_gen, output_config_gen)
+    config_gen.main(input_config_gen, output_config_gen)
 
     # Process config files in the output_config_gen directory
     for config_file in sorted(os.listdir(output_config_gen)):
-        config_file_path = os.path.join(output_config_gen, config_file)
-         
+        config_file_path = os.path.join(output_config_gen, config_file)     
         # Run the pre-script before calling mrbench
         pre_script_process = subprocess.run(script_file, shell=True)
         if pre_script_process.returncode != 0:
