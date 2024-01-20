@@ -91,7 +91,16 @@ def analyze_and_save_csv(csv_original, transformation_directory):
     if os.path.exists(intermediate_csv_path):
         os.remove(intermediate_csv_path)
 
-def main():
+def main_a(analyze, csv_original, transformation_directory):
+    if analyze:
+        analyze_and_save_csv(csv_original, transformation_directory)
+
+def main_m(merge, input_directory, selected_csv):
+    if merge:
+        output_csv_path = create_merged_csv(input_directory, selected_csv)
+        print(f"\n{BOLD}Merged CSV file:{RESET}{YELLOW} '{output_csv_path}' {RESET}{BOLD}has been created with the extracted values.{RESET}\n")
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Perform CSV operations and merge files.')
     parser.add_argument('-i', '--input_directory', help='Path to the directory containing CSV files (required for -M)')
     parser.add_argument('-c', '--selected_csv', help='Name of the selected CSV file or "*.csv" (required for -M)')
@@ -100,7 +109,7 @@ def main():
     parser.add_argument('-ct', '--csv_org', help='Custom CSV file for analysis (required for -A)')
     parser.add_argument('-t', '--transformation_directory', help='Path to transformation directory (required for -A)')
     args = parser.parse_args()
-
+    
     # Check required arguments based on operation
     if args.merge and (args.input_directory is None or args.selected_csv is None):
         print("Error: Both -i (--input_directory) and -c (--selected_csv) switches are required for merge operation.")
@@ -119,12 +128,5 @@ def main():
         print(f"Error: Directory not found - {input_directory}")
         exit(1)
 
-    if args.merge:
-        output_csv_path = create_merged_csv(input_directory, selected_csv)
-        print(f"\n{BOLD}Merged CSV file:{RESET}{YELLOW} '{output_csv_path}' {RESET}{BOLD}has been created with the extracted values.{RESET}\n")
-
-    if args.analyze:
-        analyze_and_save_csv(csv_original, transformation_directory)
-
-if __name__ == "__main__":
-    main()
+    main_a(analyze=args.analyze, csv_original=csv_original, transformation_directory=transformation_directory)
+    main_m(merge=args.merge, input_directory=input_directory, selected_csv=selected_csv)
