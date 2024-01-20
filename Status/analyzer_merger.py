@@ -9,6 +9,7 @@ BOLD = "\033[1m"
 RESET = "\033[0m"
 YELLOW = "\033[1;33m"
 
+####### MERGER #######
 def extract_string_number_pairs(target_directory):
     keys = re.findall("(?<=#)[^:]*(?=:)", target_directory)
     values = re.findall("(?<=:)[^#]*(?=#)", target_directory)
@@ -57,7 +58,8 @@ def create_merged_csv(input_directory, selected_csv):
         merge_csv_files(input_directory, csv_writer, selected_csv)
     print(f"\n{BOLD}Merged CSV file:{RESET}{YELLOW} '{output_csv_path}' {RESET}{BOLD}has been created with the extracted values.{RESET}\n")
     return output_csv_path
-
+    
+####### ANALYZER #######
 def read_txt_file(file_path):
     with open(file_path, 'r') as txt_file:
         operation, new_column_name = txt_file.readline().strip().split(':')
