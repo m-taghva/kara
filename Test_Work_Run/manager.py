@@ -9,6 +9,7 @@ import mrbench
 import config_gen
 import status_reporter
 import monstaver
+import analyzer_merger
 
 # Defining paths
 input_config_gen = "./input.txt"
@@ -47,7 +48,7 @@ def main(argv):
                 sys.exit(1)
 
     # RUN congig_gen
-    config_gen.main(input_config_gen, output_config_gen)
+    config_gen_two.main(input_config_gen, output_config_gen)
 
     # Process config files in the output_config_gen directory
     for config_file in sorted(os.listdir(output_config_gen)):
@@ -69,16 +70,9 @@ def main(argv):
         monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True)
 
     # Run analyzer and merger script after all has finished
-    merger = f"python3 ./../Status/csv_merger.py -i {result_path} -c *.csv"
-    subprocess.call(merger, shell=True)
-    
-    if merger.returncode != 0:
-        print("Error in merger.py Exiting.")
-        sys.exit(1)
-    time.sleep(5)
-    
-    analyzer = f"python3 ./../Status/status_analyzer.py -c {result_path}/*-merge.csv -d {transformation_dir}"
-    subprocess.call(analyzer, shell=True)
+    analyzer_merger.main_m(merge=True, input_directory=result_path, selected_csv="*.csv")
+    time.sleep(10)
+    analyzer_merger.main_a(analyze=True, csv_original=result_path + "/*-merge.csv", transformation_directory=transformation_dir)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
