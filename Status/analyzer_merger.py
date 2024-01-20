@@ -92,10 +92,10 @@ def analyze_and_save_csv(csv_original, transformation_directory):
     if os.path.exists(intermediate_csv_path):
         os.remove(intermediate_csv_path)
 
-def main_a(csv_original, transformation_directory):
+def main_analyze(csv_original, transformation_directory):
     analyze_and_save_csv(csv_original, transformation_directory)
 
-def main_m(input_directory, selected_csv):
+def main_merge(input_directory, selected_csv):
     create_merged_csv(input_directory, selected_csv)
 
 if __name__ == "__main__":
@@ -127,6 +127,6 @@ if __name__ == "__main__":
         exit(1)
 
     if args.analyze:
-       main_a(csv_original=csv_original, transformation_directory=transformation_directory)
+       main_analyze(csv_original=csv_original, transformation_directory=transformation_directory)
     if args.merge:
-       main_m(input_directory=input_directory, selected_csv=selected_csv)
+       main_merge(input_directory=input_directory, selected_csv=selected_csv)
