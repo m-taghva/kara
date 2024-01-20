@@ -42,7 +42,7 @@ def main(argv):
                 print(f"Error: The specified script file '{script_file}' does not exist. Exiting.")
                 sys.exit(1)
 
-    # RUN congig_gen
+    # run congig_gen
     config_gen.main(input_config_gen, output_config_gen)
 
     # Process config files in the output_config_gen directory
@@ -54,7 +54,7 @@ def main(argv):
             print(f"Error in {script_file}. Exiting.")
             sys.exit(1)
 
-        # RUN mrbench
+        # run mrbench
         start_time, end_time, result_file_path = mrbench.main(config_file_path, result_path)
 
         # run status-reporter script 
@@ -63,7 +63,7 @@ def main(argv):
         # run monstaver script 
         monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True)
 
-    # Run analyzer and merger script after all has finished
+    # run analyzer and merger script after all has finished
     analyzer_merger.main_m(merge=True, input_directory=result_path, selected_csv="*.csv")
     time.sleep(10)
     analyzer_merger.main_a(analyze=True, csv_original=result_path + "/*-merge.csv", transformation_directory=transformation_dir)
