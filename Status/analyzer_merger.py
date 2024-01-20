@@ -55,6 +55,7 @@ def create_merged_csv(input_directory, selected_csv):
     with open(output_csv_path, mode='a', newline='') as output_csv:
         csv_writer = csv.writer(output_csv)
         merge_csv_files(input_directory, csv_writer, selected_csv)
+    print(f"\n{BOLD}Merged CSV file:{RESET}{YELLOW} '{output_csv_path}' {RESET}{BOLD}has been created with the extracted values.{RESET}\n")
     return output_csv_path
 
 def read_txt_file(file_path):
@@ -91,14 +92,11 @@ def analyze_and_save_csv(csv_original, transformation_directory):
     if os.path.exists(intermediate_csv_path):
         os.remove(intermediate_csv_path)
 
-def main_a(analyze, csv_original, transformation_directory):
-    if analyze:
-        analyze_and_save_csv(csv_original, transformation_directory)
+def main_a(csv_original, transformation_directory):
+    analyze_and_save_csv(csv_original, transformation_directory)
 
-def main_m(merge, input_directory, selected_csv):
-    if merge:
-        output_csv_path = create_merged_csv(input_directory, selected_csv)
-        print(f"\n{BOLD}Merged CSV file:{RESET}{YELLOW} '{output_csv_path}' {RESET}{BOLD}has been created with the extracted values.{RESET}\n")
+def main_m(input_directory, selected_csv):
+    create_merged_csv(input_directory, selected_csv)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Perform CSV operations and merge files.')
@@ -128,5 +126,7 @@ if __name__ == "__main__":
         print(f"Error: Directory not found - {input_directory}")
         exit(1)
 
-    main_a(analyze=args.analyze, csv_original=csv_original, transformation_directory=transformation_directory)
-    main_m(merge=args.merge, input_directory=input_directory, selected_csv=selected_csv)
+    if args.analyze:
+       main_a(csv_original=csv_original, transformation_directory=transformation_directory)
+    if args.merge:
+       main_m(input_directory=input_directory, selected_csv=selected_csv)
