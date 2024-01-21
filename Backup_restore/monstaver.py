@@ -225,7 +225,7 @@ def main(time_range=None, inputs=None, delete=False):
              sys.exit(1)
 
          # run and save lshw & sysctl in host
-         hwsys_command= f"ssh -p {str(port)} {user}@{ip} sudo lshw -html > {backup_dir}/{time_dir_name}/hardware/{container_name}-HW.html ; sudo sysctl -a > {backup_dir}/{time_dir_name}/hardware/{container_name}-SYS.txt"
+         hwsys_command= f"ssh -p {str(port)} {user}@{ip} sudo lshw > {backup_dir}/{time_dir_name}/hardware/{container_name}-HW.txt ; sudo sysctl -a > {backup_dir}/{time_dir_name}/hardware/{container_name}-SYS.txt"
          hwsys_process = subprocess.run(hwsys_command, shell=True)
          if hwsys_process.returncode == 0:
              bar()
