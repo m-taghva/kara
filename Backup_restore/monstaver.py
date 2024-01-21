@@ -232,7 +232,8 @@ def main(time_range=None, inputs=None, delete=False):
          else:
              print("\033[91mlshw & sysctl failed.\033[0m")
              sys.exit(1)
-
+             
+         # run swift-init all status in monster host
          swift_init_command =  f"ssh -p {str(port)} {user}@{ip} 'docker exec {container_name} swift-init all status' > {backup_dir}/{time_dir_name}/swift/{container_name}-swift-status.txt"  
          swift_init_process = subprocess.run(swift_init_command, shell=True)
          if swift_init_process:
