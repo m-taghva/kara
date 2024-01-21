@@ -66,7 +66,7 @@ def main(time_range=None, inputs=None, delete=False):
 
     start_time_backup, end_time_backup, time_dir_name = convert_time(start_time_str, end_time_str, margin_start, margin_end)
 
-    total_steps = 2 + (len(data_loaded['influxdbs']) * 6 + sum([len(data_loaded["influxdbs"][x]["databases"]) for x in data_loaded["influxdbs"]]) + len(data_loaded['swift']) * 7)
+    total_steps = 2 + (len(data_loaded['influxdbs']) * 6 + sum([len(data_loaded["influxdbs"][x]["databases"]) for x in data_loaded["influxdbs"]]) + len(data_loaded['swift']) * 9)
     with alive_bar(total_steps, title=f'\033[1mProcessing Backup\033[0m:\033[92m {start_time_str} - {end_time_str}\033[0m') as bar:
 
      subprocess.run(f"sudo mkdir -p {backup_dir}", shell=True)
@@ -75,6 +75,7 @@ def main(time_range=None, inputs=None, delete=False):
      os.makedirs(f"{backup_dir}/{time_dir_name}/dbs", exist_ok=True)
      os.makedirs(f"{backup_dir}/{time_dir_name}/swift", exist_ok=True)
      os.makedirs(f"{backup_dir}/{time_dir_name}/other_info", exist_ok=True)
+     os.makedirs(f"{backup_dir}/{time_dir_name}/hardware", exist_ok=True)
      subprocess.run(f"sudo chmod -R 777 {backup_dir}", shell=True)
      bar()
 
@@ -85,7 +86,7 @@ def main(time_range=None, inputs=None, delete=False):
          ssh_user = config.get('ssh_user')
          container_name = config.get('container_name')
          influx_volume = config.get('influx_volume')
-         for db_name in config.get('databases', []):
+         for db_name in database_names:
              # Perform backup using influxd backup command
              backup_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd backup -portable -db {db_name} -start {start_time_backup} -end {end_time_backup} {influx_volume}/{time_dir_name}/{container_name}/{db_name} > /dev/null 2>&1'"
              backup_process = subprocess.run(backup_command, shell=True)
@@ -144,7 +145,7 @@ def main(time_range=None, inputs=None, delete=False):
          # delete {time_dir} inside container
          del_time_cont = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec {container_name} rm -rf {influx_volume}'"
          del_time_process = subprocess.run(del_time_cont, shell=True)
-         if del_process.returncode == 0:
+         if del_time_process.returncode == 0:
              bar()
          else:
              print("\033[91mRemove time dir inside container failed.\033[0m")
@@ -169,7 +170,7 @@ def main(time_range=None, inputs=None, delete=False):
    
          get_conf_one_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {backup_dir}/{time_dir_name}/swift/{container_name}-object-server.conf"
          get_conf_one_process = subprocess.run(get_conf_one_command, shell=True)
-         if get_conf_one_process.returncode== 0:
+         if get_conf_one_process.returncode == 0:
              bar()
          else:
              print("\033[91mFailure in getting object-server.conf\033[0m")
@@ -177,7 +178,7 @@ def main(time_range=None, inputs=None, delete=False):
     
          get_conf_two_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/container-server.conf > {backup_dir}/{time_dir_name}/swift/{container_name}-container-server.conf"
          get_conf_two_process = subprocess.run(get_conf_two_command, shell=True)
-         if get_conf_two_process.returncode== 0:
+         if get_conf_two_process.returncode == 0:
              bar()
          else: 
              print("\033[91mFailure in getting container-server.conf\033[0m")
@@ -185,7 +186,7 @@ def main(time_range=None, inputs=None, delete=False):
  
          get_conf_three_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/account-server.conf > {backup_dir}/{time_dir_name}/swift/{container_name}-account-server.conf"
          get_conf_three_process = subprocess.run(get_conf_three_command, shell=True)
-         if get_conf_three_process.returncode== 0:
+         if get_conf_three_process.returncode == 0:
              bar()
          else: 
              print("\033[91mFailure in getting account-server.conf\033[0m")
@@ -193,7 +194,7 @@ def main(time_range=None, inputs=None, delete=False):
  
          get_conf_four_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} cat /etc/swift/proxy-server.conf > {backup_dir}/{time_dir_name}/swift/{container_name}-proxy-server.conf"
          get_conf_four_process = subprocess.run(get_conf_four_command, shell=True)
-         if get_conf_four_process.returncode== 0:
+         if get_conf_four_process.returncode == 0:
              bar()
          else: 
              print("\033[91mFailure in getting proxy-server.conf\033[0m")
@@ -201,7 +202,7 @@ def main(time_range=None, inputs=None, delete=False):
 
          get_conf_five_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/account.builder > {backup_dir}/{time_dir_name}/swift/{container_name}-account-ring.txt"
          get_conf_five_process = subprocess.run(get_conf_five_command, shell=True)
-         if get_conf_five_process.returncode== 0:
+         if get_conf_five_process.returncode == 0:
              bar()
          else: 
              print("\033[91mFailure in getting account-ring\033[0m")
@@ -209,7 +210,7 @@ def main(time_range=None, inputs=None, delete=False):
 
          get_conf_six_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/container.builder > {backup_dir}/{time_dir_name}/swift/{container_name}-container-ring.txt"
          get_conf_six_process = subprocess.run(get_conf_six_command, shell=True)
-         if get_conf_six_process.returncode== 0:
+         if get_conf_six_process.returncode == 0:
              bar()
          else:  
              print("\033[91mFailure in getting container-ring\033[0m")
@@ -217,12 +218,26 @@ def main(time_range=None, inputs=None, delete=False):
             
          get_conf_seven_command =  f"ssh -p {str(port)} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/object.builder > {backup_dir}/{time_dir_name}/swift/{container_name}-object-ring.txt"
          get_conf_seven_process = subprocess.run(get_conf_seven_command, shell=True)
-         if get_conf_seven_process.returncode== 0:
+         if get_conf_seven_process.returncode == 0:
              bar()
          else: 
              print("\033[91mFailure in getting object-ring\033[0m")
              sys.exit(1)
-                
+
+         # run and save lshw & sysctl in host
+         hwsys_command= f"ssh -p {str(port)} {user}@{ip} sudo lshw -html > {backup_dir}/{time_dir_name}/hardware/{container_name}-HW.html ; sudo sysctl -a > {backup_dir}/{time_dir_name}/hardware/{container_name}-SYS.txt"
+         hwsys_process = subprocess.run(hwsys_command, shell=True)
+         if hwsys_process.returncode == 0:
+             bar()
+         else:
+             print("\033[91mlshw & sysctl failed.\033[0m")
+             sys.exit(1)
+
+         swift_init_command =  f"ssh -p {str(port)} {user}@{ip} 'docker exec {container_name} swift-init all status' > {backup_dir}/{time_dir_name}/swift/{container_name}-swift-status.txt"  
+         swift_init_process = subprocess.run(swift_init_command, shell=True)
+         if swift_init_process:
+            bar()
+                 
      # tar all result inside output dir
      tar_output = f"sudo tar -C {backup_dir} -cf {backup_dir}/{time_dir_name}.tar.gz {time_dir_name}"
      tar_output_process = subprocess.run(tar_output, shell=True)
