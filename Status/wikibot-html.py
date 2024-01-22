@@ -32,7 +32,6 @@ def convert_html_to_wiki(html_content):
         if 'src' in img_tag.attrs:
             src = img_tag['src']
             img_tag.replace_with(f'[[File:{src}]]')
-
     return str(soup)
 
 def upload_images(site, html_file_path):
@@ -81,12 +80,8 @@ def main():
 
     # Create an ArgumentParser object
     parser = argparse.ArgumentParser(description='Upload HTML content to a MediaWiki page.')
-
-    # Add arguments
     parser.add_argument('-H', '--html', help='Path to the HTML file', required=True)
     parser.add_argument('-T', '--title', help='Title of the wiki page', required=True)
-
-    # Parse the command-line arguments
     args = parser.parse_args()
 
     # Read HTML file
