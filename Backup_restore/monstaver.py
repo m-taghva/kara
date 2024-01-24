@@ -183,7 +183,7 @@ def main(time_range=None, inputs=None, delete=False):
             print("\033[91mmkdir of hardware/os/swift failed.\033[0m")
             sys.exit(1)
 
-         # get swift config files 
+         # get swift config files and monster services
          get_swift_conf = f"ssh -p {port} {user}@{ip} 'docker exec {container_name} swift-init all status' > {backup_dir}/{time_dir_name}/swift/{container_name}/{container_name}-swift-status.txt ; "
          get_swift_conf += f"ssh -p {port} {user}@{ip} 'docker exec {container_name} service --status-all' > {backup_dir}/{time_dir_name}/monster_conf/os/container/{container_name}/{container_name}-services.txt 2>&1 ; "
          get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/container-server.conf > {backup_dir}/{time_dir_name}/swift/{container_name}/{container_name}-container-server.conf ; "
@@ -197,7 +197,7 @@ def main(time_range=None, inputs=None, delete=False):
          if get_swift_conf_process.returncode == 0:
              bar()
          else:
-             print("\033[91mget swift configs failed.\033[0m")
+             print("\033[91mget swift configs and monster services failed.\033[0m")
              sys.exit(1)
          
          # copy etc dir from container to host
