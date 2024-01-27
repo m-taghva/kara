@@ -1,0 +1,56 @@
+<h1>گزارش  تست هیولا</h1>
+
+<h2>فصل اول مشخصات سخت افزاری</h2>
+
+<img src="reporter_mon.png"> 
+--------------------------------------------------------
+<h3>تست فونت</h3>
+
+<p> تست مجموعه ابزار کارا <a href="https://www.w3schools.com/html/">تست لینک در صفحه</a> تست کارایی هیولا</p>
+
+--------------------------------------------------------
+<h4>تست فونت</h4>
+--------------------------------------------------------
+<syntaxhighlight lang="bash">
+sudo mkdir report_recorder 
+</syntaxhighlight>
+--------------------------------------------------------
+
+
+<table border="1" class="dataframe">
+<tr style="text-align: center;">
+<th></th>
+<th>Host_alias</th>
+<th>sum_system.cpu.user</th>
+<th>sum_system.cpu.system</th>
+<th>mean_system.cpu.iowait</th>
+<th>mean_system.cpu.idle</th>
+</tr>
+<tr>
+<th>0</th>
+<td>paco</td>
+<td>2669.214731</td>
+<td>766.514852</td>
+<td>0.411347</td>
+<td>74.742164</td>
+</tr>
+<tr>
+<th>1</th>
+<td>proxy</td>
+<td>1739.016165</td>
+<td>631.871739</td>
+<td>0.531745</td>
+<td>80.927474</td>
+</tr>
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+<h4>تست کانفیگ ps</h4>
+{input_config}: /tmp/influxdb-backup/231107T091001_231107T093001/monster_conf/os/host/m-r1z1s1/m-r1z1s1-ps-aux.txt
+-----------------------------------------------------------------------------------------------------------------------
+<h4>تست کانفیگ unit</h4>
+{input_config}: /tmp/influxdb-backup/231107T091001_231107T093001/monster_conf/os/host/m-r1z1s1/m-r1z1s1-list-units.txt  
+-----------------------------------------------------------------------------------------------------------------------
+<h4>تست کانفیگ sysctl</h4>
+{input_config}: /tmp/influxdb-backup/231107T091001_231107T093001/monster_conf/os/host/m-r1z1s1/m-r1z1s1-sysctl.txt
