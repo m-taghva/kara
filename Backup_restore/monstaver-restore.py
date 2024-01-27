@@ -4,7 +4,7 @@ import argparse
 import sys
 import yaml
 
-config_file = "./conf/monstaver-restore.conf"
+config_file = "./../Backup_restore/conf/monstaver-restore.conf"
 with open(config_file, "r") as stream:
     try:
         data_loaded = yaml.safe_load(stream)
