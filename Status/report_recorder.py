@@ -48,7 +48,7 @@ def main():
     print(f"HTML template saved to: {html_output}")
 
     # Assuming that pwb.py is a Python script, you can run it directly without using subprocess
-    pybot = f"python3 pwb.py ./scripts/userscripts/page-maker-html2.7.py -H {html_output} -T {page_title}"
+    pybot = f"python3 pwb.py ./scripts/userscripts/wikibot-html.py -H {html_output} -T {page_title}"
     subprocess.call(pybot, shell=True)
 
 if __name__ == "__main__":
