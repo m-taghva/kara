@@ -8,7 +8,7 @@ import pytz
 import yaml
 from alive_progress import alive_bar
 
-config_file = "./../../conf/Backup_Restore/monstaver-org.conf"
+config_file = "./../conf/Backup_Restore/monstaver.conf"
 
 def load_config(config_file):
     with open(config_file, "r") as stream:
@@ -29,25 +29,20 @@ def tehran_time_to_utc(tehran_time_str):
 def convert_time(start_time_str, end_time_str, margin_start, margin_end):
       start_datetime = datetime.datetime.strptime(start_time_str, "%Y-%m-%d %H:%M:%S")
       end_datetime = datetime.datetime.strptime(end_time_str, "%Y-%m-%d %H:%M:%S")
-
       # Convert Tehran time to UTC
       start_datetime_utc = tehran_time_to_utc(start_datetime)
       end_datetime_utc = tehran_time_to_utc(end_datetime)
-    
       # Add the margins to datetime objects
       start_datetime_utc -= datetime.timedelta(seconds=margin_start)
       end_datetime_utc += datetime.timedelta(seconds=margin_end)
-
       # Convert the UTC datetime objects back to strings
       start_datetime_utc_str = start_datetime_utc.strftime("%Y-%m-%d %H:%M:%S")
       end_datetime_utc_str = end_datetime_utc.strftime("%Y-%m-%d %H:%M:%S")
-
       # Creating backup time format
       backup_start_date, backup_start_time = start_datetime_utc_str.split(" ")
       start_time_backup = backup_start_date + "T" + backup_start_time + "Z"
       backup_end_date, backup_end_time = end_datetime_utc_str.split(" ")
       end_time_backup = backup_end_date + "T" + backup_end_time + "Z"
-
       # Directory name creation
       dir_start_date, dir_start_time = start_time_str.split(" ")
       dir_start_date = dir_start_date[2:].replace("-", "")
@@ -63,10 +58,9 @@ def main(time_range=None, inputs=None, delete=False):
     backup_dir = data_loaded['default'].get('backup_output')
     start_time_str, end_time_str = time_range.split(',')
     margin_start, margin_end = map(int, data_loaded['default'].get('time_margin').split(',')) 
-
     start_time_backup, end_time_backup, time_dir_name = convert_time(start_time_str, end_time_str, margin_start, margin_end)
 
-    total_steps = 2 + (len(data_loaded['influxdbs']) * 6 + sum([len(data_loaded["influxdbs"][x]["databases"]) for x in data_loaded["influxdbs"]]) + len(data_loaded['swift']) * 7)
+    total_steps = 2 + (len(data_loaded['influxdbs']) * 6 + sum([len(data_loaded["influxdbs"][x]["databases"]) for x in data_loaded["influxdbs"]]) + len(data_loaded['swift']) * 15)
     with alive_bar(total_steps, title=f'\033[1mProcessing Backup\033[0m:\033[92m {start_time_str} - {end_time_str}\033[0m') as bar:
 
      subprocess.run(f"sudo mkdir -p {backup_dir}", shell=True)
@@ -221,21 +215,78 @@ def main(time_range=None, inputs=None, delete=False):
          if mv_etc_host_process:
             bar()
 
-         # Execute commands to gather hardware information 
-         hwos_command = f"ssh -p {port} {user}@{ip} sudo lshw > {backup_dir}/{time_dir_name}/monster_conf/hardware/{container_name}/{container_name}-lshw.txt ; " 
-         hwos_command += f"ssh -p {port} {user}@{ip} sudo lscpu > {backup_dir}/{time_dir_name}/monster_conf/hardware/{container_name}/{container_name}-lscpu.txt ; "
-         hwos_command += f"ssh -p {port} {user}@{ip} sudo lsmem > {backup_dir}/{time_dir_name}/monster_conf/hardware/{container_name}/{container_name}-lsmem.txt ; "
-         hwos_command += f"ssh -p {port} {user}@{ip} sudo lspci > {backup_dir}/{time_dir_name}/monster_conf/hardware/{container_name}/{container_name}-lspci.txt ; "
-         # Execute commands to gather OS information
-         hwos_command += f"ssh -p {port} {user}@{ip} sudo sysctl -a > {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-sysctl.txt ; "
-         hwos_command += f"ssh -p {port} {user}@{ip} sudo ps -aux > {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-ps-aux.txt ; "
-         hwos_command += f"ssh -p {port} {user}@{ip} sudo systemctl list-units > {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-list-units.txt ; "
-         hwos_command += f"ssh -p {port} {user}@{ip} sudo lsmod > {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-lsmod.txt "
-         hwos_process = subprocess.run(hwos_command, shell=True)
-         if hwos_process.returncode == 0:
+         #### Execute commands to gather hardware information ####
+         lshw_command = f"ssh -p {port} {user}@{ip} sudo lshw > {backup_dir}/{time_dir_name}/monster_conf/hardware/{container_name}/{container_name}-lshw.txt"
+         lshw_process = subprocess.run(lshw_command, shell=True)
+         if lshw_process.returncode == 0:
              bar()
          else:
-             print("\033[91mgather OS & hardware info failed.\033[0m")
+             print("\033[91m lshw failed.\033[0m")
+             sys.exit(1)
+
+         lscpu_command = f"ssh -p {port} {user}@{ip} sudo lscpu > {backup_dir}/{time_dir_name}/monster_conf/hardware/{container_name}/{container_name}-lscpu.txt"
+         lscpu_process = subprocess.run(lscpu_command, shell=True)
+         if lscpu_process.returncode == 0:
+             bar()
+         else:
+             print("\033[91m lscpu failed.\033[0m")
+             sys.exit(1)
+
+         lsmem_command = f"ssh -p {port} {user}@{ip} sudo lsmem > {backup_dir}/{time_dir_name}/monster_conf/hardware/{container_name}/{container_name}-lsmem.txt"
+         lsmem_process = subprocess.run(lsmem_command, shell=True)
+         if lsmem_process.returncode == 0:
+             bar()
+         else:
+             print("\033[91m lamem failed.\033[0m")
+             sys.exit(1)
+
+         lspci_command = f"ssh -p {port} {user}@{ip} sudo lspci > {backup_dir}/{time_dir_name}/monster_conf/hardware/{container_name}/{container_name}-lspci.txt"
+         lspci_process = subprocess.run(lspci_command, shell=True)
+         if lspci_process.returncode == 0:
+             bar()
+         else:
+             print("\033[91m lspci failed.\033[0m")
+             sys.exit(1)
+         
+         #### Execute commands to gather OS information ####
+         sysctl_command = f"ssh -p {port} {user}@{ip} sudo sysctl -a > {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-sysctl.txt"
+         sysctl_process = subprocess.run(sysctl_command, shell=True)
+         if sysctl_process.returncode == 0:
+             bar()
+         else:
+             print("\033[91m sysctl failed.\033[0m")
+             sys.exit(1)
+
+         ps_aux_command = f"ssh -p {port} {user}@{ip} sudo ps -aux > {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-ps-aux.txt"
+         ps_aux_process = subprocess.run(ps_aux_command, shell=True)
+         if ps_aux_process.returncode == 0:
+             bar()
+         else:
+             print("\033[91m ps_aux failed.\033[0m")
+             sys.exit(1)
+
+         list_unit_command = f"ssh -p {port} {user}@{ip} sudo systemctl list-units > {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-list-units.txt"
+         list_unit_process = subprocess.run(list_unit_command, shell=True)
+         if list_unit_process.returncode == 0:
+             bar()
+         else:
+             print("\033[91m list_unit failed.\033[0m")
+             sys.exit(1)
+
+         lsmod_command = f"ssh -p {port} {user}@{ip} sudo lsmod > {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-lsmod.txt"
+         lsmod_process = subprocess.run(lsmod_command, shell=True)
+         if lsmod_process.returncode == 0:
+             bar()
+         else:
+             print("\033[91m lsmod failed.\033[0m")
+             sys.exit(1)
+         
+         lsof_command = f"ssh -p {port} {user}@{ip} sudo lsof > {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-lsof.txt 2>&1"
+         lsof_process = subprocess.run(lsof_command, shell=True)
+         if lsof_process.returncode == 0:
+             bar()
+         else:
+             print("\033[91m lsof failed.\033[0m")
              sys.exit(1)
 
          # remove /influxdb-backup/time_dir from container and host
