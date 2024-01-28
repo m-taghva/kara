@@ -67,11 +67,8 @@ def main(time_range=None, inputs=None, delete=False):
      #create dbs-swif-other_info sub dirs in {time} directory 
      os.makedirs(f"{backup_dir}/{time_dir_name}", exist_ok=True)
      os.makedirs(f"{backup_dir}/{time_dir_name}/dbs", exist_ok=True)
-     os.makedirs(f"{backup_dir}/{time_dir_name}/swift", exist_ok=True)
      os.makedirs(f"{backup_dir}/{time_dir_name}/other_info", exist_ok=True)
-     os.makedirs(f"{backup_dir}/{time_dir_name}/monster_conf/hardware", exist_ok=True)
-     os.makedirs(f"{backup_dir}/{time_dir_name}/monster_conf/os/host", exist_ok=True)
-     os.makedirs(f"{backup_dir}/{time_dir_name}/monster_conf/os/container", exist_ok=True)
+     os.makedirs(f"{backup_dir}/{time_dir_name}/monster_conf", exist_ok=True)
      subprocess.run(f"sudo chmod -R 777 {backup_dir}", shell=True)
      bar()
 
@@ -165,11 +162,11 @@ def main(time_range=None, inputs=None, delete=False):
          port = value['ssh_port']
          
          # make hardware/os/swift sub directories
-         mkdir_hwoss_output = f"sudo mkdir -p {backup_dir}/{time_dir_name}/swift/{container_name} ; "
-         mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/monster_conf/hardware/{container_name}/ ; " 
-         mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-etc/ ; " 
-         mkdir_hwoss_output += f"sudo mkdir -p  {backup_dir}/{time_dir_name}/monster_conf/os/container/{container_name}/{container_name}-etc/ ; " 
-         mkdir_hwoss_output += f"ssh -p {port} {user}@{ip} sudo mkdir -p {backup_dir}/{time_dir_name}/monster_conf/os/container/{container_name}/{container_name}-etc/ "
+         mkdir_hwoss_output = f"sudo mkdir -p {backup_dir}/{time_dir_name}/monster_conf/{container_name}/swift/ ; "
+         mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/monster_conf/{container_name}/hardware ; " 
+         mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-etc-host/ ; " 
+         mkdir_hwoss_output += f"sudo mkdir -p  {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-etc-container/ ; " 
+         mkdir_hwoss_output += f"ssh -p {port} {user}@{ip} sudo mkdir -p {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-etc-container/ "
          mkdir_hwoss_process = subprocess.run(mkdir_hwoss_output, shell=True)
          if mkdir_hwoss_process.returncode == 0:
             bar()
@@ -178,15 +175,15 @@ def main(time_range=None, inputs=None, delete=False):
             sys.exit(1)
 
          # get swift config files and monster services
-         get_swift_conf = f"ssh -p {port} {user}@{ip} 'docker exec {container_name} swift-init all status' > {backup_dir}/{time_dir_name}/swift/{container_name}/{container_name}-swift-status.txt ; "
-         get_swift_conf += f"ssh -p {port} {user}@{ip} 'docker exec {container_name} service --status-all' > {backup_dir}/{time_dir_name}/monster_conf/os/container/{container_name}/{container_name}-services.txt 2>&1 ; "
-         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/container-server.conf > {backup_dir}/{time_dir_name}/swift/{container_name}/{container_name}-container-server.conf ; "
-         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/account-server.conf > {backup_dir}/{time_dir_name}/swift/{container_name}/{container_name}-account-server.conf ; "
-         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/proxy-server.conf > {backup_dir}/{time_dir_name}/swift/{container_name}/{container_name}-proxy-server.conf ; "
-         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/account.builder > {backup_dir}/{time_dir_name}/swift/{container_name}/{container_name}-account-ring.txt ; "
-         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/container.builder > {backup_dir}/{time_dir_name}/swift/{container_name}/{container_name}-container-ring.txt ; "
-         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/object.builder > {backup_dir}/{time_dir_name}/swift/{container_name}/{container_name}-object-ring.txt ; "
-         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {backup_dir}/{time_dir_name}/swift/{container_name}/{container_name}-object-server.conf "
+         get_swift_conf = f"ssh -p {port} {user}@{ip} 'docker exec {container_name} swift-init all status' > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/swift/{container_name}-swift-status.txt ; "
+         get_swift_conf += f"ssh -p {port} {user}@{ip} 'docker exec {container_name} service --status-all' > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-services-container.txt 2>&1 ; "
+         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/container-server.conf > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/swift/{container_name}-container-server.conf ; "
+         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/account-server.conf > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/swift/{container_name}-account-server.conf ; "
+         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/proxy-server.conf > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/swift/{container_name}-proxy-server.conf ; "
+         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/account.builder > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/swift/{container_name}-account-ring.txt ; "
+         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/container.builder > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/swift/{container_name}-container-ring.txt ; "
+         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/object.builder > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/swift/{container_name}-object-ring.txt ; "
+         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/swift/{container_name}-object-server.conf "
          get_swift_conf_process = subprocess.run(get_swift_conf, shell=True)
          if get_swift_conf_process.returncode == 0:
              bar()
@@ -195,7 +192,7 @@ def main(time_range=None, inputs=None, delete=False):
              sys.exit(1)
          
          # copy etc dir from container to host
-         get_etc_command =  f"ssh -p {port} {user}@{ip} 'docker cp {container_name}:/etc  {backup_dir}/{time_dir_name}/monster_conf/os/container/{container_name}/{container_name}-etc/'"
+         get_etc_command =  f"ssh -p {port} {user}@{ip} 'docker cp {container_name}:/etc  {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-etc-container/'"
          get_etc_process = subprocess.run(get_etc_command, shell=True)
          if get_etc_process.returncode == 0:
              bar()
@@ -204,19 +201,19 @@ def main(time_range=None, inputs=None, delete=False):
              sys.exit(1)
 
          # copy container etc dir from host to your server
-         mv_etc_cont_command = f"scp -r -P {port} {user}@{ip}:{backup_dir}/{time_dir_name}/monster_conf/os/container/{container_name}/{container_name}-etc/etc/*  {backup_dir}/{time_dir_name}/monster_conf/os/container/{container_name}/{container_name}-etc/ > /dev/null 2>&1"
+         mv_etc_cont_command = f"scp -r -P {port} {user}@{ip}:{backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-etc-container/etc/*  {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-etc-container/ > /dev/null 2>&1"
          mv_etc_cont_process = subprocess.run(mv_etc_cont_command, shell=True)
          if mv_etc_cont_process:
              bar()
          
          # copy host etc dir from host to your server
-         mv_etc_host_command = f"scp -r -P {port} {user}@{ip}:/etc/*  {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-etc/ > /dev/null 2>&1"
+         mv_etc_host_command = f"scp -r -P {port} {user}@{ip}:/etc/*  {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-etc-host/ > /dev/null 2>&1"
          mv_etc_host_process = subprocess.run(mv_etc_host_command, shell=True)
          if mv_etc_host_process:
             bar()
 
          #### Execute commands to gather hardware information ####
-         lshw_command = f"ssh -p {port} {user}@{ip} sudo lshw > {backup_dir}/{time_dir_name}/monster_conf/hardware/{container_name}/{container_name}-lshw.txt"
+         lshw_command = f"ssh -p {port} {user}@{ip} sudo lshw > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/hardware/{container_name}-lshw-host.txt"
          lshw_process = subprocess.run(lshw_command, shell=True)
          if lshw_process.returncode == 0:
              bar()
@@ -224,7 +221,7 @@ def main(time_range=None, inputs=None, delete=False):
              print("\033[91m lshw failed.\033[0m")
              sys.exit(1)
 
-         lscpu_command = f"ssh -p {port} {user}@{ip} sudo lscpu > {backup_dir}/{time_dir_name}/monster_conf/hardware/{container_name}/{container_name}-lscpu.txt"
+         lscpu_command = f"ssh -p {port} {user}@{ip} sudo lscpu > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/hardware/{container_name}-lscpu-host.txt"
          lscpu_process = subprocess.run(lscpu_command, shell=True)
          if lscpu_process.returncode == 0:
              bar()
@@ -232,7 +229,7 @@ def main(time_range=None, inputs=None, delete=False):
              print("\033[91m lscpu failed.\033[0m")
              sys.exit(1)
 
-         lsmem_command = f"ssh -p {port} {user}@{ip} sudo lsmem > {backup_dir}/{time_dir_name}/monster_conf/hardware/{container_name}/{container_name}-lsmem.txt"
+         lsmem_command = f"ssh -p {port} {user}@{ip} sudo lsmem > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/hardware/{container_name}-lsmem-host.txt"
          lsmem_process = subprocess.run(lsmem_command, shell=True)
          if lsmem_process.returncode == 0:
              bar()
@@ -240,7 +237,7 @@ def main(time_range=None, inputs=None, delete=False):
              print("\033[91m lamem failed.\033[0m")
              sys.exit(1)
 
-         lspci_command = f"ssh -p {port} {user}@{ip} sudo lspci > {backup_dir}/{time_dir_name}/monster_conf/hardware/{container_name}/{container_name}-lspci.txt"
+         lspci_command = f"ssh -p {port} {user}@{ip} sudo lspci > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/hardware/{container_name}-lspci-host.txt"
          lspci_process = subprocess.run(lspci_command, shell=True)
          if lspci_process.returncode == 0:
              bar()
@@ -249,7 +246,7 @@ def main(time_range=None, inputs=None, delete=False):
              sys.exit(1)
          
          #### Execute commands to gather OS information ####
-         sysctl_command = f"ssh -p {port} {user}@{ip} sudo sysctl -a > {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-sysctl.txt"
+         sysctl_command = f"ssh -p {port} {user}@{ip} sudo sysctl -a > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-sysctl-host.txt"
          sysctl_process = subprocess.run(sysctl_command, shell=True)
          if sysctl_process.returncode == 0:
              bar()
@@ -257,7 +254,7 @@ def main(time_range=None, inputs=None, delete=False):
              print("\033[91m sysctl failed.\033[0m")
              sys.exit(1)
 
-         ps_aux_command = f"ssh -p {port} {user}@{ip} sudo ps -aux > {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-ps-aux.txt"
+         ps_aux_command = f"ssh -p {port} {user}@{ip} sudo ps -aux > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-ps-aux-host.txt"
          ps_aux_process = subprocess.run(ps_aux_command, shell=True)
          if ps_aux_process.returncode == 0:
              bar()
@@ -265,7 +262,7 @@ def main(time_range=None, inputs=None, delete=False):
              print("\033[91m ps_aux failed.\033[0m")
              sys.exit(1)
 
-         list_unit_command = f"ssh -p {port} {user}@{ip} sudo systemctl list-units > {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-list-units.txt"
+         list_unit_command = f"ssh -p {port} {user}@{ip} sudo systemctl list-units > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-list-units-host.txt"
          list_unit_process = subprocess.run(list_unit_command, shell=True)
          if list_unit_process.returncode == 0:
              bar()
@@ -273,7 +270,7 @@ def main(time_range=None, inputs=None, delete=False):
              print("\033[91m list_unit failed.\033[0m")
              sys.exit(1)
 
-         lsmod_command = f"ssh -p {port} {user}@{ip} sudo lsmod > {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-lsmod.txt"
+         lsmod_command = f"ssh -p {port} {user}@{ip} sudo lsmod > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-lsmod-host.txt"
          lsmod_process = subprocess.run(lsmod_command, shell=True)
          if lsmod_process.returncode == 0:
              bar()
@@ -281,7 +278,7 @@ def main(time_range=None, inputs=None, delete=False):
              print("\033[91m lsmod failed.\033[0m")
              sys.exit(1)
          
-         lsof_command = f"ssh -p {port} {user}@{ip} sudo lsof > {backup_dir}/{time_dir_name}/monster_conf/os/host/{container_name}/{container_name}-lsof.txt 2>&1"
+         lsof_command = f"ssh -p {port} {user}@{ip} sudo lsof > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-lsof-host.txt 2>&1"
          lsof_process = subprocess.run(lsof_command, shell=True)
          if lsof_process.returncode == 0:
              bar()
