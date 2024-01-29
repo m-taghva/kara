@@ -55,6 +55,7 @@ def convert_time(start_time_str, end_time_str, margin_start, margin_end):
 
 ##### RESTORE PARTS #####
 def restore():
+  data_loaded = load_config(config_file)
   for mc_server, config in data_loaded.get('influxdbs_restore', {}).items(): 
    ip_influxdb = config.get('ip')
    ssh_port = config.get('ssh_port')
