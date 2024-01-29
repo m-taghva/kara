@@ -11,31 +11,6 @@ with open(config_file, "r") as stream:
         print(f"Error loading the configuration: {exc}")
         sys.exit(1)
 
-# Process given directory name as an arqument
-argParser = argparse.ArgumentParser()
-argParser.add_argument("-bl", "--backup_location", help="Backup Location (Path to backup file)")
-args = argParser.parse_args()
-backup_location = args.backup_location
-
-if not backup_location:
-    backup_location_found = False
-    for mc_server, config in data_loaded.get('influxdbs_restore', {}).items():
-        databases = config.get('databases', [])
-        for db_info in databases:
-            location = db_info.get('location')
-            if location:
-                backup_location = location
-                backup_location_found = True
-                break
-        if backup_location_found:
-           break
-    if not backup_location_found:
-        print("Error: No instance found in the configuration with a valid backup location.")
-        sys.exit(1)
-    if not backup_location:
-        print("Error: Backup location not found for any instance in the configuration.")
-        sys.exit(1)
-
 for mc_server, config in data_loaded.get('influxdbs_restore', {}).items(): 
    ip_influxdb = config.get('ip')
    ssh_port = config.get('ssh_port')
@@ -107,7 +82,7 @@ for mc_server, config in data_loaded.get('influxdbs_restore', {}).items():
           sys.exit(1)
 
        # Copy backup file to container mount point
-       copy_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker cp {backup_location} {container_name}:{influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_tar'"
+       copy_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker cp {location} {container_name}:{influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_tar'"
        copy_process = subprocess.run(copy_command, shell=True)
        exit_code = copy_process.returncode
        if exit_code == 0:
