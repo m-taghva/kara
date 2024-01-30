@@ -61,7 +61,7 @@ def restore():
    ssh_port = config.get('ssh_port')
    ssh_user = config.get('ssh_user')
    container_name = config.get('container_name')
-   influx_mount_point = config.get('influx_mount_point')
+   influx_mount_point = config.get('influx_volume')
    databases = config.get('databases')
    for db_info in databases:
        prefix = db_info.get('prefix')
@@ -190,10 +190,19 @@ def restore():
           else:
              print("\033[91mDropping temporary database failed.\033[0m")
              print()
+             
+          # remove untar and tar file in container
+          del_restore_cont = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec {container_name} rm -rf {influx_mount_point}'"
+          del_restore_process = subprocess.run(del_restore_cont, shell=True)
+          if del_restore_process.returncode == 0:
+              time.sleep(1)
+          else:
+              print("\033[91mRemove time dir inside container failed.\033[0m")
+              sys.exit(1)
 
           print(f"*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* END OF RESTORE FOR\033[92m {mc_server} | {destination_db_name} \033[0m*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
           print()
-          
+
        # If main database does not exist 
        elif output is not None and databases not in output:
              restore_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd restore -portable -db {source_db_name} {influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_untar'"
