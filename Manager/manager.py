@@ -16,11 +16,11 @@ import monstaver
 import analyzer_merger
 
 # Defining paths
-input_config_gen = "./input.txt"
-output_config_gen = "./workloads"
+input_config_gen = "./Config_gen/input.txt"
+output_config_gen = "./Config_gen/workloads"
 result_path = "./../results"
 script_file = "./pre_test_script.sh"
-transformation_dir = "./../Status/conf/transformation-cpu"
+transformation_dir = "./../Analyzer/conf/transformation-cpu"
 
 def usage():
    print("""
