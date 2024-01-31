@@ -5,8 +5,10 @@ import subprocess
 import time
 sys.path.append('./../Status/')
 sys.path.append('./../Backup_restore/')
-sys.path.append('./../Status/Analyzer/')
-sys.path.append('./../Status/Report_recorder')
+sys.path.append('./../Analyzer/')
+sys.path.append('./../Config_gen/')
+sys.path.append('./../Report_recorder/')
+sys.path.append('./../Mrbench/')
 import mrbench
 import config_gen
 import status_reporter
