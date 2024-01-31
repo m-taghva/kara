@@ -346,7 +346,8 @@ def main(time_range=None, inputs=None, delete=None):
          get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/account.builder > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/swift/{container_name}-account-ring.txt ; "
          get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/container.builder > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/swift/{container_name}-container-ring.txt ; "
          get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/object.builder > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/swift/{container_name}-object-ring.txt ; "
-         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/swift/{container_name}-object-server.conf "
+         get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/swift/{container_name}-object-server.conf ; "
+         get_swift_conf += f"ssh -p {port} {user}@{ip} docker inspect {container_name} > {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-docker-inspect.txt "
          get_swift_conf_process = subprocess.run(get_swift_conf, shell=True)
          if get_swift_conf_process.returncode == 0:
              bar()
