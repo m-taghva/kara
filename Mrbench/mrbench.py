@@ -5,6 +5,11 @@ import csv
 import shutil
 import time
 import argparse
+import sys
+import yaml
+import json
+
+config_file = "./../Mrbench/conf/mrbench.conf"
 
 # For font style
 BOLD = "\033[1m"
@@ -14,6 +19,41 @@ YELLOW = "\033[1;33m"
 print("")
 print(f"{YELLOW}========================================{RESET}")
 
+def load_config(config_file):
+    with open(config_file, "r") as stream:
+        try:
+           data_loaded = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+           print(f"Error loading the configuration: {exc}")
+           sys.exit(1)
+    return data_loaded
+
+def copy_swift_conf(ring_dir, conf_dir):
+    data_loaded = load_config(config_file)
+    for key,value in data_loaded['swift'].items():
+        container_name = key
+        user = value['ssh_user']
+        ip = value['ip_swift']
+        port = value['ssh_port']
+        key_to_extract = "com.docker.compose.project.working_dir"
+
+        # Run the docker inspect command and capture the output
+        inspect_command = f"ssh -p {port} {user}@{ip} docker inspect {container_name}"
+        inspect_result = subprocess.run(inspect_command, shell=True, capture_output=True, text=True)
+        if inspect_result.returncode == 0:
+        # Parse the JSON output
+           container_info = json.loads(inspect_result.stdout)
+        # Check if the key exists in the JSON structure
+        if key_to_extract in container_info[0]['Config']['Labels']:
+           inspect_value = container_info[0]['Config']['Labels'][key_to_extract]
+
+        copy_conf_command = f"scp -r -P {port} {conf_dir}/* {user}@{ip}:{inspect_value} > /dev/null 2>&1 ; "
+        copy_conf_command += f"scp -r -P {port} {ring_dir}/* {user}@{ip}:{inspect_value}/rings > /dev/null 2>&1 "
+        copy_conf_process = subprocess.run(copy_conf_command, shell=True)
+        if copy_conf_process:
+           time.sleep(1)
+    print("\033[92mcopy config and rings file successful\033[0m")
+           
 def submit(workload_file_path, output_path):
     cosbenchBin = shutil.which("cosbench")
     if not(cosbenchBin):
@@ -119,9 +159,18 @@ def main(workload_config_path, output_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Monster Benchmark')
-    parser.add_argument('-i', '--input', help='Input file path', required=True)
-    parser.add_argument('-o', '--output', help='Output directory', required=True)
+    parser.add_argument('-i', '--input', help='Input file path')
+    parser.add_argument('-o', '--output', help='Output directory')
+    parser.add_argument('-r', '--ring', help='ring directory')
+    parser.add_argument('-c', '--conf_swift', help='swift config directory')
+    parser.add_argument("-s", "--swift", action="store_true", help="run copy swift function")
     args = parser.parse_args()
     workload_config_path = args.input
     output_path = args.output
-    main(workload_config_path, output_path)
+    ring_dir = args.ring
+    conf_dir = args.conf_swift
+
+    if args.swift:
+        copy_swift_conf(ring_dir, conf_dir)
+    else:
+        main(workload_config_path, output_path)
