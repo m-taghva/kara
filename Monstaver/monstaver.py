@@ -484,7 +484,7 @@ if __name__ == "__main__":
     argParser.add_argument("-t", "--time_range", help="Start and end times for backup (format: 'start_time,end_time')")
     argParser.add_argument("-d", "--delete", action="store_true", help="Remove the original time dir inside output dir")
     argParser.add_argument("-i", "--inputs", help="Input paths for copying to result")
-    argParser.add_argument("-r", "--restore", action="store_true", help="Backup Location (Path to backup file)")
+    argParser.add_argument("-r", "--restore", action="store_true", help="run restore function")
     args = argParser.parse_args()
     data_loaded = load_config(config_file)
     
