@@ -49,7 +49,7 @@ def copy_swift_conf(ring_dir, conf_dir):
            inspect_value = container_info[0]['Config']['Labels'][key_to_extract]
         
         if ring_dir:
-           rsync_ring_command = f"rsync -r --checksum -e 'ssh -p {port}' {ring_dir}/ {user}@{ip}:{inspect_value}/rings "
+           rsync_ring_command = f"rsync -r -e 'ssh -p {port}' {ring_dir}/ {user}@{ip}:{inspect_value}/rings "
            rsync_ring_result = subprocess.run(shlex.split(rsync_ring_command), capture_output=True, text=True)
            print("")
            print("please wait ...")
@@ -70,7 +70,7 @@ def copy_swift_conf(ring_dir, conf_dir):
                   print(f"\033[91mrings in {container_name} failed to sync.\033[0m")
 
         if conf_dir:
-           rsync_conf_command = f"rsync -r --checksum -e 'ssh -p {port}' {conf_dir}/ {user}@{ip}:{inspect_value}/ "
+           rsync_conf_command = f"rsync -r -e 'ssh -p {port}' {conf_dir}/ {user}@{ip}:{inspect_value}/ "
            rsync_conf_result = subprocess.run(shlex.split(rsync_conf_command), capture_output=True, text=True)
            print("")
            print("please wait ...")
