@@ -199,7 +199,7 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--output', help='Output directory')
     parser.add_argument('-r', '--ring', help='ring directory')
     parser.add_argument('-c', '--conf_swift', help='swift config directory')
-    parser.add_argument("-s", "--swift", action="store_true", help="run copy swift function")
+    parser.add_argument('-s', "--swift", action="store_true", help="run copy swift function")
     args = parser.parse_args()
     workload_config_path = args.input
     output_path = args.output
