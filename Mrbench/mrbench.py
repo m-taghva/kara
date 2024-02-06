@@ -8,7 +8,6 @@ import argparse
 import sys
 import yaml
 import json
-import shlex
 
 config_file = "./../Mrbench/conf/mrbench.conf"
 
@@ -49,46 +48,47 @@ def copy_swift_conf(ring_dir, conf_dir):
            inspect_value = container_info[0]['Config']['Labels'][key_to_extract]
         
         if ring_dir:
-           rsync_ring_command = f"rsync -r -e 'ssh -p {port}' {ring_dir}/ {user}@{ip}:{inspect_value}/rings "
-           rsync_ring_result = subprocess.run(shlex.split(rsync_ring_command), capture_output=True, text=True)
-           print("")
-           print("please wait ...")
-           if rsync_ring_result.returncode == 0:
-              copy_ring_command = f"scp -r -P {port} {ring_dir}/* {user}@{ip}:{inspect_value}/rings > /dev/null 2>&1"
-              copy_ring_process = subprocess.run(copy_ring_command, shell=True)
-              if copy_ring_process.returncode == 0:
-                 restart_cont_ring = f"ssh -p {port} {user}@{ip} docker restart {container_name} > /dev/null 2>&1"
-                 restart_cont_ring_process = subprocess.run(restart_cont_ring, shell=True)
-                 if restart_cont_ring_process.returncode == 0:
-                     print("")
-                     print(f"\033[92mcopy rings file to {container_name} successful\033[0m")
-                     print("")
-                     print(f"\033[92mcontainer {container_name} successfully restart.\033[0m")
-                 else:
-                     print(f"\033[91mcontainer {container_name} failed to reatsrt.\033[0m")
-              else:
-                  print(f"\033[91mrings in {container_name} failed to sync.\033[0m")
-
+           for ring_files in os.listdir(ring_dir):
+               diff_ring_command = f"ssh -p {port} {user}@{ip} 'cat {inspect_value}/rings/{ring_files}' | diff - {ring_dir}/{ring_files}"
+               diff_ring_result = subprocess.run(diff_ring_command, shell=True, capture_output=True, text=True)
+               print("")
+               print(f"please wait for checking ring file: {ring_files}")
+               if diff_ring_result.stdout != "":
+                  copy_ring_command = f"scp -r -P {port} {ring_dir}/* {user}@{ip}:{inspect_value}/rings > /dev/null 2>&1"
+                  copy_ring_process = subprocess.run(copy_ring_command, shell=True)
+                  if copy_ring_process.returncode == 0:
+                     restart_cont_ring = f"ssh -p {port} {user}@{ip} docker restart {container_name} > /dev/null 2>&1"
+                     restart_cont_ring_process = subprocess.run(restart_cont_ring, shell=True)
+                     if restart_cont_ring_process.returncode == 0:
+                        print("")
+                        print(f"\033[92mcopy rings file to {container_name} successful\033[0m")
+                        print("")
+                        print(f"\033[92mcontainer {container_name} successfully restart.\033[0m")
+                     else:
+                         print(f"\033[91mcontainer {container_name} failed to reatsrt.\033[0m")
+                  else:
+                      print(f"\033[91mrings in {container_name} failed to sync.\033[0m")
         if conf_dir:
-           rsync_conf_command = f"rsync -r -e 'ssh -p {port}' {conf_dir}/ {user}@{ip}:{inspect_value}/ "
-           rsync_conf_result = subprocess.run(shlex.split(rsync_conf_command), capture_output=True, text=True)
-           print("")
-           print("please wait ...")
-           if rsync_conf_result.returncode == 0:
-              copy_conf_command = f"scp -r -P {port} {conf_dir}/* {user}@{ip}:{inspect_value}/ > /dev/null 2>&1"
-              copy_conf_process = subprocess.run(copy_conf_command, shell=True)
-              if copy_conf_process.returncode == 0:
-                 restart_cont_conf = f"ssh -p {port} {user}@{ip} docker restart {container_name} > /dev/null 2>&1"
-                 restart_cont_conf_process = subprocess.run(restart_cont_conf, shell=True)
-                 if restart_cont_conf_process.returncode == 0:
-                    print("")
-                    print(f"\033[92mcopy config files to {container_name} successful\033[0m")
-                    print("")
-                    print(f"\033[92mcontainer {container_name} successfully restart.\033[0m")
-                 else:
-                     print(f"\033[91mcontainer {container_name} failed to reatsrt.\033[0m")
-              else:
-                  print(f"\033[91mconfigs in {container_name} failed to sync.\033[0m")
+           for conf_files in os.listdir(conf_dir):
+               diff_conf_command = f"ssh -p {port} {user}@{ip} 'cat {inspect_value}/{conf_files}' | diff - {conf_dir}/{conf_files}"
+               diff_conf_result = subprocess.run(diff_conf_command, shell=True, capture_output=True, text=True)
+               print("")
+               print(f"please wait for checking config file: {conf_files}")
+               if diff_conf_result.stdout != "":
+                  copy_conf_command = f"scp -r -P {port} {conf_dir}/* {user}@{ip}:{inspect_value}/ > /dev/null 2>&1"
+                  copy_conf_process = subprocess.run(copy_conf_command, shell=True)
+                  if copy_conf_process.returncode == 0:
+                     restart_cont_conf = f"ssh -p {port} {user}@{ip} docker restart {container_name} > /dev/null 2>&1"
+                     restart_cont_conf_process = subprocess.run(restart_cont_conf, shell=True)
+                     if restart_cont_conf_process.returncode == 0:
+                        print("")
+                        print(f"\033[92mcopy config files to {container_name} successful\033[0m")
+                        print("")
+                        print(f"\033[92mcontainer {container_name} successfully restart.\033[0m")
+                     else:
+                         print(f"\033[91mcontainer {container_name} failed to reatsrt.\033[0m")
+                  else:
+                      print(f"\033[91mconfigs in {container_name} failed to sync.\033[0m")
             
 def submit(workload_file_path, output_path):
     cosbenchBin = shutil.which("cosbench")
