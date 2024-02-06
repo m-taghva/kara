@@ -10,6 +10,7 @@ import yaml
 import json
 
 config_file = "./../Mrbench/conf/mrbench.conf"
+pre_test_script = "./pre_test_script.sh"
 
 # For font style
 BOLD = "\033[1m"
@@ -190,6 +191,7 @@ def copy_bench_files(archive_path, archive_workload_dir_name, result_path):
 def main(workload_config_path, output_path):
     if not os.path.exists(output_path):
        os.makedirs(output_path)
+    subprocess.call(pre_test_script, shell=True)
     start_time, end_time, result_file_path = submit(workload_config_path, output_path)
     return start_time, end_time, result_file_path
 
