@@ -31,28 +31,47 @@ def load_config(config_file):
 
 def config_gen_agent():
     data_loaded = load_config(config_file)
+    output_subdirs = []
     if 'scenario' in data_loaded:
         for task in data_loaded['scenario']:
             if 'Config_gen' in task:
                 config_params = task['Config_gen']
                 input_files = config_params.get('conf_templates', [])
-                output_dir = config_params.get('output_path')
+                output_path = config_params.get('output_path')
                 for input_file in input_files:
                     # Create output directory for each input file
-                    output_subdir = os.path.join(output_dir, os.path.splitext(os.path.basename(input_file))[0])
-                    os.makedirs(output_subdir, exist_ok=True)
+                    output_subdir = os.path.join(output_path, os.path.splitext(os.path.basename(input_file))[0])
                     config_gen.main(input_file, output_subdir)
-                break
+                    output_subdirs.append(output_subdir)
+    else:
+        print("No scenario found in the configuration file.")
+    return output_subdirs
+
+def mrbench_agent(output_subdirs):
+    data_loaded = load_config(config_file)
+    if 'scenario' in data_loaded:
+        for task in data_loaded['scenario']:
+            if 'Mrbench' in task:
+                config_params = task['Mrbench']
+                result_dir = config_params.get('output_parent')
+                run_status_reporter = config_params.get('Status_Reporter', False)
+                subdirs = output_subdirs
+                for subdir in subdirs:
+                    for test_config in os.listdir(subdir):
+                        test_config_path = os.path.join(subdir, test_config)
+                        if os.path.isfile(test_config_path):  # Ensure it's a file
+                           start_time, end_time, result_file_path = mrbench.main(test_config_path, result_dir)
+                           if run_status_reporter:
+                              status_reporter_agent(result_file_path, start_time, end_time)           
     else:
         print("No scenario found in the configuration file.")
 
-def mrbench_agent(config_path, result_dir):
+def mrbench_copy_conf_agent():
     data_loaded = load_config(config_file)
-    start_time, end_time, result_file_path = mrbench.main(config_path, result_dir)
-    return start_time, end_time, result_file_path
+    if 'scenario' in data_loaded:
+         mrbench.copy_swift_conf(ring_dir, conf_dir)
 
 def status_reporter_agent(result_file_path, start_time, end_time):
-    data_loaded = load_config(config_file)
     status_reporter.main(path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)
 
 def monstaver_backup_agent(result_file_path, start_time, end_time):
@@ -77,16 +96,15 @@ def report_recorder_agent( input_template, output_html, kateb_title):
     subprocess.call(pybot, shell=True)
 
 def main():
-    data_loaded = load_config(config_file)
-    config_gen_agent()
-    start_time, end_time, result_file_path = mrbench_agent(input_config, output_parent)
-    status_reporter_agent(result_file_path, start_time, end_time)
-    monstaver_backup_agent(result_file_path, start_time, end_time)
-    monstaver_restore_agent()
-    analyzer_merge_agent(input_parent, csv)
-    time.sleep(10)
-    analyzer_analyze_agent(input_parent + "/*-merge.csv", transformation_dir)
-    report_recorder_agent(input_template, output_html, kateb_title)
+    output_subdirs = config_gen_agent()
+    mrbench_agent(output_subdirs)
+    #status_reporter_agent(result_file_path, start_time, end_time)
+    #monstaver_backup_agent(result_file_path, start_time, end_time)
+    #monstaver_restore_agent()
+    #analyzer_merge_agent(input_parent, csv)
+    #time.sleep(10)
+    #analyzer_analyze_agent(input_parent + "/*-merge.csv", transformation_dir)
+    #report_recorder_agent(input_template, output_html, kateb_title)
 
 if __name__ == "__main__":
     main()
