@@ -57,15 +57,15 @@ def mrbench_agent(output_subdirs):
                 run_status_reporter = config_params.get('Status_Reporter', False)
                 subdirs = output_subdirs
                 for subdir in subdirs:
-                    for test_config in os.listdir(subdir):
-                        test_config_path = os.path.join(subdir, test_config)
-                        if os.path.isfile(test_config_path):  # Ensure it's a file
+                    if os.path.basename(subdir) == "workloads":
+                       for test_config in os.listdir(subdir):
+                           test_config_path = os.path.join(subdir, test_config)
                            start_time, end_time, result_file_path = mrbench.main(test_config_path, result_dir)
                            if run_status_reporter:
-                              status_reporter_agent(result_file_path, start_time, end_time)           
+                              status_reporter_agent(result_file_path, start_time, end_time)  
     else:
         print("No scenario found in the configuration file.")
-
+        
 def mrbench_copy_conf_agent():
     data_loaded = load_config(config_file)
     if 'scenario' in data_loaded:
