@@ -53,23 +53,27 @@ def mrbench_agent(output_subdirs):
         for task in data_loaded['scenario']:
             if 'Mrbench' in task:
                 config_params = task['Mrbench']
-                result_dir = config_params.get('output_parent')
+                one_input_conf = config_params.get('input_config')
+                result_dir = config_params.get('output_path')
                 run_status_reporter = config_params.get('Status_Reporter', False)
-                subdirs = output_subdirs
-                for subdir in subdirs:
-                    if os.path.basename(subdir) == "workloads":
-                       for test_config in os.listdir(subdir):
-                           test_config_path = os.path.join(subdir, test_config)
-                           start_time, end_time, result_file_path = mrbench.main(test_config_path, result_dir)
-                           if run_status_reporter:
-                              status_reporter_agent(result_file_path, start_time, end_time)  
+                ring_dir = config_params.get('ring_dir')
+                conf_dir = config_params.get('conf_dir')
+                mrbench.copy_swift_conf(ring_dir, conf_dir)
+                if one_input_conf:
+                   start_time, end_time, result_file_path = mrbench.main(one_input_conf, result_dir)
+                   if run_status_reporter:
+                      status_reporter_agent(result_file_path, start_time, end_time) 
+                else:
+                    subdirs = output_subdirs
+                    for subdir in subdirs:
+                        if os.path.basename(subdir) == "workloads":
+                           for test_config in os.listdir(subdir):
+                               test_config_path = os.path.join(subdir, test_config)
+                               start_time, end_time, result_file_path = mrbench.main(test_config_path, result_dir)
+                               if run_status_reporter:
+                                  status_reporter_agent(result_file_path, start_time, end_time)  
     else:
         print("No scenario found in the configuration file.")
-        
-def mrbench_copy_conf_agent():
-    data_loaded = load_config(config_file)
-    if 'scenario' in data_loaded:
-         mrbench.copy_swift_conf(ring_dir, conf_dir)
 
 def status_reporter_agent(result_file_path, start_time, end_time):
     status_reporter.main(path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)
