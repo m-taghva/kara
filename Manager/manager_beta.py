@@ -3,6 +3,7 @@ import os
 import subprocess
 import time
 import yaml
+import argparse
 
 sys.path.append('./../Status_reporter/')
 sys.path.append('./../Monstaver/')
@@ -16,9 +17,6 @@ import config_gen
 import status_reporter
 import monstaver
 import analyzer_merger
-
-# Defining paths
-config_file = "./../Manager/manager_sc1.conf"
 
 def load_config(config_file):
     with open(config_file, "r") as stream:
@@ -56,13 +54,16 @@ def mrbench_agent(output_subdirs):
                 one_input_conf = config_params.get('input_config')
                 result_dir = config_params.get('output_path')
                 run_status_reporter = config_params.get('Status_Reporter', False)
+                run_monstaver = config_params.get('monstaver', False)
                 ring_dir = config_params.get('ring_dir')
                 conf_dir = config_params.get('conf_dir')
                 mrbench.copy_swift_conf(ring_dir, conf_dir)
                 if one_input_conf:
                    start_time, end_time, result_file_path = mrbench.main(one_input_conf, result_dir)
                    if run_status_reporter:
-                      status_reporter_agent(result_file_path, start_time, end_time) 
+                      status_reporter_agent(result_file_path, start_time, end_time)
+                   if run_monstaver:
+                      monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True)
                 else:
                     subdirs = output_subdirs
                     for subdir in subdirs:
@@ -72,6 +73,8 @@ def mrbench_agent(output_subdirs):
                                start_time, end_time, result_file_path = mrbench.main(test_config_path, result_dir)
                                if run_status_reporter:
                                   status_reporter_agent(result_file_path, start_time, end_time)  
+                               if run_monstaver:
+                                  monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True)
     else:
         print("No scenario found in the configuration file.")
 
@@ -111,4 +114,8 @@ def main():
     #report_recorder_agent(input_template, output_html, kateb_title)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='kara tools manager')
+    parser.add_argument('-sn', '--scenario_name', help='input scenario path')
+    args = parser.parse_args()
+    config_file = args.scenario_name
     main()
