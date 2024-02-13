@@ -146,22 +146,21 @@ def main():
 
     data_loaded = load_config(config_file)
 
-    if 'scenario' in data_loaded:
-        for task in data_loaded['scenario']:
-            if 'Config_gen' in task:
-                output_subdirs = config_gen_agent()
+    if data_loaded['scenario']:
+        if 'Config_gen':
+            print('test1')
+            output_subdirs = config_gen_agent()
 
-    if 'scenario' in data_loaded:
-        for task in data_loaded['scenario']:
-            if 'Mrbench' in task:
-                first_start_time, last_end_time, result_file_path  = mrbench_agent(output_subdirs)
+    if data_loaded['scenario']:
+        if 'Mrbench':
+            first_start_time, last_end_time, result_file_path  = mrbench_agent(output_subdirs)
    
     #status_reporter_agent(result_file_path, start_time, end_time)
-    if 'scenario' in data_loaded:
-        for task in data_loaded['scenario']:
-            if 'Monstaver' in task:
-                monstaver_backup_agent(first_start_time, last_end_time, result_file_path)
-
+       
+    if data_loaded['scenario']:
+        if 'Monstaver':
+            monstaver_backup_agent(first_start_time, last_end_time, result_file_path)
+            
     #monstaver_restore_agent()
     #analyzer_merge_agent(input_parent, csv)
     #time.sleep(10)
