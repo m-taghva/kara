@@ -88,7 +88,7 @@ def mrbench_agent(output_subdirs):
     last_end_time = all_end_times[-1] 
     return first_start_time, last_end_time, result_file_path
 
-def monstaver_backup_agent(first_start_time=None, last_end_time=None, result_file_path="./"):
+def monstaver_backup_agent(first_start_time, last_end_time, result_file_path):
     data_loaded = load_config(config_file)
     if 'scenario' in data_loaded:
         for task in data_loaded['scenario']:
@@ -96,7 +96,7 @@ def monstaver_backup_agent(first_start_time=None, last_end_time=None, result_fil
                 config_params = task['Monstaver']
                 operation = config_params.get('operation')
                 batch_mode = config_params.get('batch_mode', False)
-                times_file = config_params.get('time')
+                times_file = config_params.get('times')
                 input_path = config_params.get('input_path')
                 if times_file:
                    with open(times_file, 'r') as file:
@@ -116,56 +116,75 @@ def monstaver_backup_agent(first_start_time=None, last_end_time=None, result_fil
     else:
         print("No scenario found in the configuration file.")
 
-#def status_reporter_agent():
-#    data_loaded = load_config(config_file)
-#    if 'scenario' in data_loaded:
-#        for task in data_loaded['scenario']:
-#            if 'Status-Reporter' in task:
-#                config_params = task['Status-Reporter']
-#                result_dir = config_params.get('output_path')
-#                times = config_params.get('times')
+def status_reporter_agent():
+    data_loaded = load_config(config_file)
+    if 'scenario' in data_loaded:
+        for task in data_loaded['scenario']:
+            if 'Status-Reporter' in task:
+                config_params = task['Status-Reporter']
+                result_dir = config_params.get('output_path')
+                times_file = config_params.get('times')
+                if times_file:
+                   with open(times_file, 'r') as file:
+                        times = file.readlines()
+                        for time_range in times:
+                            start_time, end_time = time_range.strip().split(',')
+                            status_reporter.main(path_dir=result_dir, time_range=f"{start_time},{end_time}", img=True)
+    else:
+        print("No scenario found in the configuration file.")
 
-    #status_reporter.main(path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)
+def status_analyzer_agent():
+    data_loaded = load_config(config_file)
+    if 'scenario' in data_loaded:
+        for task in data_loaded['scenario']:
+            if 'Status_Analyzer' in task:
+                config_params = task['Status_Analyzer']
+                result_dir = config_params.get('input_path')
+                merge = config_params.get('merge', False)
+                merge_csv = config_params.get('merge_csv')
+                analyze = config_params.get('analyze', False)
+                analyze_csv = config_params.get('analyze_csv')
+                transform_dir = config_params.get('transform')
+            if merge:
+                analyzer_merger.main_merge(input_directory=result_dir, selected_csv=merge_csv)
+            if analyze:
+               analyzer_merger.main_analyze(csv_original=result_dir/analyze_csv, transformation_directory=transform_dir)
+    else:
+        print("No scenario found in the configuration file.")
 
-
-
-#def analyzer_merge_agent(input_dir, selected_csv):
-#    data_loaded = load_config(config_file)
-#    analyzer_merger.main_merge(input_directory=input_dir, selected_csv=selected_csv)
-
-#def analyzer_analyze_agent(csv_original, transformation_dir):
-#    data_loaded = load_config(config_file)
-#    analyzer_merger.main_analyze(csv_original=csv_original, transformation_directory=transformation_dir)
-
-#def report_recorder_agent( input_template, output_html, kateb_title):
-#    data_loaded = load_config(config_file)
-#    pybot = f"python3 ./../../pywikibot/report_recorder.py  -it {input_template} -oh {output_html} -kt {kateb_title}"
-#    subprocess.call(pybot, shell=True)
+def report_recorder_agent( input_template, output_html, kateb_title):
+    data_loaded = load_config(config_file)
+    pybot = f"python3 ./../../pywikibot/report_recorder.py -it {input_template} -oh {output_html} -kt {kateb_title}"
+    subprocess.call(pybot, shell=True)
 
 def main():
 
     data_loaded = load_config(config_file)
 
     if data_loaded['scenario']:
-        if 'Config_gen':
+       if 'Config_gen':
             print('test1')
             output_subdirs = config_gen_agent()
 
     if data_loaded['scenario']:
-        if 'Mrbench':
+       if 'Mrbench':
             first_start_time, last_end_time, result_file_path  = mrbench_agent(output_subdirs)
    
-    #status_reporter_agent(result_file_path, start_time, end_time)
+    if data_loaded['scenario']:
+       if 'Status-Reporter':
+            status_reporter_agent()
        
     if data_loaded['scenario']:
-        if 'Monstaver':
+       if 'Monstaver':
             monstaver_backup_agent(first_start_time, last_end_time, result_file_path)
-            
-    #monstaver_restore_agent()
-    #analyzer_merge_agent(input_parent, csv)
-    #time.sleep(10)
-    #analyzer_analyze_agent(input_parent + "/*-merge.csv", transformation_dir)
-    #report_recorder_agent(input_template, output_html, kateb_title)
+
+    if data_loaded['scenario']:
+       if 'Status_Analyzer':
+           status_analyzer_agent()
+
+    if data_loaded['scenario']:
+       if 'Report_Recorder':
+          report_recorder_agent(input_template, output_html, kateb_title)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='kara tools manager')
