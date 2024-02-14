@@ -80,9 +80,9 @@ def mrbench_agent(output_subdirs):
     # Extract first start time and last end time
     first_start_time = all_start_times[0] 
     last_end_time = all_end_times[-1] 
-    return first_start_time, last_end_time, result_file_path
+    return first_start_time, last_end_time
 
-def monstaver_agent(first_start_time, last_end_time, result_file_path):
+def monstaver_agent(first_start_time, last_end_time):
     data_loaded = load_config(config_file)
     if 'scenario' in data_loaded:
         for task in data_loaded['scenario']:
@@ -97,14 +97,13 @@ def monstaver_agent(first_start_time, last_end_time, result_file_path):
                         times = file.readlines()
                         for time_range in times:
                             start_time, end_time = time_range.strip().split(',')
-                            if input_path:
-                               if operation == "backup":
+                            if operation == "backup":
                                   monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path], delete=True)
                             elif operation == "restore":
                                  monstaver.restore()          
                 elif operation == "backup":
                      if batch_mode:
-                        monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[result_file_path], delete=True)
+                        monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path], delete=True)
                 elif operation == "restore":
                      monstaver.restore()
 
@@ -161,7 +160,7 @@ def main():
 
     if data_loaded['scenario']:
        if 'Mrbench':
-           first_start_time, last_end_time, result_file_path  = mrbench_agent(output_subdirs)
+           first_start_time, last_end_time = mrbench_agent(output_subdirs)
 
     if data_loaded['scenario']:
        if 'Status-Reporter':
@@ -169,7 +168,7 @@ def main():
 
     if data_loaded['scenario']:
        if 'Monstaver':
-           monstaver_agent(first_start_time, last_end_time, result_file_path)
+           monstaver_agent(first_start_time, last_end_time)
 
     if data_loaded['scenario']:
        if 'Status_Analyzer':
