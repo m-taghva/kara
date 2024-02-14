@@ -39,8 +39,6 @@ def config_gen_agent():
                     output_subdir = os.path.join(output_path, os.path.splitext(os.path.basename(input_file))[0])
                     config_gen.main(input_file, output_subdir)
                     output_subdirs.append(output_subdir)
-    else:
-        print("No scenario found in the configuration file.")
     return output_subdirs
 
 def mrbench_agent(output_subdirs):
@@ -79,8 +77,6 @@ def mrbench_agent(output_subdirs):
                                   status_reporter.main(path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)  
                                if run_monstaver:
                                   monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True)                         
-    else:
-        print("No scenario found in the configuration file.")
     # Extract first start time and last end time
     first_start_time = all_start_times[0] 
     last_end_time = all_end_times[-1] 
@@ -111,8 +107,6 @@ def monstaver_backup_agent(first_start_time, last_end_time, result_file_path):
                         monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[result_file_path], delete=True)
                 elif operation == "restore":
                      monstaver.restore()
-    else:
-        print("No scenario found in the configuration file.")
 
 def status_reporter_agent():
     data_loaded = load_config(config_file)
@@ -128,8 +122,6 @@ def status_reporter_agent():
                         for time_range in times:
                             start_time, end_time = time_range.strip().split(',')
                             status_reporter.main(path_dir=result_dir, time_range=f"{start_time},{end_time}", img=True)
-    else:
-        print("No scenario found in the configuration file.")
 
 def status_analyzer_agent():
     data_loaded = load_config(config_file)
@@ -145,10 +137,9 @@ def status_analyzer_agent():
                 transform_dir = config_params.get('transform')
                 if merge:
                         analyzer_merger.main_merge(input_directory=result_dir, selected_csv=merge_csv)
+                        time.sleep(10)
                 if analyze:
                         analyzer_merger.main_analyze(csv_original=f"{result_dir}/{analyze_csv}", transformation_directory=transform_dir)
-    else:
-        print("No scenario found in the configuration file.")
 
 def report_recorder_agent():
     data_loaded = load_config(config_file)
@@ -161,8 +152,6 @@ def report_recorder_agent():
                 kateb_title = config_params.get('kateb_title')
                 pybot = f"python3 ./../../pywikibot/report_recorder.py -it {input_template} -oh {output_html} -kt {kateb_title}"
                 subprocess.call(pybot, shell=True)
-    else:
-        print("No scenario found in the configuration file.")
 
 def main():
     data_loaded = load_config(config_file)
