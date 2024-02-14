@@ -82,7 +82,7 @@ def mrbench_agent(output_subdirs):
     last_end_time = all_end_times[-1] 
     return first_start_time, last_end_time, result_file_path
 
-def monstaver_backup_agent(first_start_time, last_end_time, result_file_path):
+def monstaver_agent(first_start_time, last_end_time, result_file_path):
     data_loaded = load_config(config_file)
     if 'scenario' in data_loaded:
         for task in data_loaded['scenario']:
@@ -169,7 +169,7 @@ def main():
 
     if data_loaded['scenario']:
        if 'Monstaver':
-           monstaver_backup_agent(first_start_time, last_end_time, result_file_path)
+           monstaver_agent(first_start_time, last_end_time, result_file_path)
 
     if data_loaded['scenario']:
        if 'Status_Analyzer':
