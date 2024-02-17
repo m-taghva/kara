@@ -57,7 +57,7 @@ def mrbench_agent(output_subdirs):
                 conf_dir = config_params.get('conf_dir')
                 mrbench.copy_swift_conf(ring_dir, conf_dir)
                 if one_input_conf:
-                   start_time, end_time, result_file_path = mrbench.main(one_input_conf, result_dir)
+                   start_time, end_time, result_file_path = mrbench.submit(one_input_conf, result_dir)
                    all_start_times.append(start_time)
                    all_end_times.append(end_time)
                    if run_status_reporter:
@@ -70,7 +70,7 @@ def mrbench_agent(output_subdirs):
                         if os.path.basename(subdir) == "workloads":
                            for test_config in os.listdir(subdir):
                                test_config_path = os.path.join(subdir, test_config)
-                               start_time, end_time, result_file_path = mrbench.main(test_config_path, result_dir)
+                               start_time, end_time, result_file_path = mrbench.submit(test_config_path, result_dir)
                                all_start_times.append(start_time)
                                all_end_times.append(end_time)
                                if run_status_reporter:
