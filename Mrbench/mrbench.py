@@ -197,12 +197,12 @@ def copy_bench_files(archive_path, archive_workload_dir_name, result_path):
         if retry == 0 :
             print(f"\033[91mMaximum retries reached ({retry}). File {archive_file_path} copy failed.\033[0m")
   
-def main(workload_config_path, output_path):
-    if not os.path.exists(output_path):
-       os.makedirs(output_path)
-    subprocess.call(pre_test_script, shell=True)
-    start_time, end_time, result_file_path = submit(workload_config_path, output_path)
-    return start_time, end_time, result_file_path
+def main(workload_config_path, output_path, swift_conf, ring_dir, conf_dir):
+    if swift_conf:
+        copy_swift_conf(ring_dir, conf_dir)
+    else:
+        start_time, end_time, result_file_path = submit(workload_config_path, output_path)
+        return start_time, end_time, result_file_path
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Monster Benchmark')
@@ -216,8 +216,5 @@ if __name__ == "__main__":
     output_path = args.output
     ring_dir = args.ring
     conf_dir = args.conf_swift
-
-    if args.swift:
-        copy_swift_conf(ring_dir, conf_dir)
-    else:
-        main(workload_config_path, output_path)
+    swift_conf= args.swift
+    main(workload_config_path, output_path, swift_conf, ring_dir, conf_dir)
