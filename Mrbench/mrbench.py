@@ -101,6 +101,9 @@ def copy_swift_conf(ring_dir, conf_dir):
                   print(f"\033[91mWARNING: your config file naming is wrong [ {conf_files} ] or not exist inside {container_name}\033[0m")
             
 def submit(workload_file_path, output_path):
+    if not os.path.exists(output_path):
+       os.makedirs(output_path)
+    subprocess.call(pre_test_script, shell=True)
     cosbenchBin = shutil.which("cosbench")
     if not(cosbenchBin):
         print("Command 'cosbench' not found, but can be add with:\n\n\t ln -s {cosbench-dir}/cli.sh /usr/bin/cosbench\n")
