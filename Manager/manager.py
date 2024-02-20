@@ -4,6 +4,7 @@ import subprocess
 import time
 import yaml
 import argparse
+import shutil
 
 sys.path.append('./../Status_reporter/')
 sys.path.append('./../Monstaver/')
@@ -45,8 +46,7 @@ def config_gen_agent():
 
 def mrbench_agent(output_subdirs):
     data_loaded = load_config(config_file)
-    all_start_times = []
-    all_end_times = []
+    all_start_times = [] ; all_end_times = []
     if 'scenario' in data_loaded:
         for task in data_loaded['scenario']:
             if 'Mrbench' in task:
@@ -60,8 +60,7 @@ def mrbench_agent(output_subdirs):
                 if one_input_conf:
                    mrbench.copy_swift_conf(ring_dir=ring_dir, conf_dir=conf_dir, ring_file=None, conf_file=None)
                    start_time, end_time, result_file_path = mrbench.submit(one_input_conf, result_dir)
-                   all_start_times.append(start_time)
-                   all_end_times.append(end_time)
+                   all_start_times.append(start_time) ; all_end_times.append(end_time)
                    if run_status_reporter:
                       status_reporter.main(path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)
                    if run_monstaver:
@@ -78,15 +77,14 @@ def mrbench_agent(output_subdirs):
                                        mrbench.copy_swift_conf(ring_dir=None, conf_dir=None, ring_file=ring_file, conf_file=conf_file) 
                                        test_config_path = os.path.join(subdir, test_config)
                                        start_time, end_time, result_file_path = mrbench.submit(test_config_path, result_dir)
-                                       all_start_times.append(start_time)
-                                       all_end_times.append(end_time)
+                                       shutil.copy(ring_file, result_file_path) ; shutil.copy(conf_file, result_file_path)
+                                       all_start_times.append(start_time) ; all_end_times.append(end_time)
                                        if run_status_reporter:
                                           status_reporter.main(path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)  
                                        if run_monstaver:
                                           monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True)                     
     # Extract first start time and last end time
-    first_start_time = all_start_times[0] 
-    last_end_time = all_end_times[-1] 
+    first_start_time = all_start_times[0] ; last_end_time = all_end_times[-1] 
     return first_start_time, last_end_time
 
 def monstaver_agent(first_start_time, last_end_time):
