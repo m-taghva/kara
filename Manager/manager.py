@@ -103,12 +103,12 @@ def monstaver_agent(first_start_time, last_end_time):
                         for time_range in times:
                             start_time, end_time = time_range.strip().split(',')
                             if operation == "backup":
-                               monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path], delete=True)
+                               monstaver.backup(time_range=f"{start_time},{end_time}", inputs=[input_path], delete=True)
                             elif operation == "restore":
                                  monstaver.restore()          
                 elif operation == "backup":
                      if batch_mode:
-                        monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path], delete=True)
+                        monstaver.backup(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path], delete=True)
                 elif operation == "restore":
                      monstaver.restore()
 
