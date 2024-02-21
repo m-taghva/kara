@@ -64,7 +64,7 @@ def mrbench_agent(output_subdirs):
                    if run_status_reporter:
                       status_reporter.main(path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)
                    if run_monstaver:
-                      monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True)        
+                      monstaver.backup(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True)        
                 else:
                     subdirs = output_subdirs
                     for subdir in subdirs:
