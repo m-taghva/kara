@@ -252,10 +252,9 @@ def copy_bench_files(archive_path, archive_workload_dir_name, result_path):
 def main(workload_config_path, output_path, swift_run, ring_dir, conf_dir, ring_file, conf_file):
     if swift_run:
         copy_swift_conf(ring_dir, conf_dir, ring_file, conf_file)
-    else:
-        start_time, end_time, result_file_path = submit(workload_config_path, output_path)
-        return start_time, end_time, result_file_path
-
+    start_time, end_time, result_file_path = submit(workload_config_path, output_path)
+    return start_time, end_time, result_file_path
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Monster Benchmark')
     parser.add_argument('-i', '--input', help='Input file path')
