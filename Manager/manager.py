@@ -17,7 +17,7 @@ import mrbench
 import config_gen
 import status_reporter
 import monstaver
-import analyzer_merger
+import analyzer
 
 def load_config(config_file):
     with open(config_file, "r") as stream:
@@ -140,10 +140,10 @@ def status_analyzer_agent():
                 analyze_csv = config_params.get('analyze_csv')
                 transform_dir = config_params.get('transform')
                 if merge:
-                   analyzer_merger.main_merge(input_directory=result_dir, selected_csv=merge_csv)
+                   analyzer.main_merge(input_directory=result_dir, selected_csv=merge_csv)
                    time.sleep(10)
                 if analyze:
-                   analyzer_merger.main_analyze(csv_original=f"{result_dir}/{analyze_csv}", transformation_directory=transform_dir)
+                   analyzer.main_analyze(csv_original=f"{result_dir}/{analyze_csv}", transformation_directory=transform_dir)
 
 def report_recorder_agent():
     data_loaded = load_config(config_file)
