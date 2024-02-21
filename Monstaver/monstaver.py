@@ -217,7 +217,7 @@ def restore():
              print("error") 
 
 ##### BACKUP PARTS #####
-def main(time_range=None, inputs=None, delete=None): 
+def backup(time_range=None, inputs=None, delete=None): 
     data_loaded = load_config(config_file)
     backup_dir = data_loaded['default'].get('backup_output')
     start_time_str, end_time_str = time_range.split(',')
@@ -491,4 +491,4 @@ if __name__ == "__main__":
     if args.restore:
        restore()
     else:
-       main(time_range=args.time_range if args.time_range else data_loaded['default'].get('time'), inputs=args.inputs.split(',') if args.inputs else data_loaded['default'].get('input_paths') if data_loaded['default'].get('input_paths') else [], delete=args.delete)
+       backup(time_range=args.time_range if args.time_range else data_loaded['default'].get('time'), inputs=args.inputs.split(',') if args.inputs else data_loaded['default'].get('input_paths') if data_loaded['default'].get('input_paths') else [], delete=args.delete)
