@@ -82,7 +82,7 @@ def mrbench_agent(output_subdirs):
                                        if run_status_reporter:
                                           status_reporter.main(path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)  
                                        if run_monstaver:
-                                          monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True)                     
+                                          monstaver.backup(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True)                     
     # Extract first start time and last end time
     first_start_time = all_start_times[0] ; last_end_time = all_end_times[-1] 
     return first_start_time, last_end_time
