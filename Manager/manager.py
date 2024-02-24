@@ -4,20 +4,17 @@ import subprocess
 import time
 import yaml
 import argparse
-import shutil
-
 sys.path.append('./../Status_reporter/')
 sys.path.append('./../Monstaver/')
 sys.path.append('./../Analyzer/')
 sys.path.append('./../Config_gen/')
 sys.path.append('./../Report_recorder/')
 sys.path.append('./../Mrbench/')
-
 import mrbench
 import config_gen
 import status_reporter
 import monstaver
-import analyzer
+import analyzer_merger
 
 def load_config(config_file):
     with open(config_file, "r") as stream:
@@ -55,10 +52,12 @@ def mrbench_agent(output_subdirs):
                 result_dir = config_params.get('output_path')
                 run_status_reporter = config_params.get('Status_Reporter', False)
                 run_monstaver = config_params.get('monstaver', False)
-                ring_dir = config_params.get('ring_dir')
-                conf_dir = config_params.get('conf_dir')
+                conf_ring_dir = config_params.get('conf_ring_dir')
+                file_dict = {}
+                for filename in os.listdir(conf_ring_dir):
+                    file_dict[filename] = os.path.join(conf_ring_dir, filename)
                 if one_input_conf:
-                   mrbench.copy_swift_conf(ring_dir=ring_dir, conf_dir=conf_dir, ring_file=None, conf_file=None)
+                   mrbench.copy_swift_conf(file_dict)
                    start_time, end_time, result_file_path = mrbench.submit(one_input_conf, result_dir)
                    all_start_times.append(start_time) ; all_end_times.append(end_time)
                    if run_status_reporter:
@@ -70,19 +69,14 @@ def mrbench_agent(output_subdirs):
                     for subdir in subdirs:
                         if os.path.basename(subdir) == "workloads":
                            for test_config in os.listdir(subdir):
-                               for ring_files in sorted(os.listdir(ring_dir)):
-                                   ring_file = os.path.join(ring_dir, ring_files)
-                                   for conf_files in sorted(os.listdir(conf_dir)):
-                                       conf_file = os.path.join(conf_dir, conf_files)
-                                       mrbench.copy_swift_conf(ring_dir=None, conf_dir=None, ring_file=ring_file, conf_file=conf_file) 
-                                       test_config_path = os.path.join(subdir, test_config)
-                                       start_time, end_time, result_file_path = mrbench.submit(test_config_path, result_dir)
-                                       shutil.copy(ring_file, result_file_path) ; shutil.copy(conf_file, result_file_path)
-                                       all_start_times.append(start_time) ; all_end_times.append(end_time)
-                                       if run_status_reporter:
-                                          status_reporter.main(path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)  
-                                       if run_monstaver:
-                                          monstaver.backup(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True)                     
+                               mrbench.copy_swift_conf(file_dict) 
+                               test_config_path = os.path.join(subdir, test_config)
+                               start_time, end_time, result_file_path = mrbench.submit(test_config_path, result_dir)
+                               all_start_times.append(start_time) ; all_end_times.append(end_time)
+                               if run_status_reporter:
+                                  status_reporter.main(path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)  
+                               if run_monstaver:
+                                  monstaver.backup(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True)                     
     # Extract first start time and last end time
     first_start_time = all_start_times[0] ; last_end_time = all_end_times[-1] 
     return first_start_time, last_end_time
@@ -140,10 +134,10 @@ def status_analyzer_agent():
                 analyze_csv = config_params.get('analyze_csv')
                 transform_dir = config_params.get('transform')
                 if merge:
-                   analyzer.main_merge(input_directory=result_dir, selected_csv=merge_csv)
+                   analyzer_merger.main_merge(input_directory=result_dir, selected_csv=merge_csv)
                    time.sleep(10)
                 if analyze:
-                   analyzer.main_analyze(csv_original=f"{result_dir}/{analyze_csv}", transformation_directory=transform_dir)
+                   analyzer_merger.main_analyze(csv_original=f"{result_dir}/{analyze_csv}", transformation_directory=transform_dir)
 
 def report_recorder_agent():
     data_loaded = load_config(config_file)
