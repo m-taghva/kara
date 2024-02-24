@@ -356,7 +356,7 @@ def backup(time_range=None, inputs=None, delete=None):
              sys.exit(1)
          
          # copy etc dir from container to host
-         get_etc_command =  f"ssh -p {port} {user}@{ip} 'docker cp {container_name}:/etc  {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-etc-container/'"
+         get_etc_command =  f"ssh -p {port} {user}@{ip} 'sudo docker cp {container_name}:/etc  {backup_dir}/{time_dir_name}/monster_conf/{container_name}/os/{container_name}-etc-container/'"
          get_etc_process = subprocess.run(get_etc_command, shell=True)
          if get_etc_process.returncode == 0:
              bar()
