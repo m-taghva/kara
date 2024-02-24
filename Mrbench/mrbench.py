@@ -69,7 +69,7 @@ def copy_swift_conf(file_dict):
                             print(f"\033[91mcontainer {container_name} failed to reatsrt\033[0m")
                      else: 
                          print(f"\033[91mrings in {container_name} failed to sync\033[0m")
-                  if diff_ring_result.stderr != "":
+               if diff_ring_result.stderr != "":
                      print("")
                      print(f"\033[91mWARNING: your ring file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
 
