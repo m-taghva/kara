@@ -133,6 +133,8 @@ def submit(workload_file_path, output_path):
     result_path = create_test_dir(output_path, workload_name)
     archive_workload_dir_name = f"{workload_id}-swift-sample"
     print(f"Result Path: {result_path}")
+    cosbench_info = f"cosbench info > {result_path}/cosbench.info"
+    cosbench_info_result = subprocess.run(cosbench_info, shell=True, capture_output=True, text=True)
     # run other functions 
     start_time, end_time = save_time(f"{archive_path}{archive_workload_dir_name}/{archive_workload_dir_name}.csv", result_path)
     copy_bench_files(archive_path, archive_workload_dir_name, result_path)
