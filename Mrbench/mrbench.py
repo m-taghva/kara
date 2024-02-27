@@ -97,7 +97,7 @@ def copy_swift_conf(file_dict):
                         print("")
                         print(f"\033[91mWARNING: your config file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
         else:
-            print(f"\033[91mWARNING: there is a problem in your config file so mrbench can't sync config and ring files !\033[0m") 
+            print(f"\033[91mWARNING: there is a problem in your mrbench's config file so mrbench can't sync config and ring files !\033[0m") 
             
 def submit(workload_file_path, output_path):
     if not os.path.exists(output_path):
@@ -203,7 +203,7 @@ def copy_bench_files(archive_path, archive_workload_dir_name, result_path):
   
 def main(workload_config_path, output_path, file_dict):
     
-    if file_dict is not None:
+    if file_dict:
        copy_swift_conf(file_dict)
 
     if workload_config_path is not None:
