@@ -122,30 +122,24 @@ def report_recorder_agent(config_params):
     subprocess.call(pybot, shell=True)
 
 def main():
-
     data_loaded = load_config(config_file)
     if 'scenario' in data_loaded:
         for task in data_loaded['scenario']:
             if 'Config_gen' in task:
                 config_params = task['Config_gen']
                 output_subdirs = config_gen_agent(config_params)
-
             if 'Mrbench' in task:
                 config_params = task['Mrbench']
                 first_start_time, last_end_time = mrbench_agent(config_params, output_subdirs)
- 
             if 'Status-Reporter' in task:
                 config_params = task['Status-Reporter']
                 status_reporter_agent(config_params)
-
             if 'Monstaver' in task:
                 config_params = task['Monstaver']
                 monstaver_agent(config_params, first_start_time, last_end_time)
-
             if 'Status_Analyzer' in task:
                 config_params = task['Status_Analyzer']
                 status_analyzer_agent(config_params)
-
             if 'Report_Recorder' in task:
                 config_params = task['Report_Recorder']
                 report_recorder_agent(config_params)
