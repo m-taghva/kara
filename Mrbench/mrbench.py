@@ -97,7 +97,9 @@ def copy_swift_conf(file_dict):
                         print("")
                         print(f"\033[91mWARNING: your config file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
         else:
+            print("")
             print(f"\033[91mWARNING: there is a problem in your mrbench's config file for \033[0m'\033[92m{container_name}\033[0m' \033[91mcontainer section so mrbench can't sync config and ring files !\033[0m") 
+            print(f"{YELLOW}========================================{RESET}") 
             
 def submit(workload_file_path, output_path):
     if not os.path.exists(output_path):
