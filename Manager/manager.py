@@ -4,17 +4,15 @@ import subprocess
 import time
 import yaml
 import argparse
-sys.path.append('./../Status_reporter/')
-sys.path.append('./../Monstaver/')
-sys.path.append('./../Analyzer/')
-sys.path.append('./../Config_gen/')
-sys.path.append('./../Report_recorder/')
-sys.path.append('./../Mrbench/')
+
+configure_script = "./configure.sh"
+subprocess.call(configure_script, shell=True)
+
 import mrbench
 import config_gen
 import status_reporter
 import monstaver
-import analyzer_merger
+import analyzer
 
 def load_config(config_file):
     with open(config_file, "r") as stream:
