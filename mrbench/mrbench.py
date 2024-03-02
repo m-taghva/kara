@@ -9,7 +9,7 @@ import sys
 import yaml
 import json
 
-config_file = "./../mrbench/conf/mrbench.conf"
+config_file = "/etc/KARA/mrbench.conf"
 pre_test_script = "./pre_test_script.sh"
 
 # For font style
