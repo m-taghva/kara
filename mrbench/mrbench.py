@@ -28,7 +28,7 @@ def load_config(config_file):
            sys.exit(1)
     return data_loaded
 
-def copy_swift_conf(file_dict):
+def copy_swift_conf(swift_configs):
     data_loaded = load_config(config_file)
     for key,value in data_loaded['swift'].items():
         container_name = key
@@ -46,7 +46,7 @@ def copy_swift_conf(file_dict):
            # Check if the key exists in the JSON structure
            if key_to_extract in container_info[0]['Config']['Labels']:
               inspect_value = container_info[0]['Config']['Labels'][key_to_extract]
-              for filename, filepath in file_dict.items():  
+              for filename, filepath in swift_configs.items():  
                   if filename.endswith(".gz"):
                      diff_ring_command = f"ssh -p {port} {user}@{ip} 'cat {inspect_value}/rings/{filename}' | diff - {filepath}"
                      diff_ring_result = subprocess.run(diff_ring_command, shell=True, capture_output=True, text=True)
