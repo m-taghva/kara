@@ -8,7 +8,7 @@ import pytz
 import yaml
 from alive_progress import alive_bar
 
-config_file = "./../monstaver/conf/monstaver.conf"
+config_file = "/etc/KARA/monstaver.conf"
 
 def load_config(config_file):
     with open(config_file, "r") as stream:
