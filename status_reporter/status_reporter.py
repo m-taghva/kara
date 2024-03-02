@@ -130,8 +130,8 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--time_range", help="Time range in the format 'start_time,end_time'")
     parser.add_argument("--img", action="store_true", help="Create images and graphs")
     args = parser.parse_args()
-    metric_file=args.metric_file.split(',') if args.metric_file else [] 
-    path_dir=args.path_dir if args.path_dir else "." 
+    metric_file = args.metric_file.split(',') if args.metric_file else [] 
+    path_dir = args.path_dir if args.path_dir else "." 
     time_range = args.time_range if args.time_range else load_config(CONFIG_FILE).get('time', [])[0]
     img=args.img
     
