@@ -487,7 +487,6 @@ if __name__ == "__main__":
     argParser.add_argument("-r", "--restore", action="store_true", help="run restore function")
     args = argParser.parse_args()
     data_loaded = load_config(config_file)
-    data_loaded = load_config(config_file)
     time_range = args.time_range if args.time_range else data_loaded['default'].get('time')
     inputs = args.inputs.split(',') if args.inputs else data_loaded['default'].get('input_paths') if data_loaded['default'].get('input_paths') else []
     delete = args.delete
