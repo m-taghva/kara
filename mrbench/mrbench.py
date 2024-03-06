@@ -10,7 +10,7 @@ import yaml
 import json
 
 config_file = "/etc/KARA/mrbench.conf"
-pre_test_script = "./pre_test_script.sh"
+pre_test_script = "./../mrbench/pre_test_script.sh"
 
 # For font style
 BOLD = "\033[1m"
