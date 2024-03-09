@@ -1,0 +1,910 @@
+================================================== stage: s1-init ==================================================
+---------------------------------- mission: M8230CD2358, driver: driver1 ----------------------------------
+2024-03-09 15:20:27,006 [INFO] [Log4jLogManager] - will append log to file /root/0.4.2.c4/log/mission/M8230CD2358.log
+2024-03-09 15:20:27,223 [INFO] [NoneStorage] - performing PUT at /FYYSB5
+2024-03-09 15:20:27,224 [INFO] [NoneStorage] - performing PUT at /FYYSB13
+2024-03-09 15:20:27,224 [INFO] [NoneStorage] - performing PUT at /FYYSB12
+2024-03-09 15:20:27,224 [INFO] [NoneStorage] - performing PUT at /FYYSB11
+2024-03-09 15:20:27,222 [INFO] [NoneStorage] - performing PUT at /FYYSB2
+2024-03-09 15:20:27,224 [INFO] [NoneStorage] - performing PUT at /FYYSB10
+2024-03-09 15:20:27,223 [INFO] [NoneStorage] - performing PUT at /FYYSB6
+2024-03-09 15:20:27,223 [INFO] [NoneStorage] - performing PUT at /FYYSB9
+2024-03-09 15:20:27,223 [INFO] [NoneStorage] - performing PUT at /FYYSB8
+2024-03-09 15:20:27,223 [INFO] [NoneStorage] - performing PUT at /FYYSB7
+2024-03-09 15:20:27,222 [INFO] [NoneStorage] - performing PUT at /FYYSB3
+2024-03-09 15:20:27,222 [INFO] [NoneStorage] - performing PUT at /FYYSB1
+2024-03-09 15:20:27,223 [INFO] [NoneStorage] - performing PUT at /FYYSB4
+================================================== stage: s2-main ==================================================
+---------------------------------- mission: MF230CEE9CB, driver: driver1 ----------------------------------
+2024-03-09 15:20:34,005 [INFO] [Log4jLogManager] - will append log to file /root/0.4.2.c4/log/mission/MF230CEE9CB.log
+2024-03-09 15:20:34,221 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects5
+2024-03-09 15:20:34,224 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects13
+2024-03-09 15:20:34,223 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects7
+2024-03-09 15:20:34,225 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects15
+2024-03-09 15:20:34,223 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects9
+2024-03-09 15:20:34,223 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects8
+2024-03-09 15:20:34,221 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects2
+2024-03-09 15:20:34,220 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects1
+2024-03-09 15:20:34,221 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects6
+2024-03-09 15:20:34,221 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects4
+2024-03-09 15:20:34,221 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects3
+2024-03-09 15:20:34,224 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects16
+2024-03-09 15:20:34,224 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects14
+2024-03-09 15:20:34,224 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects11
+2024-03-09 15:20:34,224 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects12
+2024-03-09 15:20:34,224 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects10
+2024-03-09 15:20:34,708 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects17
+2024-03-09 15:20:34,747 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects18
+2024-03-09 15:20:34,747 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects19
+2024-03-09 15:20:34,749 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects20
+2024-03-09 15:20:34,755 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects21
+2024-03-09 15:20:34,821 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects22
+2024-03-09 15:20:34,823 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects23
+2024-03-09 15:20:34,825 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects24
+2024-03-09 15:20:34,825 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects25
+2024-03-09 15:20:34,872 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects26
+2024-03-09 15:20:34,875 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects27
+2024-03-09 15:20:34,876 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects28
+2024-03-09 15:20:34,877 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects29
+2024-03-09 15:20:34,879 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects30
+2024-03-09 15:20:34,880 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects31
+2024-03-09 15:20:35,022 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects32
+2024-03-09 15:20:35,142 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects33
+2024-03-09 15:20:35,171 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects34
+2024-03-09 15:20:35,201 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects36
+2024-03-09 15:20:35,201 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects35
+2024-03-09 15:20:35,203 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects37
+2024-03-09 15:20:35,205 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects38
+2024-03-09 15:20:35,206 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects39
+2024-03-09 15:20:35,206 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects40
+2024-03-09 15:20:35,209 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects41
+2024-03-09 15:20:35,235 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects42
+2024-03-09 15:20:35,237 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects43
+2024-03-09 15:20:35,241 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects44
+2024-03-09 15:20:35,281 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects45
+2024-03-09 15:20:35,282 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects46
+2024-03-09 15:20:35,286 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects47
+2024-03-09 15:20:35,385 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects48
+2024-03-09 15:20:35,547 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects49
+2024-03-09 15:20:35,550 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects50
+2024-03-09 15:20:35,550 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects51
+2024-03-09 15:20:35,557 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects52
+2024-03-09 15:20:35,569 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects53
+2024-03-09 15:20:35,570 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects54
+2024-03-09 15:20:35,570 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects55
+2024-03-09 15:20:35,573 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects56
+2024-03-09 15:20:35,573 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects57
+2024-03-09 15:20:35,587 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects58
+2024-03-09 15:20:35,590 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects59
+2024-03-09 15:20:35,597 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects60
+2024-03-09 15:20:35,597 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects61
+2024-03-09 15:20:35,598 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects62
+2024-03-09 15:20:35,733 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects63
+2024-03-09 15:20:35,734 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects64
+2024-03-09 15:20:35,918 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects65
+2024-03-09 15:20:35,925 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects66
+2024-03-09 15:20:35,927 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects67
+2024-03-09 15:20:35,928 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects68
+2024-03-09 15:20:35,929 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects69
+2024-03-09 15:20:35,933 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects70
+2024-03-09 15:20:35,958 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects71
+2024-03-09 15:20:35,958 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects72
+2024-03-09 15:20:35,959 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects73
+2024-03-09 15:20:35,959 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects74
+2024-03-09 15:20:35,962 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects75
+2024-03-09 15:20:35,962 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects76
+2024-03-09 15:20:35,972 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects77
+2024-03-09 15:20:35,972 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects78
+2024-03-09 15:20:36,055 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects79
+2024-03-09 15:20:36,056 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects80
+2024-03-09 15:20:36,235 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects81
+2024-03-09 15:20:36,239 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects82
+2024-03-09 15:20:36,290 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects83
+2024-03-09 15:20:36,291 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects85
+2024-03-09 15:20:36,291 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects84
+2024-03-09 15:20:36,340 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects86
+2024-03-09 15:20:36,341 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects87
+2024-03-09 15:20:36,343 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects88
+2024-03-09 15:20:36,391 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects89
+2024-03-09 15:20:36,392 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects90
+2024-03-09 15:20:36,393 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects91
+2024-03-09 15:20:36,394 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects92
+2024-03-09 15:20:36,402 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects93
+2024-03-09 15:20:36,405 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects94
+2024-03-09 15:20:36,451 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects95
+2024-03-09 15:20:36,628 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects96
+2024-03-09 15:20:36,665 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects97
+2024-03-09 15:20:36,677 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects98
+2024-03-09 15:20:36,681 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects99
+2024-03-09 15:20:36,714 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects100
+2024-03-09 15:20:36,747 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects101
+2024-03-09 15:20:36,748 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects102
+2024-03-09 15:20:36,777 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects103
+2024-03-09 15:20:36,778 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects104
+2024-03-09 15:20:36,779 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects105
+2024-03-09 15:20:36,786 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects106
+2024-03-09 15:20:36,788 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects107
+2024-03-09 15:20:36,789 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects108
+2024-03-09 15:20:36,865 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects110
+2024-03-09 15:20:36,865 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects109
+2024-03-09 15:20:36,924 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects111
+2024-03-09 15:20:36,971 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects112
+2024-03-09 15:20:36,997 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects113
+2024-03-09 15:20:37,016 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects114
+2024-03-09 15:20:37,016 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects115
+2024-03-09 15:20:37,085 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects116
+2024-03-09 15:20:37,086 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects117
+2024-03-09 15:20:37,086 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects118
+2024-03-09 15:20:37,193 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects119
+2024-03-09 15:20:37,260 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects120
+2024-03-09 15:20:37,264 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects121
+2024-03-09 15:20:37,272 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects122
+2024-03-09 15:20:37,274 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects123
+2024-03-09 15:20:37,274 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects124
+2024-03-09 15:20:37,277 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects125
+2024-03-09 15:20:37,337 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects126
+2024-03-09 15:20:37,375 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects127
+2024-03-09 15:20:37,484 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects128
+2024-03-09 15:20:37,525 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects129
+2024-03-09 15:20:37,527 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects130
+2024-03-09 15:20:37,553 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects131
+2024-03-09 15:20:37,577 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects132
+2024-03-09 15:20:37,579 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects133
+2024-03-09 15:20:37,585 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects134
+2024-03-09 15:20:37,713 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects135
+2024-03-09 15:20:37,723 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects137
+2024-03-09 15:20:37,723 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects136
+2024-03-09 15:20:37,724 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects138
+2024-03-09 15:20:37,725 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects139
+2024-03-09 15:20:37,728 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects140
+2024-03-09 15:20:37,729 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects141
+2024-03-09 15:20:37,754 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects142
+2024-03-09 15:20:37,754 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects143
+2024-03-09 15:20:37,755 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects144
+2024-03-09 15:20:37,764 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects145
+2024-03-09 15:20:37,877 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects146
+2024-03-09 15:20:37,913 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects147
+2024-03-09 15:20:37,930 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects148
+2024-03-09 15:20:37,931 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects149
+2024-03-09 15:20:37,934 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects150
+2024-03-09 15:20:38,186 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects151
+2024-03-09 15:20:38,199 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects152
+2024-03-09 15:20:38,199 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects153
+2024-03-09 15:20:38,201 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects154
+2024-03-09 15:20:38,201 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects155
+2024-03-09 15:20:38,223 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects156
+2024-03-09 15:20:38,224 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects157
+2024-03-09 15:20:38,227 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects158
+2024-03-09 15:20:38,230 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects159
+2024-03-09 15:20:38,249 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects160
+2024-03-09 15:20:38,264 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects161
+2024-03-09 15:20:38,293 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects162
+2024-03-09 15:20:38,293 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects163
+2024-03-09 15:20:38,414 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects164
+2024-03-09 15:20:38,463 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects165
+2024-03-09 15:20:38,492 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects166
+2024-03-09 15:20:38,730 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects167
+2024-03-09 15:20:38,741 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects168
+2024-03-09 15:20:38,753 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects169
+2024-03-09 15:20:38,776 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects170
+2024-03-09 15:20:38,807 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects171
+2024-03-09 15:20:38,808 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects172
+2024-03-09 15:20:38,810 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects173
+2024-03-09 15:20:38,813 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects174
+2024-03-09 15:20:38,844 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects175
+2024-03-09 15:20:38,848 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects176
+2024-03-09 15:20:38,849 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects177
+2024-03-09 15:20:38,849 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects178
+2024-03-09 15:20:38,850 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects179
+2024-03-09 15:20:38,912 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects180
+2024-03-09 15:20:38,975 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects181
+2024-03-09 15:20:38,975 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects182
+2024-03-09 15:20:39,191 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects183
+2024-03-09 15:20:39,266 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects184
+2024-03-09 15:20:39,290 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects185
+2024-03-09 15:20:39,374 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects186
+2024-03-09 15:20:39,422 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects187
+2024-03-09 15:20:39,510 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects188
+2024-03-09 15:20:39,545 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects189
+2024-03-09 15:20:39,546 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects190
+2024-03-09 15:20:39,547 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects191
+2024-03-09 15:20:39,554 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects192
+2024-03-09 15:20:39,555 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects193
+2024-03-09 15:20:39,557 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects194
+2024-03-09 15:20:39,560 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects195
+2024-03-09 15:20:39,606 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects196
+2024-03-09 15:20:39,610 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects197
+2024-03-09 15:20:39,614 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects198
+2024-03-09 15:20:39,843 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects199
+2024-03-09 15:20:39,956 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects200
+2024-03-09 15:20:39,980 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects201
+2024-03-09 15:20:40,052 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects202
+2024-03-09 15:20:40,088 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects203
+2024-03-09 15:20:40,192 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects204
+2024-03-09 15:20:40,233 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects205
+2024-03-09 15:20:40,293 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects206
+2024-03-09 15:20:40,293 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects207
+2024-03-09 15:20:40,297 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects208
+2024-03-09 15:20:40,342 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects209
+2024-03-09 15:20:40,342 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects210
+2024-03-09 15:20:40,556 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects211
+2024-03-09 15:20:40,581 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects212
+2024-03-09 15:20:40,582 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects213
+2024-03-09 15:20:40,632 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects214
+2024-03-09 15:20:40,633 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects215
+2024-03-09 15:20:40,647 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects216
+2024-03-09 15:20:40,691 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects217
+2024-03-09 15:20:40,920 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects218
+2024-03-09 15:20:40,922 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects219
+2024-03-09 15:20:41,041 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects220
+2024-03-09 15:20:41,043 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects221
+2024-03-09 15:20:41,140 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects222
+2024-03-09 15:20:41,140 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects223
+2024-03-09 15:20:41,241 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects224
+2024-03-09 15:20:41,368 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects225
+2024-03-09 15:20:41,420 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects226
+2024-03-09 15:20:41,424 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects227
+2024-03-09 15:20:41,479 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects228
+2024-03-09 15:20:41,481 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects229
+2024-03-09 15:20:41,485 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects230
+2024-03-09 15:20:41,508 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects231
+2024-03-09 15:20:41,608 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects232
+2024-03-09 15:20:41,610 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects233
+2024-03-09 15:20:41,627 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects234
+2024-03-09 15:20:41,706 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects235
+2024-03-09 15:20:41,787 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects236
+2024-03-09 15:20:41,916 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects237
+2024-03-09 15:20:41,920 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects238
+2024-03-09 15:20:42,026 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects239
+2024-03-09 15:20:42,101 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects240
+2024-03-09 15:20:42,105 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects241
+2024-03-09 15:20:42,133 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects242
+2024-03-09 15:20:42,137 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects243
+2024-03-09 15:20:42,160 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects244
+2024-03-09 15:20:42,165 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects245
+2024-03-09 15:20:42,194 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects246
+2024-03-09 15:20:42,245 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects247
+2024-03-09 15:20:42,343 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects248
+2024-03-09 15:20:42,360 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects249
+2024-03-09 15:20:42,556 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects250
+2024-03-09 15:20:42,633 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects251
+2024-03-09 15:20:42,642 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects252
+2024-03-09 15:20:42,643 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects253
+2024-03-09 15:20:42,643 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects254
+2024-03-09 15:20:42,645 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects255
+2024-03-09 15:20:42,836 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects256
+2024-03-09 15:20:42,903 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects257
+2024-03-09 15:20:42,941 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects258
+2024-03-09 15:20:42,942 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects259
+2024-03-09 15:20:42,992 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects260
+2024-03-09 15:20:43,004 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects261
+2024-03-09 15:20:43,005 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects262
+2024-03-09 15:20:43,055 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects263
+2024-03-09 15:20:43,193 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects264
+2024-03-09 15:20:43,255 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects265
+2024-03-09 15:20:43,271 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects266
+2024-03-09 15:20:43,295 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects267
+2024-03-09 15:20:43,298 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects268
+2024-03-09 15:20:43,315 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects269
+2024-03-09 15:20:43,352 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects270
+2024-03-09 15:20:43,353 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects271
+2024-03-09 15:20:43,399 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects272
+2024-03-09 15:20:43,400 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects273
+2024-03-09 15:20:43,401 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects274
+2024-03-09 15:20:43,528 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects275
+2024-03-09 15:20:43,554 [INFO] [NoneStorage] - performing PUT at /FYYSB3/myobjects276
+2024-03-09 15:20:43,562 [INFO] [NoneStorage] - performing PUT at /FYYSB4/myobjects277
+2024-03-09 15:20:43,601 [INFO] [NoneStorage] - performing PUT at /FYYSB5/myobjects278
+2024-03-09 15:20:43,605 [INFO] [NoneStorage] - performing PUT at /FYYSB6/myobjects279
+2024-03-09 15:20:43,664 [INFO] [NoneStorage] - performing PUT at /FYYSB7/myobjects280
+2024-03-09 15:20:43,686 [INFO] [NoneStorage] - performing PUT at /FYYSB8/myobjects281
+2024-03-09 15:20:43,732 [INFO] [NoneStorage] - performing PUT at /FYYSB9/myobjects282
+2024-03-09 15:20:43,745 [INFO] [NoneStorage] - performing PUT at /FYYSB10/myobjects283
+2024-03-09 15:20:43,812 [INFO] [NoneStorage] - performing PUT at /FYYSB11/myobjects284
+2024-03-09 15:20:43,894 [INFO] [NoneStorage] - performing PUT at /FYYSB12/myobjects285
+2024-03-09 15:20:43,937 [INFO] [NoneStorage] - performing PUT at /FYYSB13/myobjects286
+2024-03-09 15:20:43,937 [INFO] [NoneStorage] - performing PUT at /FYYSB1/myobjects287
+2024-03-09 15:20:44,130 [INFO] [NoneStorage] - performing PUT at /FYYSB2/myobjects288
+================================================== stage: s3-dispose ==================================================
+---------------------------------- mission: MA230D30F50, driver: driver1 ----------------------------------
+2024-03-09 15:20:51,005 [INFO] [Log4jLogManager] - will append log to file /root/0.4.2.c4/log/mission/MA230D30F50.log
+2024-03-09 15:20:51,219 [INFO] [NoneStorage] - performing DELETE at /FYYSB3
+2024-03-09 15:20:51,222 [INFO] [NoneStorage] - performing DELETE at /FYYSB13
+2024-03-09 15:20:51,222 [INFO] [NoneStorage] - performing DELETE at /FYYSB12
+2024-03-09 15:20:51,221 [INFO] [NoneStorage] - performing DELETE at /FYYSB11
+2024-03-09 15:20:51,221 [INFO] [NoneStorage] - performing DELETE at /FYYSB10
+2024-03-09 15:20:51,221 [INFO] [NoneStorage] - performing DELETE at /FYYSB9
+2024-03-09 15:20:51,221 [INFO] [NoneStorage] - performing DELETE at /FYYSB8
+2024-03-09 15:20:51,221 [INFO] [NoneStorage] - performing DELETE at /FYYSB7
+2024-03-09 15:20:51,220 [INFO] [NoneStorage] - performing DELETE at /FYYSB6
+2024-03-09 15:20:51,219 [INFO] [NoneStorage] - performing DELETE at /FYYSB2
+2024-03-09 15:20:51,220 [INFO] [NoneStorage] - performing DELETE at /FYYSB4
+2024-03-09 15:20:51,220 [INFO] [NoneStorage] - performing DELETE at /FYYSB5
+2024-03-09 15:20:51,219 [INFO] [NoneStorage] - performing DELETE at /FYYSB1
+2024-03-09 15:20:51,257 [ERROR] [AbstractOperator] - Error deleting container FYYSB3
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container FYYSB3
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:20:51,258 [INFO] [NoneStorage] - performing LIST at /FYYSB3/
+2024-03-09 15:20:51,260 [ERROR] [AbstractOperator] - Error deleting container FYYSB9
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container FYYSB9
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:20:51,260 [INFO] [NoneStorage] - performing LIST at /FYYSB9/
+2024-03-09 15:20:51,262 [ERROR] [AbstractOperator] - Error deleting container FYYSB4
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container FYYSB4
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:20:51,262 [INFO] [NoneStorage] - performing LIST at /FYYSB4/
+2024-03-09 15:20:51,263 [ERROR] [AbstractOperator] - Error deleting container FYYSB11
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container FYYSB11
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:20:51,263 [INFO] [NoneStorage] - performing LIST at /FYYSB11/
+2024-03-09 15:20:51,264 [ERROR] [AbstractOperator] - Error deleting container FYYSB10
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container FYYSB10
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:20:51,265 [INFO] [NoneStorage] - performing LIST at /FYYSB10/
+2024-03-09 15:20:51,265 [ERROR] [AbstractOperator] - Error deleting container FYYSB8
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container FYYSB8
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:20:51,265 [INFO] [NoneStorage] - performing LIST at /FYYSB8/
+2024-03-09 15:20:51,272 [ERROR] [AbstractOperator] - Error deleting container FYYSB5
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container FYYSB5
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:20:51,273 [INFO] [NoneStorage] - performing LIST at /FYYSB5/
+2024-03-09 15:20:51,272 [ERROR] [AbstractOperator] - Error deleting container FYYSB2
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container FYYSB2
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:20:51,272 [ERROR] [AbstractOperator] - Error deleting container FYYSB13
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container FYYSB13
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:20:51,274 [INFO] [NoneStorage] - performing LIST at /FYYSB13/
+2024-03-09 15:20:51,274 [INFO] [NoneStorage] - performing LIST at /FYYSB2/
+2024-03-09 15:20:51,285 [ERROR] [AbstractOperator] - Error deleting container FYYSB6
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container FYYSB6
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:20:51,285 [INFO] [NoneStorage] - performing LIST at /FYYSB6/
+2024-03-09 15:20:51,289 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects100
+2024-03-09 15:20:51,289 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects107
+2024-03-09 15:20:51,290 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects108
+2024-03-09 15:20:51,295 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects112
+2024-03-09 15:20:51,296 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects102
+2024-03-09 15:20:51,303 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects10
+2024-03-09 15:20:51,303 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects106
+2024-03-09 15:20:51,310 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects104
+2024-03-09 15:20:51,313 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects109
+2024-03-09 15:20:51,316 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects110
+2024-03-09 15:20:51,545 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects113
+2024-03-09 15:20:51,547 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects121
+2024-03-09 15:20:51,549 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects120
+2024-03-09 15:20:51,554 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects11
+2024-03-09 15:20:51,571 [ERROR] [AbstractOperator] - Error deleting container FYYSB12
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container FYYSB12
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:20:51,571 [INFO] [NoneStorage] - performing LIST at /FYYSB12/
+2024-03-09 15:20:51,598 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects122
+2024-03-09 15:20:51,604 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects103
+2024-03-09 15:20:51,665 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects125
+2024-03-09 15:20:51,670 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects123
+2024-03-09 15:20:51,690 [ERROR] [AbstractOperator] - Error deleting container FYYSB7
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container FYYSB7
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:20:51,690 [INFO] [NoneStorage] - performing LIST at /FYYSB7/
+2024-03-09 15:20:51,694 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects119
+2024-03-09 15:20:51,696 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects117
+2024-03-09 15:20:51,697 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects101
+2024-03-09 15:20:51,723 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects111
+2024-03-09 15:20:51,723 [ERROR] [AbstractOperator] - Error deleting container FYYSB1
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container FYYSB1
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:20:51,723 [INFO] [NoneStorage] - performing LIST at /FYYSB1/
+2024-03-09 15:20:51,763 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects1
+2024-03-09 15:20:51,782 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects115
+2024-03-09 15:20:51,783 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects133
+2024-03-09 15:20:51,784 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects134
+2024-03-09 15:20:51,827 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects126
+2024-03-09 15:20:51,828 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects116
+2024-03-09 15:20:51,829 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects138
+2024-03-09 15:20:51,829 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects136
+2024-03-09 15:20:51,831 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects135
+2024-03-09 15:20:51,880 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects132
+2024-03-09 15:20:51,927 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects114
+2024-03-09 15:20:51,987 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects124
+2024-03-09 15:20:51,991 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects105
+2024-03-09 15:20:52,043 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects151
+2024-03-09 15:20:52,044 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects146
+2024-03-09 15:20:52,047 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects13
+2024-03-09 15:20:52,106 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects147
+2024-03-09 15:20:52,109 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects12
+2024-03-09 15:20:52,110 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects128
+2024-03-09 15:20:52,112 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects145
+2024-03-09 15:20:52,170 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects139
+2024-03-09 15:20:52,171 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects148
+2024-03-09 15:20:52,174 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects149
+2024-03-09 15:20:52,211 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects118
+2024-03-09 15:20:52,211 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects127
+2024-03-09 15:20:52,269 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects159
+2024-03-09 15:20:52,271 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects130
+2024-03-09 15:20:52,272 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects164
+2024-03-09 15:20:52,307 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects137
+2024-03-09 15:20:52,321 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects15
+2024-03-09 15:20:52,374 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects141
+2024-03-09 15:20:52,390 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects129
+2024-03-09 15:20:52,394 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects160
+2024-03-09 15:20:52,466 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects152
+2024-03-09 15:20:52,494 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects162
+2024-03-09 15:20:52,536 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects140
+2024-03-09 15:20:52,538 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects177
+2024-03-09 15:20:52,585 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects131
+2024-03-09 15:20:52,606 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects161
+2024-03-09 15:20:52,608 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects150
+2024-03-09 15:20:52,643 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects142
+2024-03-09 15:20:52,693 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects17
+2024-03-09 15:20:52,695 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects16
+2024-03-09 15:20:52,698 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects143
+2024-03-09 15:20:52,709 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects154
+2024-03-09 15:20:52,721 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects175
+2024-03-09 15:20:52,725 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects153
+2024-03-09 15:20:52,725 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects190
+2024-03-09 15:20:52,740 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects165
+2024-03-09 15:20:52,765 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects14
+2024-03-09 15:20:52,807 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects163
+2024-03-09 15:20:52,821 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects174
+2024-03-09 15:20:52,822 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects158
+2024-03-09 15:20:52,830 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects203
+2024-03-09 15:20:52,890 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects156
+2024-03-09 15:20:52,894 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects167
+2024-03-09 15:20:52,909 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects172
+2024-03-09 15:20:52,910 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects155
+2024-03-09 15:20:52,958 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects173
+2024-03-09 15:20:52,978 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects176
+2024-03-09 15:20:52,980 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects188
+2024-03-09 15:20:52,984 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects178
+2024-03-09 15:20:52,984 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects166
+2024-03-09 15:20:53,035 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects21
+2024-03-09 15:20:53,088 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects144
+2024-03-09 15:20:53,101 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects18
+2024-03-09 15:20:53,103 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects169
+2024-03-09 15:20:53,120 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects185
+2024-03-09 15:20:53,139 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects168
+2024-03-09 15:20:53,143 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects171
+2024-03-09 15:20:53,175 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects179
+2024-03-09 15:20:53,176 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects180
+2024-03-09 15:20:53,209 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects186
+2024-03-09 15:20:53,210 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects216
+2024-03-09 15:20:53,259 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects19
+2024-03-09 15:20:53,259 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects182
+2024-03-09 15:20:53,268 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects189
+2024-03-09 15:20:53,269 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects191
+2024-03-09 15:20:53,346 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects187
+2024-03-09 15:20:53,347 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects184
+2024-03-09 15:20:53,354 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects157
+2024-03-09 15:20:53,356 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects198
+2024-03-09 15:20:53,415 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects229
+2024-03-09 15:20:53,417 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects193
+2024-03-09 15:20:53,452 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects181
+2024-03-09 15:20:53,455 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects192
+2024-03-09 15:20:53,481 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects199
+2024-03-09 15:20:53,517 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects201
+2024-03-09 15:20:53,578 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects20
+2024-03-09 15:20:53,581 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects204
+2024-03-09 15:20:53,624 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects195
+2024-03-09 15:20:53,686 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects170
+2024-03-09 15:20:53,723 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects197
+2024-03-09 15:20:53,761 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects211
+2024-03-09 15:20:53,785 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects200
+2024-03-09 15:20:53,786 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects205
+2024-03-09 15:20:53,837 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects194
+2024-03-09 15:20:53,873 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects214
+2024-03-09 15:20:53,873 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects212
+2024-03-09 15:20:53,990 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects206
+2024-03-09 15:20:53,997 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects242
+2024-03-09 15:20:54,053 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects217
+2024-03-09 15:20:54,135 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects202
+2024-03-09 15:20:54,241 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects183
+2024-03-09 15:20:54,284 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects2
+2024-03-09 15:20:54,284 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects224
+2024-03-09 15:20:54,286 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects208
+2024-03-09 15:20:54,436 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects225
+2024-03-09 15:20:54,438 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects218
+2024-03-09 15:20:54,568 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects219
+2024-03-09 15:20:54,689 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects227
+2024-03-09 15:20:54,725 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects213
+2024-03-09 15:20:54,777 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects255
+2024-03-09 15:20:54,868 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects196
+2024-03-09 15:20:54,871 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects238
+2024-03-09 15:20:54,871 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects221
+2024-03-09 15:20:54,927 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects207
+2024-03-09 15:20:55,028 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects237
+2024-03-09 15:20:55,029 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects23
+2024-03-09 15:20:55,033 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects240
+2024-03-09 15:20:55,068 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects22
+2024-03-09 15:20:55,076 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects210
+2024-03-09 15:20:55,100 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects226
+2024-03-09 15:20:55,113 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects215
+2024-03-09 15:20:55,176 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects232
+2024-03-09 15:20:55,258 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects209
+2024-03-09 15:20:55,261 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects234
+2024-03-09 15:20:55,344 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects220
+2024-03-09 15:20:55,345 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects251
+2024-03-09 15:20:55,406 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects231
+2024-03-09 15:20:55,445 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects230
+2024-03-09 15:20:55,485 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects253
+2024-03-09 15:20:55,485 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects250
+2024-03-09 15:20:55,516 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects223
+2024-03-09 15:20:55,519 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects228
+2024-03-09 15:20:55,586 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects24
+2024-03-09 15:20:55,590 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects268
+2024-03-09 15:20:55,667 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects247
+2024-03-09 15:20:55,687 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects239
+2024-03-09 15:20:55,738 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects264
+2024-03-09 15:20:55,742 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects222
+2024-03-09 15:20:55,837 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects233
+2024-03-09 15:20:55,838 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects244
+2024-03-09 15:20:55,946 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects263
+2024-03-09 15:20:55,946 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects243
+2024-03-09 15:20:56,036 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects266
+2024-03-09 15:20:56,036 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects236
+2024-03-09 15:20:56,099 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects245
+2024-03-09 15:20:56,159 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects277
+2024-03-09 15:20:56,215 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects281
+2024-03-09 15:20:56,217 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects26
+2024-03-09 15:20:56,251 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects246
+2024-03-09 15:20:56,265 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects252
+2024-03-09 15:20:56,265 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects257
+2024-03-09 15:20:56,318 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects241
+2024-03-09 15:20:56,326 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects249
+2024-03-09 15:20:56,326 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects276
+2024-03-09 15:20:56,354 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects258
+2024-03-09 15:20:56,355 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects279
+2024-03-09 15:20:56,462 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects30
+2024-03-09 15:20:56,465 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects256
+2024-03-09 15:20:56,487 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects260
+2024-03-09 15:20:56,515 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects34
+2024-03-09 15:20:56,554 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects270
+2024-03-09 15:20:56,612 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects262
+2024-03-09 15:20:56,672 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects235
+2024-03-09 15:20:56,717 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects29
+2024-03-09 15:20:56,718 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects265
+2024-03-09 15:20:56,726 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects273
+2024-03-09 15:20:56,768 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects271
+2024-03-09 15:20:56,769 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects32
+2024-03-09 15:20:56,770 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects47
+2024-03-09 15:20:56,777 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects283
+2024-03-09 15:20:56,782 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects254
+2024-03-09 15:20:56,787 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects25
+2024-03-09 15:20:56,820 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects269
+2024-03-09 15:20:56,820 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects275
+2024-03-09 15:20:56,964 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects248
+2024-03-09 15:20:56,968 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects286
+2024-03-09 15:20:57,033 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects278
+2024-03-09 15:20:57,033 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects3
+2024-03-09 15:20:57,034 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects60
+2024-03-09 15:20:57,038 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects45
+2024-03-09 15:20:57,098 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects284
+2024-03-09 15:20:57,158 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects28
+2024-03-09 15:20:57,166 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects4
+2024-03-09 15:20:57,169 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects36
+2024-03-09 15:20:57,265 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects58
+2024-03-09 15:20:57,307 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects39
+2024-03-09 15:20:57,317 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects42
+2024-03-09 15:20:57,343 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects267
+2024-03-09 15:20:57,347 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects259
+2024-03-09 15:20:57,363 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects37
+2024-03-09 15:20:57,364 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects288
+2024-03-09 15:20:57,375 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects31
+2024-03-09 15:20:57,415 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects282
+2024-03-09 15:20:57,518 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects261
+2024-03-09 15:20:57,519 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects43
+2024-03-09 15:20:57,519 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects49
+2024-03-09 15:20:57,551 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects55
+2024-03-09 15:20:57,631 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects272
+2024-03-09 15:20:57,634 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects73
+2024-03-09 15:20:57,674 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects6
+2024-03-09 15:20:57,749 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects52
+2024-03-09 15:20:57,787 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects50
+2024-03-09 15:20:57,902 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects27
+2024-03-09 15:20:57,954 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects285
+2024-03-09 15:20:57,958 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects41
+2024-03-09 15:20:58,125 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects44
+2024-03-09 15:20:58,125 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects63
+2024-03-09 15:20:58,125 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects68
+2024-03-09 15:20:58,129 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects62
+2024-03-09 15:20:58,129 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects280
+2024-03-09 15:20:58,130 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects56
+2024-03-09 15:20:58,194 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects35
+2024-03-09 15:20:58,265 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects65
+2024-03-09 15:20:58,430 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects69
+2024-03-09 15:20:58,431 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects33
+2024-03-09 15:20:58,433 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects5
+2024-03-09 15:20:58,435 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects81
+2024-03-09 15:20:58,443 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects274
+2024-03-09 15:20:58,468 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects71
+2024-03-09 15:20:58,485 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects76
+2024-03-09 15:20:58,486 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects75
+2024-03-09 15:20:58,489 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects78
+2024-03-09 15:20:58,505 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects38
+2024-03-09 15:20:58,509 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects8
+2024-03-09 15:20:58,583 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects54
+2024-03-09 15:20:58,833 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects57
+2024-03-09 15:20:58,834 [INFO] [NoneStorage] - performing DELETE at /FYYSB3/myobjects94
+2024-03-09 15:20:58,869 [INFO] [NoneStorage] - performing DELETE at /FYYSB10/myobjects88
+2024-03-09 15:20:58,872 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects84
+2024-03-09 15:20:58,886 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects46
+2024-03-09 15:20:58,900 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects48
+2024-03-09 15:20:58,918 [INFO] [NoneStorage] - performing DELETE at /FYYSB11/myobjects89
+2024-03-09 15:20:59,232 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects82
+2024-03-09 15:20:59,250 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects70
+2024-03-09 15:20:59,250 [INFO] [NoneStorage] - performing DELETE at /FYYSB6/myobjects97
+2024-03-09 15:20:59,296 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects287
+2024-03-09 15:20:59,336 [INFO] [NoneStorage] - performing DELETE at /FYYSB13/myobjects91
+2024-03-09 15:20:59,342 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects61
+2024-03-09 15:20:59,362 [INFO] [NoneStorage] - performing DELETE at /FYYSB10
+2024-03-09 15:20:59,363 [INFO] [NoneStorage] - performing DELETE at /FYYSB3
+2024-03-09 15:20:59,384 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects51
+2024-03-09 15:20:59,390 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects86
+2024-03-09 15:20:59,430 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects67
+2024-03-09 15:20:59,479 [INFO] [NoneStorage] - performing DELETE at /FYYSB11
+2024-03-09 15:20:59,555 [INFO] [NoneStorage] - performing DELETE at /FYYSB4/myobjects95
+2024-03-09 15:20:59,673 [INFO] [NoneStorage] - performing DELETE at /FYYSB6
+2024-03-09 15:20:59,752 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects59
+2024-03-09 15:20:59,789 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects40
+2024-03-09 15:20:59,814 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects64
+2024-03-09 15:21:00,102 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects83
+2024-03-09 15:21:00,258 [INFO] [NoneStorage] - performing DELETE at /FYYSB8/myobjects99
+2024-03-09 15:21:00,294 [INFO] [NoneStorage] - performing DELETE at /FYYSB13
+2024-03-09 15:21:00,320 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects74
+2024-03-09 15:21:00,386 [INFO] [NoneStorage] - performing DELETE at /FYYSB4
+2024-03-09 15:21:00,426 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects80
+2024-03-09 15:21:00,529 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects7
+2024-03-09 15:21:00,534 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects53
+2024-03-09 15:21:00,772 [INFO] [NoneStorage] - performing DELETE at /FYYSB5/myobjects96
+2024-03-09 15:21:00,992 [INFO] [NoneStorage] - performing DELETE at /FYYSB5
+2024-03-09 15:21:01,028 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects77
+2024-03-09 15:21:01,029 [INFO] [NoneStorage] - performing DELETE at /FYYSB8
+2024-03-09 15:21:01,095 [INFO] [NoneStorage] - performing DELETE at /FYYSB2/myobjects93
+2024-03-09 15:21:01,148 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects87
+2024-03-09 15:21:01,150 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects66
+2024-03-09 15:21:01,449 [INFO] [NoneStorage] - performing DELETE at /FYYSB9/myobjects9
+2024-03-09 15:21:01,454 [INFO] [NoneStorage] - performing DELETE at /FYYSB12/myobjects90
+2024-03-09 15:21:01,475 [INFO] [NoneStorage] - performing DELETE at /FYYSB2
+2024-03-09 15:21:01,527 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects79
+2024-03-09 15:21:01,563 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects72
+2024-03-09 15:21:01,814 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects85
+2024-03-09 15:21:01,952 [INFO] [NoneStorage] - performing DELETE at /FYYSB7/myobjects98
+2024-03-09 15:21:01,983 [INFO] [NoneStorage] - performing DELETE at /FYYSB12
+2024-03-09 15:21:02,029 [INFO] [NoneStorage] - performing DELETE at /FYYSB9
+2024-03-09 15:21:02,033 [INFO] [NoneStorage] - performing DELETE at /FYYSB1/myobjects92
+2024-03-09 15:21:02,171 [INFO] [NoneStorage] - performing DELETE at /FYYSB1
+2024-03-09 15:21:02,583 [INFO] [NoneStorage] - performing DELETE at /FYYSB7

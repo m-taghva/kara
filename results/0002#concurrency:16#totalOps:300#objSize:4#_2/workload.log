@@ -1,0 +1,910 @@
+================================================== stage: s1-init ==================================================
+---------------------------------- mission: M7231026C57, driver: driver1 ----------------------------------
+2024-03-09 15:24:05,006 [INFO] [Log4jLogManager] - will append log to file /root/0.4.2.c4/log/mission/M7231026C57.log
+2024-03-09 15:24:05,222 [INFO] [NoneStorage] - performing PUT at /WLODB2
+2024-03-09 15:24:05,223 [INFO] [NoneStorage] - performing PUT at /WLODB9
+2024-03-09 15:24:05,223 [INFO] [NoneStorage] - performing PUT at /WLODB8
+2024-03-09 15:24:05,223 [INFO] [NoneStorage] - performing PUT at /WLODB6
+2024-03-09 15:24:05,223 [INFO] [NoneStorage] - performing PUT at /WLODB7
+2024-03-09 15:24:05,222 [INFO] [NoneStorage] - performing PUT at /WLODB5
+2024-03-09 15:24:05,222 [INFO] [NoneStorage] - performing PUT at /WLODB4
+2024-03-09 15:24:05,221 [INFO] [NoneStorage] - performing PUT at /WLODB1
+2024-03-09 15:24:05,222 [INFO] [NoneStorage] - performing PUT at /WLODB3
+2024-03-09 15:24:05,224 [INFO] [NoneStorage] - performing PUT at /WLODB13
+2024-03-09 15:24:05,224 [INFO] [NoneStorage] - performing PUT at /WLODB12
+2024-03-09 15:24:05,224 [INFO] [NoneStorage] - performing PUT at /WLODB11
+2024-03-09 15:24:05,224 [INFO] [NoneStorage] - performing PUT at /WLODB10
+================================================== stage: s2-main ==================================================
+---------------------------------- mission: ME2310432D0, driver: driver1 ----------------------------------
+2024-03-09 15:24:12,006 [INFO] [Log4jLogManager] - will append log to file /root/0.4.2.c4/log/mission/ME2310432D0.log
+2024-03-09 15:24:12,220 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects1
+2024-03-09 15:24:12,222 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects4
+2024-03-09 15:24:12,222 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects3
+2024-03-09 15:24:12,223 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects9
+2024-03-09 15:24:12,221 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects2
+2024-03-09 15:24:12,223 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects15
+2024-03-09 15:24:12,223 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects16
+2024-03-09 15:24:12,223 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects13
+2024-03-09 15:24:12,223 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects14
+2024-03-09 15:24:12,223 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects12
+2024-03-09 15:24:12,223 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects10
+2024-03-09 15:24:12,223 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects11
+2024-03-09 15:24:12,223 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects8
+2024-03-09 15:24:12,222 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects6
+2024-03-09 15:24:12,222 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects7
+2024-03-09 15:24:12,222 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects5
+2024-03-09 15:24:12,549 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects17
+2024-03-09 15:24:12,549 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects18
+2024-03-09 15:24:12,556 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects19
+2024-03-09 15:24:12,615 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects20
+2024-03-09 15:24:12,694 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects21
+2024-03-09 15:24:12,723 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects22
+2024-03-09 15:24:12,724 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects23
+2024-03-09 15:24:12,726 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects24
+2024-03-09 15:24:12,727 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects25
+2024-03-09 15:24:12,727 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects26
+2024-03-09 15:24:12,728 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects27
+2024-03-09 15:24:12,729 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects28
+2024-03-09 15:24:12,731 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects29
+2024-03-09 15:24:12,731 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects30
+2024-03-09 15:24:12,733 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects31
+2024-03-09 15:24:12,737 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects32
+2024-03-09 15:24:12,941 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects33
+2024-03-09 15:24:12,941 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects34
+2024-03-09 15:24:12,942 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects35
+2024-03-09 15:24:12,947 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects36
+2024-03-09 15:24:12,965 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects37
+2024-03-09 15:24:12,970 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects38
+2024-03-09 15:24:13,016 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects39
+2024-03-09 15:24:13,017 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects40
+2024-03-09 15:24:13,111 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects41
+2024-03-09 15:24:13,112 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects42
+2024-03-09 15:24:13,144 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects43
+2024-03-09 15:24:13,145 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects44
+2024-03-09 15:24:13,146 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects45
+2024-03-09 15:24:13,146 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects46
+2024-03-09 15:24:13,195 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects47
+2024-03-09 15:24:13,198 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects48
+2024-03-09 15:24:13,204 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects49
+2024-03-09 15:24:13,447 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects50
+2024-03-09 15:24:13,454 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects51
+2024-03-09 15:24:13,456 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects52
+2024-03-09 15:24:13,459 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects53
+2024-03-09 15:24:13,460 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects54
+2024-03-09 15:24:13,494 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects55
+2024-03-09 15:24:13,495 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects56
+2024-03-09 15:24:13,513 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects57
+2024-03-09 15:24:13,525 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects58
+2024-03-09 15:24:13,532 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects59
+2024-03-09 15:24:13,584 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects60
+2024-03-09 15:24:13,586 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects61
+2024-03-09 15:24:13,614 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects62
+2024-03-09 15:24:13,624 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects63
+2024-03-09 15:24:13,624 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects64
+2024-03-09 15:24:13,626 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects65
+2024-03-09 15:24:13,866 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects66
+2024-03-09 15:24:13,870 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects67
+2024-03-09 15:24:13,873 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects68
+2024-03-09 15:24:13,878 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects69
+2024-03-09 15:24:13,879 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects70
+2024-03-09 15:24:13,881 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects71
+2024-03-09 15:24:13,883 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects72
+2024-03-09 15:24:13,898 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects73
+2024-03-09 15:24:13,915 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects75
+2024-03-09 15:24:13,915 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects74
+2024-03-09 15:24:13,916 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects76
+2024-03-09 15:24:13,916 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects77
+2024-03-09 15:24:13,942 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects78
+2024-03-09 15:24:14,004 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects79
+2024-03-09 15:24:14,012 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects81
+2024-03-09 15:24:14,012 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects80
+2024-03-09 15:24:14,167 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects82
+2024-03-09 15:24:14,179 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects83
+2024-03-09 15:24:14,180 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects84
+2024-03-09 15:24:14,182 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects85
+2024-03-09 15:24:14,199 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects86
+2024-03-09 15:24:14,215 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects87
+2024-03-09 15:24:14,215 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects88
+2024-03-09 15:24:14,244 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects89
+2024-03-09 15:24:14,245 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects90
+2024-03-09 15:24:14,246 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects91
+2024-03-09 15:24:14,262 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects92
+2024-03-09 15:24:14,262 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects93
+2024-03-09 15:24:14,267 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects94
+2024-03-09 15:24:14,269 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects95
+2024-03-09 15:24:14,331 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects96
+2024-03-09 15:24:14,332 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects97
+2024-03-09 15:24:14,506 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects98
+2024-03-09 15:24:14,511 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects99
+2024-03-09 15:24:14,566 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects100
+2024-03-09 15:24:14,569 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects101
+2024-03-09 15:24:14,569 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects102
+2024-03-09 15:24:14,571 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects103
+2024-03-09 15:24:14,590 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects104
+2024-03-09 15:24:14,651 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects105
+2024-03-09 15:24:14,655 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects106
+2024-03-09 15:24:14,657 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects107
+2024-03-09 15:24:14,732 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects108
+2024-03-09 15:24:14,732 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects110
+2024-03-09 15:24:14,732 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects109
+2024-03-09 15:24:14,773 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects111
+2024-03-09 15:24:14,773 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects112
+2024-03-09 15:24:14,899 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects113
+2024-03-09 15:24:14,984 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects114
+2024-03-09 15:24:15,072 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects115
+2024-03-09 15:24:15,123 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects116
+2024-03-09 15:24:15,208 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects117
+2024-03-09 15:24:15,208 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects118
+2024-03-09 15:24:15,209 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects119
+2024-03-09 15:24:15,220 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects120
+2024-03-09 15:24:15,220 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects121
+2024-03-09 15:24:15,241 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects122
+2024-03-09 15:24:15,244 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects123
+2024-03-09 15:24:15,247 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects124
+2024-03-09 15:24:15,389 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects125
+2024-03-09 15:24:15,390 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects126
+2024-03-09 15:24:15,550 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects127
+2024-03-09 15:24:15,554 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects128
+2024-03-09 15:24:15,624 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects129
+2024-03-09 15:24:15,731 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects130
+2024-03-09 15:24:15,802 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects131
+2024-03-09 15:24:15,847 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects132
+2024-03-09 15:24:15,896 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects133
+2024-03-09 15:24:15,927 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects134
+2024-03-09 15:24:15,992 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects135
+2024-03-09 15:24:15,995 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects136
+2024-03-09 15:24:16,017 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects137
+2024-03-09 15:24:16,047 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects138
+2024-03-09 15:24:16,049 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects139
+2024-03-09 15:24:16,153 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects140
+2024-03-09 15:24:16,158 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects141
+2024-03-09 15:24:16,252 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects142
+2024-03-09 15:24:16,394 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects143
+2024-03-09 15:24:16,430 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects144
+2024-03-09 15:24:16,479 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects145
+2024-03-09 15:24:16,479 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects146
+2024-03-09 15:24:16,491 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects147
+2024-03-09 15:24:16,544 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects148
+2024-03-09 15:24:16,584 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects149
+2024-03-09 15:24:16,686 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects150
+2024-03-09 15:24:16,778 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects151
+2024-03-09 15:24:16,840 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects152
+2024-03-09 15:24:16,844 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects153
+2024-03-09 15:24:16,860 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects154
+2024-03-09 15:24:16,880 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects155
+2024-03-09 15:24:16,894 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects156
+2024-03-09 15:24:16,912 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects157
+2024-03-09 15:24:16,960 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects158
+2024-03-09 15:24:16,960 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects159
+2024-03-09 15:24:17,161 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects160
+2024-03-09 15:24:17,246 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects161
+2024-03-09 15:24:17,247 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects162
+2024-03-09 15:24:17,267 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects163
+2024-03-09 15:24:17,298 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects164
+2024-03-09 15:24:17,311 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects165
+2024-03-09 15:24:17,396 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects166
+2024-03-09 15:24:17,412 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects167
+2024-03-09 15:24:17,446 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects168
+2024-03-09 15:24:17,450 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects169
+2024-03-09 15:24:17,466 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects170
+2024-03-09 15:24:17,482 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects171
+2024-03-09 15:24:17,528 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects172
+2024-03-09 15:24:17,643 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects173
+2024-03-09 15:24:17,647 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects174
+2024-03-09 15:24:17,661 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects175
+2024-03-09 15:24:17,704 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects176
+2024-03-09 15:24:17,708 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects177
+2024-03-09 15:24:17,708 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects178
+2024-03-09 15:24:17,764 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects179
+2024-03-09 15:24:17,765 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects180
+2024-03-09 15:24:17,796 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects181
+2024-03-09 15:24:17,803 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects182
+2024-03-09 15:24:17,813 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects183
+2024-03-09 15:24:17,916 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects184
+2024-03-09 15:24:17,940 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects185
+2024-03-09 15:24:18,019 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects186
+2024-03-09 15:24:18,020 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects187
+2024-03-09 15:24:18,134 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects188
+2024-03-09 15:24:18,156 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects189
+2024-03-09 15:24:18,173 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects190
+2024-03-09 15:24:18,174 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects191
+2024-03-09 15:24:18,187 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects193
+2024-03-09 15:24:18,187 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects192
+2024-03-09 15:24:18,225 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects194
+2024-03-09 15:24:18,227 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects195
+2024-03-09 15:24:18,230 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects196
+2024-03-09 15:24:18,243 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects197
+2024-03-09 15:24:18,247 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects198
+2024-03-09 15:24:18,286 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects199
+2024-03-09 15:24:18,344 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects200
+2024-03-09 15:24:18,377 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects201
+2024-03-09 15:24:18,445 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects202
+2024-03-09 15:24:18,460 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects203
+2024-03-09 15:24:18,471 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects204
+2024-03-09 15:24:18,517 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects205
+2024-03-09 15:24:18,554 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects206
+2024-03-09 15:24:18,598 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects207
+2024-03-09 15:24:18,599 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects208
+2024-03-09 15:24:18,600 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects209
+2024-03-09 15:24:18,610 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects210
+2024-03-09 15:24:18,619 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects211
+2024-03-09 15:24:18,744 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects212
+2024-03-09 15:24:18,804 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects213
+2024-03-09 15:24:18,926 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects214
+2024-03-09 15:24:18,965 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects215
+2024-03-09 15:24:18,966 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects216
+2024-03-09 15:24:18,966 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects217
+2024-03-09 15:24:18,968 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects218
+2024-03-09 15:24:19,024 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects219
+2024-03-09 15:24:19,093 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects220
+2024-03-09 15:24:19,134 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects221
+2024-03-09 15:24:19,186 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects222
+2024-03-09 15:24:19,190 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects223
+2024-03-09 15:24:19,196 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects224
+2024-03-09 15:24:19,202 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects225
+2024-03-09 15:24:19,214 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects226
+2024-03-09 15:24:19,229 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects227
+2024-03-09 15:24:19,231 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects228
+2024-03-09 15:24:19,283 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects229
+2024-03-09 15:24:19,401 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects230
+2024-03-09 15:24:19,476 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects231
+2024-03-09 15:24:19,478 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects232
+2024-03-09 15:24:19,480 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects233
+2024-03-09 15:24:19,486 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects234
+2024-03-09 15:24:19,513 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects235
+2024-03-09 15:24:19,541 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects236
+2024-03-09 15:24:19,623 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects237
+2024-03-09 15:24:19,625 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects238
+2024-03-09 15:24:19,626 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects239
+2024-03-09 15:24:19,713 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects240
+2024-03-09 15:24:19,713 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects241
+2024-03-09 15:24:19,745 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects242
+2024-03-09 15:24:19,811 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects243
+2024-03-09 15:24:19,869 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects244
+2024-03-09 15:24:19,874 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects245
+2024-03-09 15:24:19,895 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects246
+2024-03-09 15:24:19,909 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects247
+2024-03-09 15:24:19,911 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects248
+2024-03-09 15:24:19,979 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects249
+2024-03-09 15:24:20,115 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects250
+2024-03-09 15:24:20,168 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects251
+2024-03-09 15:24:20,219 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects252
+2024-03-09 15:24:20,219 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects253
+2024-03-09 15:24:20,220 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects254
+2024-03-09 15:24:20,269 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects255
+2024-03-09 15:24:20,343 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects256
+2024-03-09 15:24:20,408 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects257
+2024-03-09 15:24:20,482 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects258
+2024-03-09 15:24:20,504 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects259
+2024-03-09 15:24:20,611 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects260
+2024-03-09 15:24:20,663 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects261
+2024-03-09 15:24:20,666 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects262
+2024-03-09 15:24:20,691 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects263
+2024-03-09 15:24:20,829 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects264
+2024-03-09 15:24:20,892 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects265
+2024-03-09 15:24:20,946 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects266
+2024-03-09 15:24:20,946 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects267
+2024-03-09 15:24:21,016 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects268
+2024-03-09 15:24:21,159 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects269
+2024-03-09 15:24:21,160 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects270
+2024-03-09 15:24:21,215 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects271
+2024-03-09 15:24:21,225 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects272
+2024-03-09 15:24:21,293 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects273
+2024-03-09 15:24:21,303 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects274
+2024-03-09 15:24:21,487 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects275
+2024-03-09 15:24:21,489 [INFO] [NoneStorage] - performing PUT at /WLODB3/myobjects276
+2024-03-09 15:24:21,555 [INFO] [NoneStorage] - performing PUT at /WLODB4/myobjects277
+2024-03-09 15:24:21,715 [INFO] [NoneStorage] - performing PUT at /WLODB5/myobjects278
+2024-03-09 15:24:21,816 [INFO] [NoneStorage] - performing PUT at /WLODB6/myobjects279
+2024-03-09 15:24:21,882 [INFO] [NoneStorage] - performing PUT at /WLODB7/myobjects280
+2024-03-09 15:24:21,931 [INFO] [NoneStorage] - performing PUT at /WLODB8/myobjects281
+2024-03-09 15:24:21,934 [INFO] [NoneStorage] - performing PUT at /WLODB9/myobjects282
+2024-03-09 15:24:22,080 [INFO] [NoneStorage] - performing PUT at /WLODB10/myobjects283
+2024-03-09 15:24:22,230 [INFO] [NoneStorage] - performing PUT at /WLODB11/myobjects284
+2024-03-09 15:24:22,230 [INFO] [NoneStorage] - performing PUT at /WLODB12/myobjects285
+2024-03-09 15:24:22,276 [INFO] [NoneStorage] - performing PUT at /WLODB13/myobjects286
+2024-03-09 15:24:22,650 [INFO] [NoneStorage] - performing PUT at /WLODB1/myobjects287
+2024-03-09 15:24:22,796 [INFO] [NoneStorage] - performing PUT at /WLODB2/myobjects288
+================================================== stage: s3-dispose ==================================================
+---------------------------------- mission: M323108485C, driver: driver1 ----------------------------------
+2024-03-09 15:24:29,005 [INFO] [Log4jLogManager] - will append log to file /root/0.4.2.c4/log/mission/M323108485C.log
+2024-03-09 15:24:29,219 [INFO] [NoneStorage] - performing DELETE at /WLODB3
+2024-03-09 15:24:29,222 [INFO] [NoneStorage] - performing DELETE at /WLODB13
+2024-03-09 15:24:29,222 [INFO] [NoneStorage] - performing DELETE at /WLODB12
+2024-03-09 15:24:29,222 [INFO] [NoneStorage] - performing DELETE at /WLODB11
+2024-03-09 15:24:29,221 [INFO] [NoneStorage] - performing DELETE at /WLODB9
+2024-03-09 15:24:29,221 [INFO] [NoneStorage] - performing DELETE at /WLODB10
+2024-03-09 15:24:29,221 [INFO] [NoneStorage] - performing DELETE at /WLODB8
+2024-03-09 15:24:29,221 [INFO] [NoneStorage] - performing DELETE at /WLODB7
+2024-03-09 15:24:29,221 [INFO] [NoneStorage] - performing DELETE at /WLODB6
+2024-03-09 15:24:29,221 [INFO] [NoneStorage] - performing DELETE at /WLODB4
+2024-03-09 15:24:29,218 [INFO] [NoneStorage] - performing DELETE at /WLODB2
+2024-03-09 15:24:29,220 [INFO] [NoneStorage] - performing DELETE at /WLODB5
+2024-03-09 15:24:29,218 [INFO] [NoneStorage] - performing DELETE at /WLODB1
+2024-03-09 15:24:29,256 [ERROR] [AbstractOperator] - Error deleting container WLODB5
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container WLODB5
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:24:29,256 [INFO] [NoneStorage] - performing LIST at /WLODB5/
+2024-03-09 15:24:29,258 [ERROR] [AbstractOperator] - Error deleting container WLODB1
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container WLODB1
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:24:29,259 [INFO] [NoneStorage] - performing LIST at /WLODB1/
+2024-03-09 15:24:29,258 [ERROR] [AbstractOperator] - Error deleting container WLODB13
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container WLODB13
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:24:29,260 [INFO] [NoneStorage] - performing LIST at /WLODB13/
+2024-03-09 15:24:29,262 [ERROR] [AbstractOperator] - Error deleting container WLODB3
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container WLODB3
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:24:29,263 [INFO] [NoneStorage] - performing LIST at /WLODB3/
+2024-03-09 15:24:29,265 [ERROR] [AbstractOperator] - Error deleting container WLODB6
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container WLODB6
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:24:29,265 [INFO] [NoneStorage] - performing LIST at /WLODB6/
+2024-03-09 15:24:29,269 [ERROR] [AbstractOperator] - Error deleting container WLODB8
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container WLODB8
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:24:29,269 [INFO] [NoneStorage] - performing LIST at /WLODB8/
+2024-03-09 15:24:29,283 [ERROR] [AbstractOperator] - Error deleting container WLODB9
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container WLODB9
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:24:29,284 [INFO] [NoneStorage] - performing LIST at /WLODB9/
+2024-03-09 15:24:29,285 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects1
+2024-03-09 15:24:29,285 [ERROR] [AbstractOperator] - Error deleting container WLODB4
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container WLODB4
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:24:29,286 [INFO] [NoneStorage] - performing LIST at /WLODB4/
+2024-03-09 15:24:29,287 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects109
+2024-03-09 15:24:29,288 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects104
+2024-03-09 15:24:29,289 [ERROR] [AbstractOperator] - Error deleting container WLODB7
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container WLODB7
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:24:29,289 [INFO] [NoneStorage] - performing LIST at /WLODB7/
+2024-03-09 15:24:29,295 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects107
+2024-03-09 15:24:29,297 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects110
+2024-03-09 15:24:29,304 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects112
+2024-03-09 15:24:29,323 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects100
+2024-03-09 15:24:29,329 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects108
+2024-03-09 15:24:29,334 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects111
+2024-03-09 15:24:29,469 [ERROR] [AbstractOperator] - Error deleting container WLODB12
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container WLODB12
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:24:29,470 [INFO] [NoneStorage] - performing LIST at /WLODB12/
+2024-03-09 15:24:29,506 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects103
+2024-03-09 15:24:29,617 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects105
+2024-03-09 15:24:29,648 [ERROR] [AbstractOperator] - Error deleting container WLODB2
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container WLODB2
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:24:29,648 [INFO] [NoneStorage] - performing LIST at /WLODB2/
+2024-03-09 15:24:29,683 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects106
+2024-03-09 15:24:29,762 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects122
+2024-03-09 15:24:29,786 [ERROR] [AbstractOperator] - Error deleting container WLODB11
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container WLODB11
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:24:29,787 [INFO] [NoneStorage] - performing LIST at /WLODB11/
+2024-03-09 15:24:29,794 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects113
+2024-03-09 15:24:29,796 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects117
+2024-03-09 15:24:29,917 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects124
+2024-03-09 15:24:29,920 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects121
+2024-03-09 15:24:29,920 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects120
+2024-03-09 15:24:30,005 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects125
+2024-03-09 15:24:30,009 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects123
+2024-03-09 15:24:30,082 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects116
+2024-03-09 15:24:30,137 [ERROR] [AbstractOperator] - Error deleting container WLODB10
+com.intel.cosbench.api.storage.StorageException: HTTP/1.1 409 Conflict
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:246)
+	at com.intel.cosbench.driver.operator.Cleaner.doDispose(Cleaner.java:111)
+	at com.intel.cosbench.driver.operator.Disposer.doDispose(Disposer.java:1)
+	at com.intel.cosbench.driver.operator.Cleaner.operate(Cleaner.java:94)
+	at com.intel.cosbench.driver.operator.AbstractOperator.operate(AbstractOperator.java:76)
+	at com.intel.cosbench.driver.operator.Disposer.operate(Disposer.java:1)
+	at com.intel.cosbench.driver.agent.WorkAgent.performOperation(WorkAgent.java:197)
+	at com.intel.cosbench.driver.agent.WorkAgent.doWork(WorkAgent.java:177)
+	at com.intel.cosbench.driver.agent.WorkAgent.execute(WorkAgent.java:134)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:44)
+	at com.intel.cosbench.driver.agent.AbstractAgent.call(AbstractAgent.java:1)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+Caused by: com.intel.cosbench.client.swift.SwiftConflictException: cannot delete an non-empty container WLODB10
+	at com.intel.cosbench.client.swift.SwiftClient.deleteContainer(SwiftClient.java:164)
+	at com.intel.cosbench.api.swift.SwiftStorage.deleteContainer(SwiftStorage.java:237)
+	... 14 more
+2024-03-09 15:24:30,138 [INFO] [NoneStorage] - performing LIST at /WLODB10/
+2024-03-09 15:24:30,271 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects118
+2024-03-09 15:24:30,301 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects135
+2024-03-09 15:24:30,317 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects119
+2024-03-09 15:24:30,323 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects13
+2024-03-09 15:24:30,540 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects133
+2024-03-09 15:24:30,540 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects137
+2024-03-09 15:24:30,594 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects10
+2024-03-09 15:24:30,596 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects126
+2024-03-09 15:24:30,637 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects102
+2024-03-09 15:24:30,654 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects138
+2024-03-09 15:24:30,817 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects131
+2024-03-09 15:24:30,818 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects134
+2024-03-09 15:24:30,897 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects136
+2024-03-09 15:24:31,145 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects151
+2024-03-09 15:24:31,145 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects148
+2024-03-09 15:24:31,160 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects139
+2024-03-09 15:24:31,160 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects101
+2024-03-09 15:24:31,164 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects150
+2024-03-09 15:24:31,165 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects146
+2024-03-09 15:24:31,166 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects11
+2024-03-09 15:24:31,175 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects147
+2024-03-09 15:24:31,215 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects14
+2024-03-09 15:24:31,244 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects149
+2024-03-09 15:24:31,245 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects130
+2024-03-09 15:24:31,319 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects12
+2024-03-09 15:24:31,482 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects159
+2024-03-09 15:24:31,486 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects132
+2024-03-09 15:24:31,506 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects164
+2024-03-09 15:24:31,555 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects160
+2024-03-09 15:24:31,565 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects152
+2024-03-09 15:24:31,565 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects162
+2024-03-09 15:24:31,617 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects144
+2024-03-09 15:24:31,617 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects115
+2024-03-09 15:24:31,619 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects161
+2024-03-09 15:24:31,621 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects163
+2024-03-09 15:24:31,705 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects16
+2024-03-09 15:24:31,748 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects165
+2024-03-09 15:24:31,748 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects177
+2024-03-09 15:24:31,751 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects17
+2024-03-09 15:24:31,807 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects114
+2024-03-09 15:24:31,809 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects175
+2024-03-09 15:24:31,831 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects143
+2024-03-09 15:24:31,867 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects157
+2024-03-09 15:24:31,867 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects174
+2024-03-09 15:24:31,871 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects129
+2024-03-09 15:24:31,962 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects128
+2024-03-09 15:24:31,966 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects178
+2024-03-09 15:24:31,968 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects176
+2024-03-09 15:24:31,969 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects172
+2024-03-09 15:24:32,053 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects173
+2024-03-09 15:24:32,054 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects127
+2024-03-09 15:24:32,057 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects190
+2024-03-09 15:24:32,105 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects18
+2024-03-09 15:24:32,115 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects145
+2024-03-09 15:24:32,145 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects156
+2024-03-09 15:24:32,145 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects170
+2024-03-09 15:24:32,147 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects188
+2024-03-09 15:24:32,231 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects189
+2024-03-09 15:24:32,235 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects191
+2024-03-09 15:24:32,274 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects186
+2024-03-09 15:24:32,288 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects185
+2024-03-09 15:24:32,288 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects141
+2024-03-09 15:24:32,357 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects203
+2024-03-09 15:24:32,357 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects140
+2024-03-09 15:24:32,456 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects142
+2024-03-09 15:24:32,491 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects187
+2024-03-09 15:24:32,492 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects15
+2024-03-09 15:24:32,556 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects183
+2024-03-09 15:24:32,558 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects19
+2024-03-09 15:24:32,599 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects198
+2024-03-09 15:24:32,601 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects199
+2024-03-09 15:24:32,612 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects20
+2024-03-09 15:24:32,616 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects204
+2024-03-09 15:24:32,707 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects169
+2024-03-09 15:24:32,720 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects21
+2024-03-09 15:24:32,804 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects200
+2024-03-09 15:24:32,826 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects154
+2024-03-09 15:24:32,865 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects196
+2024-03-09 15:24:32,908 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects202
+2024-03-09 15:24:32,910 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects211
+2024-03-09 15:24:32,944 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects212
+2024-03-09 15:24:32,954 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects217
+2024-03-09 15:24:33,029 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects216
+2024-03-09 15:24:33,034 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects182
+2024-03-09 15:24:33,057 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects155
+2024-03-09 15:24:33,072 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects213
+2024-03-09 15:24:33,073 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects167
+2024-03-09 15:24:33,098 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects153
+2024-03-09 15:24:33,112 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects209
+2024-03-09 15:24:33,130 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects201
+2024-03-09 15:24:33,169 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects224
+2024-03-09 15:24:33,177 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects215
+2024-03-09 15:24:33,223 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects158
+2024-03-09 15:24:33,233 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects225
+2024-03-09 15:24:33,236 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects168
+2024-03-09 15:24:33,322 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects22
+2024-03-09 15:24:33,322 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects229
+2024-03-09 15:24:33,436 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects226
+2024-03-09 15:24:33,436 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects222
+2024-03-09 15:24:33,499 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects237
+2024-03-09 15:24:33,553 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects180
+2024-03-09 15:24:33,633 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects214
+2024-03-09 15:24:33,666 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects166
+2024-03-09 15:24:33,728 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects228
+2024-03-09 15:24:33,731 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects242
+2024-03-09 15:24:33,733 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects238
+2024-03-09 15:24:33,756 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects171
+2024-03-09 15:24:33,819 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects195
+2024-03-09 15:24:33,851 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects235
+2024-03-09 15:24:33,877 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects250
+2024-03-09 15:24:33,910 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects239
+2024-03-09 15:24:33,943 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects230
+2024-03-09 15:24:34,021 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects193
+2024-03-09 15:24:34,061 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects241
+2024-03-09 15:24:34,091 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects251
+2024-03-09 15:24:34,125 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects255
+2024-03-09 15:24:34,125 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects248
+2024-03-09 15:24:34,183 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects263
+2024-03-09 15:24:34,237 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects181
+2024-03-09 15:24:34,247 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects252
+2024-03-09 15:24:34,330 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects179
+2024-03-09 15:24:34,394 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects254
+2024-03-09 15:24:34,444 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects227
+2024-03-09 15:24:34,501 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects208
+2024-03-09 15:24:34,550 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects261
+2024-03-09 15:24:34,553 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects268
+2024-03-09 15:24:34,572 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects184
+2024-03-09 15:24:34,581 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects243
+2024-03-09 15:24:34,585 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects264
+2024-03-09 15:24:34,658 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects265
+2024-03-09 15:24:34,700 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects276
+2024-03-09 15:24:34,795 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects194
+2024-03-09 15:24:34,816 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects206
+2024-03-09 15:24:34,982 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects240
+2024-03-09 15:24:35,073 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects278
+2024-03-09 15:24:35,073 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects277
+2024-03-09 15:24:35,075 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects27
+2024-03-09 15:24:35,108 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects267
+2024-03-09 15:24:35,109 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects192
+2024-03-09 15:24:35,274 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects29
+2024-03-09 15:24:35,294 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects219
+2024-03-09 15:24:35,404 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects256
+2024-03-09 15:24:35,405 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects281
+2024-03-09 15:24:35,469 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects31
+2024-03-09 15:24:35,470 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects3
+2024-03-09 15:24:35,485 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects221
+2024-03-09 15:24:35,545 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects274
+2024-03-09 15:24:35,567 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects30
+2024-03-09 15:24:35,627 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects205
+2024-03-09 15:24:35,628 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects280
+2024-03-09 15:24:35,658 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects197
+2024-03-09 15:24:35,658 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects207
+2024-03-09 15:24:35,683 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects253
+2024-03-09 15:24:35,876 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects269
+2024-03-09 15:24:35,958 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects232
+2024-03-09 15:24:35,981 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects34
+2024-03-09 15:24:36,029 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects218
+2024-03-09 15:24:36,031 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects4
+2024-03-09 15:24:36,063 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects33
+2024-03-09 15:24:36,088 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects42
+2024-03-09 15:24:36,089 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects287
+2024-03-09 15:24:36,089 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects44
+2024-03-09 15:24:36,285 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects220
+2024-03-09 15:24:36,386 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects2
+2024-03-09 15:24:36,484 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects234
+2024-03-09 15:24:36,587 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects266
+2024-03-09 15:24:36,606 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects24
+2024-03-09 15:24:36,650 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects43
+2024-03-09 15:24:36,653 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects47
+2024-03-09 15:24:36,737 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects282
+2024-03-09 15:24:36,791 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects55
+2024-03-09 15:24:36,791 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects40
+2024-03-09 15:24:36,825 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects46
+2024-03-09 15:24:36,891 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects5
+2024-03-09 15:24:37,042 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects210
+2024-03-09 15:24:37,108 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects23
+2024-03-09 15:24:37,283 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects60
+2024-03-09 15:24:37,360 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects279
+2024-03-09 15:24:37,361 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects56
+2024-03-09 15:24:37,381 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects59
+2024-03-09 15:24:37,382 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects53
+2024-03-09 15:24:37,402 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects233
+2024-03-09 15:24:37,485 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects35
+2024-03-09 15:24:37,556 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects247
+2024-03-09 15:24:37,557 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects68
+2024-03-09 15:24:37,807 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects231
+2024-03-09 15:24:37,808 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects57
+2024-03-09 15:24:37,837 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects73
+2024-03-09 15:24:37,837 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects66
+2024-03-09 15:24:37,837 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects246
+2024-03-09 15:24:37,851 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects32
+2024-03-09 15:24:37,854 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects69
+2024-03-09 15:24:37,922 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects7
+2024-03-09 15:24:37,984 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects26
+2024-03-09 15:24:37,985 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects48
+2024-03-09 15:24:37,986 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects223
+2024-03-09 15:24:38,030 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects245
+2024-03-09 15:24:38,159 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects81
+2024-03-09 15:24:38,208 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects72
+2024-03-09 15:24:38,251 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects8
+2024-03-09 15:24:38,251 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects70
+2024-03-09 15:24:38,326 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects79
+2024-03-09 15:24:38,327 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects82
+2024-03-09 15:24:38,403 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects45
+2024-03-09 15:24:38,443 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects61
+2024-03-09 15:24:38,444 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects260
+2024-03-09 15:24:38,497 [INFO] [NoneStorage] - performing DELETE at /WLODB3/myobjects94
+2024-03-09 15:24:38,516 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects244
+2024-03-09 15:24:38,523 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects25
+2024-03-09 15:24:38,692 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects85
+2024-03-09 15:24:38,697 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects273
+2024-03-09 15:24:38,698 [INFO] [NoneStorage] - performing DELETE at /WLODB4/myobjects95
+2024-03-09 15:24:38,698 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects86
+2024-03-09 15:24:38,746 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects236
+2024-03-09 15:24:38,746 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects258
+2024-03-09 15:24:38,759 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects83
+2024-03-09 15:24:38,814 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects58
+2024-03-09 15:24:38,815 [INFO] [NoneStorage] - performing DELETE at /WLODB1/myobjects92
+2024-03-09 15:24:38,916 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects259
+2024-03-09 15:24:38,919 [INFO] [NoneStorage] - performing DELETE at /WLODB3
+2024-03-09 15:24:39,007 [INFO] [NoneStorage] - performing DELETE at /WLODB8/myobjects99
+2024-03-09 15:24:39,007 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects286
+2024-03-09 15:24:39,009 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects74
+2024-03-09 15:24:39,013 [INFO] [NoneStorage] - performing DELETE at /WLODB7/myobjects98
+2024-03-09 15:24:39,144 [INFO] [NoneStorage] - performing DELETE at /WLODB1
+2024-03-09 15:24:39,146 [INFO] [NoneStorage] - performing DELETE at /WLODB5/myobjects96
+2024-03-09 15:24:39,150 [INFO] [NoneStorage] - performing DELETE at /WLODB4
+2024-03-09 15:24:39,188 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects6
+2024-03-09 15:24:39,340 [INFO] [NoneStorage] - performing DELETE at /WLODB7
+2024-03-09 15:24:39,364 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects39
+2024-03-09 15:24:39,415 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects257
+2024-03-09 15:24:39,438 [INFO] [NoneStorage] - performing DELETE at /WLODB8
+2024-03-09 15:24:39,444 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects87
+2024-03-09 15:24:39,518 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects271
+2024-03-09 15:24:39,521 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects249
+2024-03-09 15:24:39,675 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects52
+2024-03-09 15:24:39,801 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects272
+2024-03-09 15:24:39,818 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects284
+2024-03-09 15:24:39,882 [INFO] [NoneStorage] - performing DELETE at /WLODB5
+2024-03-09 15:24:39,923 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects270
+2024-03-09 15:24:40,005 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects262
+2024-03-09 15:24:40,149 [INFO] [NoneStorage] - performing DELETE at /WLODB9/myobjects9
+2024-03-09 15:24:40,159 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects71
+2024-03-09 15:24:40,190 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects65
+2024-03-09 15:24:40,303 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects285
+2024-03-09 15:24:40,483 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects84
+2024-03-09 15:24:40,524 [INFO] [NoneStorage] - performing DELETE at /WLODB9
+2024-03-09 15:24:40,572 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects38
+2024-03-09 15:24:40,643 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects283
+2024-03-09 15:24:40,700 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects275
+2024-03-09 15:24:40,725 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects37
+2024-03-09 15:24:40,768 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects78
+2024-03-09 15:24:40,958 [INFO] [NoneStorage] - performing DELETE at /WLODB6/myobjects97
+2024-03-09 15:24:41,203 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects28
+2024-03-09 15:24:41,298 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects50
+2024-03-09 15:24:41,300 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects36
+2024-03-09 15:24:41,326 [INFO] [NoneStorage] - performing DELETE at /WLODB13/myobjects91
+2024-03-09 15:24:41,639 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects49
+2024-03-09 15:24:41,644 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects63
+2024-03-09 15:24:41,651 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects288
+2024-03-09 15:24:41,709 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects51
+2024-03-09 15:24:41,709 [INFO] [NoneStorage] - performing DELETE at /WLODB6
+2024-03-09 15:24:41,844 [INFO] [NoneStorage] - performing DELETE at /WLODB13
+2024-03-09 15:24:41,844 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects41
+2024-03-09 15:24:42,015 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects62
+2024-03-09 15:24:42,147 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects76
+2024-03-09 15:24:42,226 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects54
+2024-03-09 15:24:42,318 [INFO] [NoneStorage] - performing DELETE at /WLODB11/myobjects89
+2024-03-09 15:24:42,514 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects67
+2024-03-09 15:24:42,590 [INFO] [NoneStorage] - performing DELETE at /WLODB11
+2024-03-09 15:24:42,639 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects64
+2024-03-09 15:24:42,640 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects75
+2024-03-09 15:24:42,801 [INFO] [NoneStorage] - performing DELETE at /WLODB10/myobjects88
+2024-03-09 15:24:42,905 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects77
+2024-03-09 15:24:42,935 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects80
+2024-03-09 15:24:43,061 [INFO] [NoneStorage] - performing DELETE at /WLODB10
+2024-03-09 15:24:43,074 [INFO] [NoneStorage] - performing DELETE at /WLODB2/myobjects93
+2024-03-09 15:24:43,106 [INFO] [NoneStorage] - performing DELETE at /WLODB12/myobjects90
+2024-03-09 15:24:43,335 [INFO] [NoneStorage] - performing DELETE at /WLODB12
+2024-03-09 15:24:43,782 [INFO] [NoneStorage] - performing DELETE at /WLODB2
