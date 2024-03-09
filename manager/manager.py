@@ -86,19 +86,18 @@ def mrbench_agent(config_params, output_subdirs):
                             list_dir = os.listdir(output_subdirs[key])
                             swift_configs[key] = os.path.join(conf_dir,key,list_dir[(i//m)%len(list_dir)])
                             m *= len(list_dir)
-                        #merged_conf_ring = {}
-                        #merged_conf_ring.update(swift_rings)
-                        #merged_conf_ring.update(swift_configs)
                         merged_conf_ring = {**swift_rings, **swift_configs}
-                        mrbench.copy_swift_conf(merged_conf_ring)  
-                    for test_config in os.listdir(output_subdirs["workloads.xml"]):
-                        test_config_path = os.path.join(output_subdirs["workloads.xml"], test_config)
-                        start_time, end_time, result_file_path = mrbench.submit(test_config_path, result_dir)
-                        all_start_times.append(start_time) ; all_end_times.append(end_time)
-                        if run_status_reporter:
-                            status_reporter.main(path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)  
-                        if run_monstaver:
-                            monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True, backup_restore=None)                     
+                        print(merged_conf_ring)
+                        mrbench.copy_swift_conf(merged_conf_ring)
+                        time.sleep(40)
+                        for test_config in os.listdir(output_subdirs["workloads.xml"]):
+                            test_config_path = os.path.join(output_subdirs["workloads.xml"], test_config)
+                            start_time, end_time, result_file_path = mrbench.submit(test_config_path, result_dir)
+                            all_start_times.append(start_time) ; all_end_times.append(end_time)
+                            if run_status_reporter:
+                                status_reporter.main(path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)  
+                            if run_monstaver:
+                                monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True, backup_restore=None)                     
     # Extract first start time and last end time
     first_start_time = all_start_times[0] ; last_end_time = all_end_times[-1] 
     return first_start_time, last_end_time
