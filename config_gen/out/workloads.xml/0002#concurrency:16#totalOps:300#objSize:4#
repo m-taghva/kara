@@ -7,15 +7,15 @@
 
   <workflow>
     <workstage name="init">
-      <work type="init" workers="13" config="cprefix=WLODB;containers=r(1,13)" />
+      <work type="init" workers="13" config="cprefix=GNL13;containers=r(1,13)" />
     </workstage>
     <workstage name="main">
       <work name="main" workers="16" totalOps="300">
-        <operation type="write" ratio="100" config="containers=r(1,13);cprefix=WLODB;objects=s(1,10000);sizes=c(4)KB" />
+        <operation type="write" ratio="100" config="containers=r(1,13);cprefix=GNL13;objects=s(1,10000);sizes=c(4)KB" />
       </work>
     </workstage>
     <workstage name="dispose">
-      <work type="dispose" workers="13" config="containers=r(1,13);cprefix=WLODB" />
+      <work type="dispose" workers="13" config="containers=r(1,13);cprefix=GNL13" />
     </workstage>
 
 

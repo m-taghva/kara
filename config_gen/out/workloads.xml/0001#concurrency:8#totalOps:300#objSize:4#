@@ -7,15 +7,15 @@
 
   <workflow>
     <workstage name="init">
-      <work type="init" workers="13" config="cprefix=NA4BG;containers=r(1,13)" />
+      <work type="init" workers="13" config="cprefix=RCO3Z;containers=r(1,13)" />
     </workstage>
     <workstage name="main">
       <work name="main" workers="8" totalOps="300">
-        <operation type="write" ratio="100" config="containers=r(1,13);cprefix=NA4BG;objects=s(1,10000);sizes=c(4)KB" />
+        <operation type="write" ratio="100" config="containers=r(1,13);cprefix=RCO3Z;objects=s(1,10000);sizes=c(4)KB" />
       </work>
     </workstage>
     <workstage name="dispose">
-      <work type="dispose" workers="13" config="containers=r(1,13);cprefix=NA4BG" />
+      <work type="dispose" workers="13" config="containers=r(1,13);cprefix=RCO3Z" />
     </workstage>
 
 
