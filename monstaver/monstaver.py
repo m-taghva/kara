@@ -216,7 +216,21 @@ def restore(data_loaded):
              print("error") 
 
 ##### BACKUP PARTS #####
-def backup(time_range, inputs, delete, data_loaded): 
+def backup(time_range, inputs, delete, data_loaded):
+    if time_range is None:
+        time_range = data_loaded['default'].get('time')
+    if inputs is not None:
+        if ',' in inputs:
+            inputs = inputs.split(',')
+        else:
+            inputs
+    else:
+        default_input_paths = data_loaded['default'].get('input_paths')
+        if default_input_paths:
+            inputs = default_input_paths
+        else:
+            inputs = []
+            
     backup_dir = data_loaded['default'].get('backup_output')
     start_time_str, end_time_str = time_range.split(',')
     margin_start, margin_end = map(int, data_loaded['default'].get('time_margin').split(',')) 
