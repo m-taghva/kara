@@ -28,7 +28,7 @@ def config_gen_agent(config_params):
         config_gen.main(input_file, workloads_configs)
     return config_output
 
-def mrbench_agent(config_params, config_output):
+def mrbench_agent(config_params, config_file, config_output):
     all_start_times = [] ; all_end_times = []
     result_dir = config_params.get('output_path')
     run_status_reporter = config_params.get('Status_Reporter', None)
@@ -88,13 +88,13 @@ def mrbench_agent(config_params, config_output):
                     if run_status_reporter == 'csv,img':
                         status_reporter.main(path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)  
                 if run_monstaver:
-                    monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path], delete=True, backup_restore=None) 
+                    monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path,config_file], delete=True, backup_restore=None) 
     
     # Extract first start time and last end time
     first_start_time = all_start_times[0] ; last_end_time = all_end_times[-1] 
     return first_start_time, last_end_time
 
-def monstaver_agent(config_params, first_start_time, last_end_time):
+def monstaver_agent(config_params, config_file, first_start_time, last_end_time):
     operation = config_params.get('operation')
     batch_mode = config_params.get('batch_mode', False)
     times_file = config_params.get('times')
@@ -105,12 +105,12 @@ def monstaver_agent(config_params, first_start_time, last_end_time):
             for time_range in times:
                 start_time, end_time = time_range.strip().split(',')
                 if operation == "backup":
-                    monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path], delete=True,  backup_restore=None)
+                    monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file], delete=True,  backup_restore=None)
                 elif operation == "restore":
                     monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True)          
     elif operation == "backup": 
         if batch_mode:
-            monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path], delete=True, backup_restore=None)
+            monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file], delete=True, backup_restore=None)
     elif operation == "restore":
         monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True)
 
@@ -158,13 +158,13 @@ def main():
                     config_output = config_gen_agent(config_params)
                 elif 'Mrbench' in task:
                     config_params = task['Mrbench']
-                    first_start_time, last_end_time = mrbench_agent(config_params, config_output)
+                    first_start_time, last_end_time = mrbench_agent(config_params, config_file, config_output)
                 elif 'Status-Reporter' in task:
                     config_params = task['Status-Reporter']
                     status_reporter_agent(config_params)
                 elif 'Monstaver' in task:
                     config_params = task['Monstaver']
-                    monstaver_agent(config_params, first_start_time, last_end_time)
+                    monstaver_agent(config_params, config_file, first_start_time, last_end_time)
                 elif 'Status_Analyzer' in task:
                     config_params = task['Status_Analyzer']
                     status_analyzer_agent(config_params)
