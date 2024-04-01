@@ -11,10 +11,6 @@ import status_reporter
 import monstaver
 import analyzer
 
-# Set up logging
-log_file = '/var/log/kara.log'
-logging.basicConfig(filename=log_file, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-
 kara_config_files = "/etc/KARA/"
 
 def load_config(config_file):
@@ -27,7 +23,7 @@ def load_config(config_file):
     return data_loaded
 
 def config_gen_agent(config_params):
-    logging.debug("Executing config_gen_agent function")
+    logging.info("Executing config_gen_agent function")
     input_files = config_params.get('conf_templates', [])
     config_output = config_params.get('output_path') 
     for input_file in input_files:
@@ -37,10 +33,11 @@ def config_gen_agent(config_params):
         if os.path.isdir(workloads_configs): 
             firstConfNumber = len(os.listdir(workloads_configs))+1
         config_gen.main(input_file_path=input_file, output_directory=workloads_configs, conf_num=firstConfNumber)
+    logging.debug(config_output)
     return config_output
 
 def mrbench_agent(config_params, config_file, config_output):
-    logging.debug("Executing mrbench_agent function")
+    logging.info("Executing mrbench_agent function")
     all_start_times = [] ; all_end_times = []
     result_dir = config_params.get('output_path')
     run_status_reporter = config_params.get('Status_Reporter', None)
@@ -87,10 +84,12 @@ def mrbench_agent(config_params, config_file, config_output):
                     swift_configs[key] = os.path.join(config_output,key,list_dir[(i//m)%len(list_dir)])
                     m *= len(list_dir)
                 merged_conf_ring = {**swift_rings, **swift_configs}
+                logging.debug(merged_conf_ring)
                 mrbench.copy_swift_conf(merged_conf_ring)
                 time.sleep(40)
             for test_config in sorted(os.listdir(conf_dict["workloads.xml"])):
                 test_config_path = os.path.join(conf_dict["workloads.xml"], test_config)
+                logging.debug(test_config_path)
                 start_time, end_time, result_file_path = mrbench.submit(test_config_path, result_dir)
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter is not None:
@@ -105,7 +104,7 @@ def mrbench_agent(config_params, config_file, config_output):
     return first_start_time, last_end_time
 
 def monstaver_agent(config_params, config_file, first_start_time, last_end_time):
-    logging.debug("Executing monstaver_agent function")
+    logging.info("Executing monstaver_agent function")
     operation = config_params.get('operation')
     batch_mode = config_params.get('batch_mode', False)
     times_file = config_params.get('times')
@@ -126,7 +125,7 @@ def monstaver_agent(config_params, config_file, first_start_time, last_end_time)
         monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True)
 
 def status_reporter_agent(config_params):
-    logging.debug("Executing status_reporter_agent function")
+    logging.info("Executing status_reporter_agent function")
     result_dir = config_params.get('output_path')
     times_file = config_params.get('times')
     image_generate = config_params.get('image', False)
@@ -138,7 +137,7 @@ def status_reporter_agent(config_params):
                 status_reporter.main(path_dir=result_dir, time_range=f"{start_time},{end_time}", img=image_generate)
 
 def status_analyzer_agent(config_params):
-    logging.debug("Executing status_analyzer_agent function")
+    logging.info("Executing status_analyzer_agent function")
     result_dir = config_params.get('input_path')
     merge = config_params.get('merge', False)
     merge_csv = config_params.get('merge_csv')
@@ -152,7 +151,7 @@ def status_analyzer_agent(config_params):
         analyzer.main_analyze(csv_original=f"{result_dir}/{analyze_csv}", transformation_directory=transform_dir)
 
 def report_recorder_agent(config_params):
-    logging.debug("Executing report_recorder_agent function")
+    logging.info("Executing report_recorder_agent function")
     input_template = config_params.get('input_template')
     output_html = config_params.get('output_html')
     kateb_title = config_params.get('kateb_title')
@@ -160,7 +159,7 @@ def report_recorder_agent(config_params):
     subprocess.call(pybot, shell=True)
 
 def main():
-    logging.debug("Executing manager_main function")
+    logging.info("Executing manager_main function")
     data_loaded = load_config(config_file)
     if 'scenario' in data_loaded:
         config_output = None
@@ -198,4 +197,8 @@ if __name__ == "__main__":
     parser.add_argument('-sn', '--scenario_name', help='input scenario path')
     args = parser.parse_args()
     config_file = args.scenario_name
+    # Set up logging
+    log_level = load_config(config_file)['log'].get('level')
+    log_level_int = getattr(logging, log_level.upper())
+    logging.basicConfig(filename='/var/log/kara.log', level=log_level_int , format='%(asctime)s - %(levelname)s - %(message)s')
     main()
