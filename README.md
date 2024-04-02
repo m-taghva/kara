@@ -7,15 +7,15 @@
     
     - Install dependencies:
         # pip install pytz datetime matplotlib pandas tqdm  alive_progress
-       =======================Manager============================
+       =======================Manager========================
 
 
-       =======================Config_gen=========================
+       =======================Config_gen=====================
 
 
-       =======================Mrbench============================
+       =======================Mrbench========================
        
-       =======================Monstaver==========================
+       =======================Monstaver======================
        - how to use backup script:
        - add new same users in influx host and your server : # adduser
        - edit sudoers file in both servers and add new user to it after %sudo group :  user1   ALL=(ALL) NOPASSWD: ALL
