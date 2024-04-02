@@ -4,9 +4,7 @@
 
 ‪<h2>Monster Performance Kit</h2>
 
-this project is related to https://github.com/m-taghva/status-reporter.git
-
-<img src="MPK.png" width="1450" height="709"/>
+<img src="kara.png" width="1450" height="709"/>
 
 
     
