@@ -3,12 +3,9 @@
 <h3> Attention !  README page will be complete after all tools done </h3>
 
 ‪<h2>Monster Performance Kit</h2>
-
 <img src="kara.png" width="1450" height="709"/>
 
-
-    
-    # Attention ! after clone repository, please remove (.placeholder) files inside ./result/ and Testlist_Work/workloads/ 
+    # Attention ! after clone repository, please remove (.placeholder) files inside ./result/ 
     
     - Install dependencies:
         # pip install pytz datetime matplotlib pandas tqdm  alive_progress
