@@ -36,7 +36,7 @@ def get_metrics_from_file(metric_file_path):
     return metrics
                             
 def main(metric_file, path_dir, time_range, img=False):
-    metric_file= metric_file.split(',') if metric_file else [] 
+    metric_file= metric_file.split(',') if metric_file else None 
     path_dir= path_dir if path_dir else "." 
     time_range = time_range if time_range else load_config(config_file).get('time', [])['time_range']
     # Load configuration from config file
