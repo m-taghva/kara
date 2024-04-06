@@ -23,7 +23,7 @@ def load_config(config_file):
     return data_loaded
 
 def config_gen_agent(config_params):
-    logging.info("Executing config_gen function")
+    logging.info("Executing config_gen agent function")
     input_files = config_params.get('conf_templates', [])
     config_output = config_params.get('output_path')
     while True:
