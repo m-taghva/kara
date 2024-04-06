@@ -1,5 +1,6 @@
 import sys
 import os
+import select
 import subprocess
 import time
 import yaml
@@ -78,10 +79,46 @@ def mrbench_agent(config_params, config_file, config_output):
     run_status_reporter = config_params.get('Status_Reporter', None)
     run_monstaver = config_params.get('monstaver', False)
     ring_dirs = config_params.get('ring_dirs', [])
+    while True:
+        if os.listdir(result_dir):
+            print(f"Results directory {result_dir} is not empty and includes these files and directories:")
+            for item in os.listdir(result_dir):
+                print(f"\033[91m{item}\033[0m")
+            # Ask user if they want to remove the contents
+            print("Do you want to remove these files and directories? (yes/no): ", end='', flush=True)
+            # Set up a timer for 20 seconds
+            rlist, _, _ = select.select([sys.stdin], [], [], 20)
+            if rlist:
+                response = input().lower() 
+                if response in ('y', 'yes'):
+                    response = 'yes'
+                elif response in ('n', 'no'):
+                    response = 'no'
+            else:
+                response = "yes" # If no input after 20 seconds, consider it as "yes"
+
+            if response == 'yes':
+                # Remove all files and directories in the output directory
+                for item in os.listdir(result_dir):
+                    item_path = os.path.join(result_dir, item)
+                    if os.path.isfile(item_path):
+                        os.remove(item_path)
+                    elif os.path.isdir(item_path):
+                        rm__config_output_dir = subprocess.run(f"sudo rm -rf {item_path}", shell=True)
+                print("\033[92mContents removed successfully.\033[0m")
+                break
+            elif response == 'no':
+                print("\033[1;33mLeaving existing contents untouched.\033[0m")
+                break
+            else:
+                print("\033[91mInvalid input. Please enter 'yes' or 'no'\033[0m")
+        else:
+            break    
     if config_output is None:
         if(config_params.get('conf_dir')):
             config_output = config_params.get('conf_dir')
         else:
+            logging.critical("There isn't any conf_dir in scenario file")
             print(f"\033[91mThere isn't any conf_dir in scenario file !\033[0m")
             exit()
     conf_dict = {}  
@@ -93,6 +130,7 @@ def mrbench_agent(config_params, config_file, config_output):
     swift_rings = {}
     swift_configs = {}
     if conf_dict["workloads.xml"] is None:
+        logging.critical("There isn't any workload")
         print(f"\033[91mThere isn't any workload !\033[0m")
         exit()
     if len(conf_dict)>1:
