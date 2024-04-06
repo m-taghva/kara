@@ -47,7 +47,7 @@ def copy_swift_conf(swift_configs):
                 for filename, filepath in swift_configs.items(): 
                     each_scp_successful = False 
                     if filename.endswith(".gz"):
-                        diff_ring_command = f"ssh -p {port} {user}@{ip} 'cat {inspect_value}/rings/{filename}' | diff - {filepath}"
+                        diff_ring_command = f"ssh -p {port} {user}@{ip} 'sudo cat {inspect_value}/rings/{filename}' | diff - {filepath}"
                         diff_ring_result = subprocess.run(diff_ring_command, shell=True, capture_output=True, text=True)
                         print("")
                         print(f"please wait for checking ring file [ {filename} ] inside {container_name}")
@@ -65,7 +65,7 @@ def copy_swift_conf(swift_configs):
                             print("")
                             print(f"\033[91mWARNING: your ring file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
                     elif filename.endswith(".conf"):
-                        diff_conf_command = f"ssh -p {port} {user}@{ip} 'cat {inspect_value}/{filename}' | diff - {filepath}"
+                        diff_conf_command = f"ssh -p {port} {user}@{ip} 'sudo cat {inspect_value}/{filename}' | diff - {filepath}"
                         diff_conf_result = subprocess.run(diff_conf_command, shell=True, capture_output=True, text=True)
                         print("")
                         print(f"please wait for checking config file [ {filename} ] inside {container_name}")
