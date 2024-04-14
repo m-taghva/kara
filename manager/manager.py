@@ -152,7 +152,7 @@ def mrbench_agent(config_params, config_file, config_output):
         conf_exist = 1
     ring_exist = 0
     total_ring_index = 1
-    if len(ring_dirs):
+    if len(ring_dirs)>1:
         total_ring_index = len(ring_dirs)
         ring_exist = 1
     for ri in range(total_ring_index):
