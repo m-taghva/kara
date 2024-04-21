@@ -257,15 +257,15 @@ def main(workload_config_path, output_path, swift_configs):
     if swift_configs:
        copy_swift_conf(swift_configs)
 
-    if os.path.exists(workload_config_path):
-        if output_path is not None:
-            start_time, end_time, result_file_path = submit(workload_config_path, output_path)
-            return start_time, end_time, result_file_path  
+    if workload_config_path is not None:
+        if os.path.exists(workload_config_path):
+            if output_path is not None:
+                start_time, end_time, result_file_path = submit(workload_config_path, output_path)
+                return start_time, end_time, result_file_path  
+            else:
+                print(f"\033[91mWARNING: output dir doesn't define !\033[0m")
         else:
-            print(f"\033[91mWARNING: output dir doesn't define !\033[0m")
-    else:
-        print(f"\033[91mWARNING: workload file doesn't exist !\033[0m")
-
+            print(f"\033[91mWARNING: workload file doesn't exist !\033[0m")
     logging.info("\033[92m****** mrbench main function end ******\033[0m")
 
 if __name__ == "__main__":
