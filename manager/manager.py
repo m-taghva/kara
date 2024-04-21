@@ -177,7 +177,7 @@ def mrbench_agent(config_params, config_file, config_output):
                     merged_conf_ring = {**swift_rings, **swift_configs}
                     logging.info(f"rings and configs dictionary is : {merged_conf_ring}")
                     mrbench.copy_swift_conf(merged_conf_ring)
-                    time.sleep(40)
+                    #time.sleep(40)
             for test_config in sorted(os.listdir(conf_dict["workloads.xml"])):
                 test_config_path = os.path.join(conf_dict["workloads.xml"], test_config)
                 logging.info(f"test config path in mrbench_agent submit function is : {test_config_path}")
