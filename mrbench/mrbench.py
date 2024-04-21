@@ -108,8 +108,17 @@ def copy_swift_conf(swift_configs):
             restart_cont_command = f"ssh -p {port} {user}@{ip} docker restart {container_name} > /dev/null 2>&1"
             restart_cont_command_process = subprocess.run(restart_cont_command, shell=True)
             if restart_cont_command_process.returncode == 0:
-                print("")
-                print(f"\033[92mcontainer {container_name} successfully restart\033[0m")
+                while True:
+                    check_container = f"ssh -p {port} {user}@{ip} 'sudo docker ps -f name={container_name}'"
+                    check_container_result = subprocess.run(check_container, shell=True, capture_output=True, text=True, check=True)
+                    if "Up" in check_container_result.stdout:
+                        check_services = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} service --status-all'"
+                        check_services_result = subprocess.run(check_services, shell=True, capture_output=True, text=True, check=True)
+                        if "[ + ]  swift-account\n" or "[ + ]  swift-container\n" or "[ + ]  swift-object\n" or "[ + ]  swift-proxy\n" in check_services_result:
+                            time.sleep(10)
+                            print("")
+                            print(f"\033[92mcontainer {container_name} successfully restart\033[0m")
+                            break
             else:
                 print(f"\033[91mcontainer {container_name} failed to reatsrt\033[0m") 
        
