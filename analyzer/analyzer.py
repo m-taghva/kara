@@ -4,6 +4,7 @@ import csv
 import argparse
 from glob import glob
 import pandas as pd
+import matplotlib.pyplot as plt
 
 BOLD = "\033[1m"
 RESET = "\033[0m"
@@ -15,7 +16,7 @@ def merge_normal_csv(selected_csv, input_directory):
     for file in selected_csv:
         try:
             csv_data = pd.read_csv(file)
-            # add csv name as a column
+            # add csv name as a column 
             csv_data.insert(0, 'File', os.path.basename(file).split('.')[0])
             all_csv.append(csv_data)
         except FileNotFoundError:
@@ -110,11 +111,31 @@ def analyze_and_save_csv(csv_original, transformation_directory):
     if os.path.exists(intermediate_csv_path):
         os.remove(intermediate_csv_path)
 
-def main(csv_original, transformation_directory, input_directory, selected_csv):
+###### Make graph and image ######
+def plot_and_save_graph(selected_csv, x_column, y_column):
+    # Read CSV file into a DataFrame
+    data = pd.read_csv(selected_csv)
+    # Extract x and y values from DataFrame
+    x_values = data[x_column]
+    y_values = data[y_column]
+    # Plot the data
+    plt.plot(x_values, y_values, marker='o')
+    # Set plot labels and title
+    plt.xlabel(x_column)
+    plt.ylabel(y_column)
+    file_name = os.path.basename(selected_csv)
+    time_of_graph = file_name.replace('.csv','')
+    title = f'Time of Report: {time_of_graph}'
+    plt.title(title)
+    # Save the plot as an image in the same directory as the CSV file
+    image_file_path = selected_csv.replace('.csv', '_graph.png')
+    plt.savefig(image_file_path)
 
-    if args.analyze:
+def main(merge, analyze, graph, csv_original, transformation_directory, input_directory, selected_csv, x_column, y_column):
+
+    if analyze:
         analyze_and_save_csv(csv_original, transformation_directory)
-    if args.merge:
+    if merge:
         if '*' in selected_csv:
             if input_directory and not os.path.isdir(input_directory):
                 print(f"Error: Directory not found - {input_directory}")
@@ -122,7 +143,9 @@ def main(csv_original, transformation_directory, input_directory, selected_csv):
             create_merged_csv(input_directory, selected_csv)
         else:
             merge_normal_csv(selected_csv, input_directory)
-                
+    if graph:
+        plot_and_save_graph(selected_csv, x_column, y_column)
+           
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Perform CSV operations and merge files.')
     parser.add_argument('-M', '--merge', action='store_true', help='Merge CSV files')
@@ -131,6 +154,9 @@ if __name__ == "__main__":
     parser.add_argument('-A', '--analyze', action='store_true', help='Analyze CSV files')
     parser.add_argument('-c', '--csv_org', help='Custom CSV file for analysis (required for -A)')
     parser.add_argument('-t', '--transformation_directory', help='Path to transformation directory (required for -A)')
+    parser.add_argument('-G', '--graph', action='store_true', help='make graph of CSV file')
+    parser.add_argument('-x', '--x_column', type=str, help='Name of the X column (required for -G)')
+    parser.add_argument('-y', '--y_column', type=str, help='Name of the Y column (required for -G)')
     args = parser.parse_args()
     
     # Check required arguments based on operation
@@ -140,8 +166,13 @@ if __name__ == "__main__":
     if args.analyze and (args.csv_org is None or args.transformation_directory is None):
         print("Error: Both -c (--csv_org) and -t (--transformation_directory) switches are required for analyze operation.")
         exit(1)
+    if args.graph and (args.x_column is None or args.y_column is None):
+        print("Error: Both -x (--x_column) and -y (--y_column) switches are required for make graph operation.")
+        exit(1)
 
     # Set values to None if not provided
+    merge = args.merge ; analyze = args.analyze , graph = args.graph
+    x_column = args.x_column ; y_column = args.y_column
     input_directory = args.input_directory.strip() if args.input_directory else None 
     if '*' in args.selected_csv:
         selected_csv = args.selected_csv.strip() if args.selected_csv else None
@@ -150,4 +181,4 @@ if __name__ == "__main__":
     csv_original = args.csv_org.strip() if args.csv_org else None
     transformation_directory = args.transformation_directory.strip() if args.transformation_directory else None
 
-    main(csv_original, transformation_directory, input_directory, selected_csv)
+    main(merge, analyze, graph, csv_original, transformation_directory, input_directory, selected_csv, x_column, y_column)
