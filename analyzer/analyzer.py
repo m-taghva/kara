@@ -10,6 +10,23 @@ RESET = "\033[0m"
 YELLOW = "\033[1;33m"
 
 ####### MERGER #######
+def merge_normal_csv(selected_csv, input_directory):
+    all_csv = []
+    for file in selected_csv:
+        try:
+            csv_data = pd.read_csv(file)
+            all_csv.append(csv_data)
+        except FileNotFoundError:
+            print(f"File '{file}' not found. Skipping...")
+    if len(all_csv) > 0:
+        merged_csv = pd.concat(all_csv, ignore_index=True)
+        if not os.path.exists(input_directory):
+            os.makedirs(input_directory)
+        merged_csv.to_csv(f'{input_directory}/merged.csv', index=False)
+        print(f"CSV files merged successfully. Merged file saved as '{input_directory}/merged.csv'")
+    else:
+        print("No CSV files found for merging.")
+
 def extract_string_number_pairs(target_directory):
     keys = re.findall("(?<=#)[^:]*(?=:)", target_directory)
     values = re.findall("(?<=:)[^#]*(?=#)", target_directory)
@@ -91,41 +108,44 @@ def analyze_and_save_csv(csv_original, transformation_directory):
     if os.path.exists(intermediate_csv_path):
         os.remove(intermediate_csv_path)
 
-def main_analyze(csv_original, transformation_directory):
-    analyze_and_save_csv(csv_original, transformation_directory)
+def main(csv_original, transformation_directory, input_directory, selected_csv):
 
-def main_merge(input_directory, selected_csv):
-    create_merged_csv(input_directory, selected_csv)
-
+    if args.analyze:
+        analyze_and_save_csv(csv_original, transformation_directory)
+    if args.merge:
+        if '*' in selected_csv:
+            if input_directory and not os.path.isdir(input_directory):
+                print(f"Error: Directory not found - {input_directory}")
+                exit(1)
+            create_merged_csv(input_directory, selected_csv)
+        else:
+            merge_normal_csv(selected_csv, input_directory)
+                
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Perform CSV operations and merge files.')
-    parser.add_argument('-i', '--input_directory', help='Path to the directory containing CSV files (required for -M)')
-    parser.add_argument('-c', '--selected_csv', help='Name of the selected CSV file or "*.csv" (required for -M)')
     parser.add_argument('-M', '--merge', action='store_true', help='Merge CSV files')
+    parser.add_argument('-i', '--input_directory', help='Path to the directory containing CSV files (required for -M)')
+    parser.add_argument('-sc', '--selected_csv', help='Name of the selected CSV file or "*.csv" (required for -M)')
     parser.add_argument('-A', '--analyze', action='store_true', help='Analyze CSV files')
-    parser.add_argument('-ct', '--csv_org', help='Custom CSV file for analysis (required for -A)')
+    parser.add_argument('-c', '--csv_org', help='Custom CSV file for analysis (required for -A)')
     parser.add_argument('-t', '--transformation_directory', help='Path to transformation directory (required for -A)')
     args = parser.parse_args()
     
     # Check required arguments based on operation
     if args.merge and (args.input_directory is None or args.selected_csv is None):
-        print("Error: Both -i (--input_directory) and -c (--selected_csv) switches are required for merge operation.")
+        print("Error: Both -i (--input_directory) and -sc (--selected_csv) switches are required for merge operation.")
         exit(1)
     if args.analyze and (args.csv_org is None or args.transformation_directory is None):
-        print("Error: Both -ct (--csv_org) and -t (--transformation_directory) switches are required for analyze operation.")
+        print("Error: Both -c (--csv_org) and -t (--transformation_directory) switches are required for analyze operation.")
         exit(1)
 
     # Set values to None if not provided
-    input_directory = args.input_directory.strip() if args.input_directory else None
-    selected_csv = args.selected_csv.strip() if args.selected_csv else None
+    input_directory = args.input_directory.strip() if args.input_directory else None 
+    if '*' in args.selected_csv:
+        selected_csv = args.selected_csv.strip() if args.selected_csv else None
+    elif args.selected_csv.split(','):
+        selected_csv = args.selected_csv.split(',')
     csv_original = args.csv_org.strip() if args.csv_org else None
     transformation_directory = args.transformation_directory.strip() if args.transformation_directory else None
 
-    if input_directory and not os.path.isdir(input_directory):
-        print(f"Error: Directory not found - {input_directory}")
-        exit(1)
-
-    if args.analyze:
-       main_analyze(csv_original=csv_original, transformation_directory=transformation_directory)
-    if args.merge:
-       main_merge(input_directory=input_directory, selected_csv=selected_csv)
+    main(csv_original, transformation_directory, input_directory, selected_csv)
