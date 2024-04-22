@@ -56,13 +56,11 @@ def convert_html_to_wiki(html_content):
     logging.info("Executing report_recorder convert_html_to_wiki function")
     # Use BeautifulSoup to parse the HTML
     soup = BeautifulSoup(html_content, 'html.parser')
-
     # Convert <a> tags to wiki links
     for a_tag in soup.find_all('a'):
         if 'href' in a_tag.attrs:
             href = a_tag['href']
             a_tag.replace_with(f'[{href}|{a_tag.text}]')
-
     # Convert <img> tags to wiki images
     for img_tag in soup.find_all('img'):
         if 'src' in img_tag.attrs:
@@ -75,10 +73,8 @@ def upload_images(site, html_file_path):
     # Use BeautifulSoup to parse the HTML
     with open(html_file_path, 'r', encoding='utf-8') as file:
         soup = BeautifulSoup(file, 'html.parser')
-
     # Find image filenames in <img> tags
     image_filenames = [img['src'] for img in soup.find_all('img') if 'src' in img.attrs]
-
     # Upload each image to the wiki
     for image_filename in image_filenames:
         image_path = os.path.join(os.path.dirname(html_file_path), image_filename)
@@ -86,19 +82,15 @@ def upload_images(site, html_file_path):
         if not page.exists():
             # Create a FilePage object
             file_page = pywikibot.FilePage(site, page.title())
-
             # Check if the file already exists
             if file_page.exists():
                 raise ValueError("File already exists!")
-
             # Upload the file
             success = file_page.upload(image_path, comment=f"Uploaded image '{image_filename}' using Pywikibot")
-
             if success:
                 print(f"File uploaded successfully! File page: {file_page.full_url()}")
             else:
                 print("Upload failed.")
-
             logging.info(f"Image '{image_filename}' uploaded successfully.")
         else:
             logging.warning(f"Image '{image_filename}' already exists on the wiki.")
@@ -108,7 +100,6 @@ def main(input_template_file, html_output, page_title):
     logging.basicConfig(filename= '/var/log/kara/all.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
     logging.info("\033[92m****** report_recorder main function start ******\033[0m")
-#### make HTML template ####
     # Read the HTML template from the user-specified file
     template_content = read_template_file(input_template_file)
     # Create HTML template
@@ -118,7 +109,6 @@ def main(input_template_file, html_output, page_title):
         html_file.write(html_content)
     print(f"HTML template saved to: {html_output}")
 
-#### upload data and make wiki page ####
     # Set up the wiki site
     site = pywikibot.Site()
     # Login if necessary
