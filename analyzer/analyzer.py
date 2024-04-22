@@ -15,6 +15,7 @@ def merge_normal_csv(selected_csv, input_directory):
     for file in selected_csv:
         try:
             csv_data = pd.read_csv(file)
+            csv_data.insert(0, 'File', os.path.basename(file).split('.')[0])
             all_csv.append(csv_data)
         except FileNotFoundError:
             print(f"File '{file}' not found. Skipping...")
