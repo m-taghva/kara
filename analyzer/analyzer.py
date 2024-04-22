@@ -1,6 +1,7 @@
 import os
 import re
 import csv
+import logging
 import argparse
 from glob import glob
 import pandas as pd
@@ -12,6 +13,7 @@ YELLOW = "\033[1;33m"
 
 ####### MERGER #######
 def merge_normal_csv(selected_csv, input_directory):
+    logging.info("Executing status_analyzer merge_normal_csv function")
     all_csv = []
     for file in selected_csv:
         try:
@@ -31,11 +33,13 @@ def merge_normal_csv(selected_csv, input_directory):
         print("No CSV files found for merging.")
 
 def extract_string_number_pairs(target_directory):
+    logging.info("Executing status_analyzer extract_string_number_pairs function")
     keys = re.findall("(?<=#)[^:]*(?=:)", target_directory)
     values = re.findall("(?<=:)[^#]*(?=#)", target_directory)
     return list(zip(keys, values))
 
 def read_csv_data(csv_file_path):
+    logging.info("Executing status_analyzer read_csv_data function")
     with open(csv_file_path, mode='r') as input_csv:
         csv_reader = csv.reader(input_csv)
         headers = next(csv_reader)
@@ -43,6 +47,7 @@ def read_csv_data(csv_file_path):
     return headers, input_data
 
 def merge_csv_files(input_directory, output_csv_writer, selected_csv):
+    logging.info("Executing status_analyzer merge_csv_files function")
     headers_written = False
     for subdirectory in os.listdir(input_directory):
         subdirectory_path = os.path.join(input_directory, subdirectory)
@@ -66,6 +71,7 @@ def merge_csv_files(input_directory, output_csv_writer, selected_csv):
                     output_csv_writer.writerows([csv_name_without_extension] + extracted_numbers + row for row in input_data)
 
 def create_merged_csv(input_directory, selected_csv):
+    logging.info("Executing status_analyzer create_merged_csv function")
     selected_csv_name = os.path.splitext(selected_csv)[0]
     output_csv_path = os.path.join(input_directory, f"{selected_csv_name}-merge.csv")
     if os.path.exists(output_csv_path):
@@ -78,12 +84,14 @@ def create_merged_csv(input_directory, selected_csv):
     
 ####### ANALYZER #######
 def read_txt_file(file_path):
+    logging.info("Executing status_analyzer read_txt_file function")
     with open(file_path, 'r') as txt_file:
         operation, new_column_name = txt_file.readline().strip().split(':')
         selected_columns = txt_file.read().splitlines()
     return operation, new_column_name, selected_columns
 
 def process_csv_file(csv_data, operation, new_column_name, selected_columns):
+    logging.info("Executing status_analyzer process_csv_file function")
     if operation == 'sum':
         new_column_name = f"sum.{new_column_name}"
         csv_data[new_column_name] = csv_data[selected_columns].sum(axis=1)
@@ -93,6 +101,7 @@ def process_csv_file(csv_data, operation, new_column_name, selected_columns):
     return csv_data
 
 def analyze_and_save_csv(csv_original, transformation_directory):
+    logging.info("Executing status_analyzer analyze_and_save_csv function")
     csv_intermediate = pd.read_csv(csv_original)
     selected_column_names = set()
     for txt_file in os.listdir(transformation_directory):
@@ -113,6 +122,7 @@ def analyze_and_save_csv(csv_original, transformation_directory):
 
 ###### Make graph and image ######
 def plot_and_save_graph(selected_csv, x_column, y_column):
+    logging.info("Executing status_analyzer plot_and_save_graph function")
     # Read CSV file into a DataFrame
     data = pd.read_csv(selected_csv)
     # Extract x and y values from DataFrame
@@ -132,7 +142,10 @@ def plot_and_save_graph(selected_csv, x_column, y_column):
     plt.savefig(image_file_path)
 
 def main(merge, analyze, graph, csv_original, transformation_directory, input_directory, selected_csv, x_column, y_column):
+    os.makedirs('/var/log/kara/', exist_ok=True)
+    logging.basicConfig(filename= '/var/log/kara/all.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
+    logging.info("\033[92m****** status_analyzer main function start ******\033[0m")
     if analyze:
         analyze_and_save_csv(csv_original, transformation_directory)
     if merge:
@@ -145,6 +158,7 @@ def main(merge, analyze, graph, csv_original, transformation_directory, input_di
             merge_normal_csv(selected_csv, input_directory)
     if graph:
         plot_and_save_graph(selected_csv, x_column, y_column)
+    logging.info("\033[92m****** status_analyzer main function end ******\033[0m")
            
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Perform CSV operations and merge files.')
