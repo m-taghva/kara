@@ -146,13 +146,13 @@ if __name__ == "__main__":
     
     # Check required arguments based on operation
     if args.merge and (args.io_directory is None or args.selected_csv is None):
-        print("Error: Both -io (--input_directory) and -sc (--selected_csv) switches are required for merge operation.")
+        print("Error: Both -io (--input_directory) and -sc (--selected_csv) switches are required for merge operation -M")
         exit(1)
     if args.analyze and (args.csv_org is None or args.transformation_directory is None):
-        print("Error: Both -c (--csv_org) and -t (--transformation_directory) switches are required for analyze operation.")
+        print("Error: Both -c (--csv_org) and -t (--transformation_directory) switches are required for analyze operation -A")
         exit(1)
     if args.graph and (args.x_column is None or args.y_column is None):
-        print("Error: Both -x (--x_column) and -y (--y_column) switches are required for make graph operation.")
+        print("Error: Both -x (--x_column) and -y (--y_column) switches are required for make graph operation -G")
         exit(1)
 
     # Set values to None if not provided
