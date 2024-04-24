@@ -237,10 +237,10 @@ def status_analyzer_agent(config_params):
     analyze_csv = config_params.get('analyze_csv')
     transform_dir = config_params.get('transform')
     if merge:
-        analyzer.main_merge(input_directory=result_dir, selected_csv=merge_csv)
+        analyzer.main(merge=True, io_directory=result_dir, selected_csv=merge_csv)
         time.sleep(10)
     if analyze:
-        analyzer.main_analyze(csv_original=f"{result_dir}/{analyze_csv}", transformation_directory=transform_dir)
+        analyzer.main(analyze=True, csv_original=f"{result_dir}/{analyze_csv}", transformation_directory=transform_dir)
 
 def report_recorder_agent(config_params):
     logging.info("Executing report_recorder_agent function")
