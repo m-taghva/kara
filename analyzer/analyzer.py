@@ -147,7 +147,7 @@ if __name__ == "__main__":
     
     # Check required arguments based on operation
     if args.merge and (args.output_directory is None or args.selected_csv is None):
-        print("Error: Both -io (--input_directory) and -sc (--selected_csv) switches are required for merge operation -M")
+        print("Error: Both -o (--input_directory) and -sc (--selected_csv) switches are required for merge operation -M")
         exit(1)
     if args.analyze and (args.csv_org is None or args.transformation_directory is None):
         print("Error: Both -c (--csv_org) and -t (--transformation_directory) switches are required for analyze operation -A")
