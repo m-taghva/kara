@@ -63,7 +63,6 @@ def copy_swift_conf(swift_configs):
                                 copy_ring_command_process = subprocess.run(copy_ring_command, shell=True)
                                 move_tmp_root_rings = f"ssh -p {port} {user}@{ip} 'sudo mv /tmp/rings/{filename} {inspect_value}/rings/ > /dev/null 2>&1'"
                                 move_tmp_root_rings_process = subprocess.run(move_tmp_root_rings, shell=True)
-                                print(move_tmp_root_rings_process)
                                 if move_tmp_root_rings_process.returncode == 0 and copy_ring_command_process.stderr is None:
                                     each_scp_successful = True
                                     print("")
