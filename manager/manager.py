@@ -15,6 +15,11 @@ import status_reporter
 import monstaver
 import analyzer
 
+# For font style
+BOLD = "\033[1m"
+RESET = "\033[0m"
+YELLOW = "\033[1;33m"
+
 kara_config_files = "/etc/KARA/"
 
 def load_config(config_file):
@@ -70,7 +75,8 @@ def config_gen_agent(config_params):
             else:
                 print("\033[91mInvalid input. Please enter 'yes' or 'no'\033[0m")
         else:
-            break    
+            break 
+    print(f"{YELLOW}========================================{RESET}") 
     for input_file in input_files:
         logging.info(f"config_gen_agent input_files : {input_file}")
         firstConfNumber = 1
@@ -131,7 +137,8 @@ def mrbench_agent(config_params, config_file, config_output):
             else:
                 print("\033[91mInvalid input. Please enter 'yes' or 'no'\033[0m")
         else:
-            break    
+            break
+    print(f"{YELLOW}========================================{RESET}") 
     if config_output is None:
         if(config_params.get('conf_dir')):
             config_output = config_params.get('conf_dir')
