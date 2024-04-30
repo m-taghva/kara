@@ -62,7 +62,6 @@ def config_gen_agent(config_params):
                     item_path = os.path.join(config_output, item)
                     shutil.move(item_path, destination_dir)
                 response = "yes" # If no input after 20 seconds, consider it as "yes"
-
             if response == 'yes':
                 logging.info("answer to config_gen_agent remove request is YES")
                 # Remove all files and directories in the output directory
@@ -75,18 +74,23 @@ def config_gen_agent(config_params):
             else:
                 print("\033[91mInvalid input. Please enter 'yes' or 'no'\033[0m")
         else:
-            break 
-    print(f"{YELLOW}========================================{RESET}") 
+            break
+    print(f"{YELLOW}========================================{RESET}")  
+
     for input_file in input_files:
-        logging.info(f"config_gen_agent input_files : {input_file}")
-        firstConfNumber = 1
-        # Create output directory for each input file
-        workloads_configs = os.path.join(config_output, os.path.basename(input_file).split('__')[0])
-        logging.debug(f"path to config_gen_agent output : {workloads_configs}")
-        if os.path.isdir(workloads_configs): 
-            firstConfNumber = len(os.listdir(workloads_configs))+1
-            logging.debug(f"config_gen_agent firstConfNumber : {firstConfNumber}")
-        config_gen.main(input_file_path=input_file, output_directory=workloads_configs, conf_num=firstConfNumber)
+        if os.path.exists(input_file):
+            logging.info(f"config_gen_agent input_files : {input_file}")
+            firstConfNumber = 1
+            # Create output directory for each input file
+            workloads_configs = os.path.join(config_output, os.path.basename(input_file).split('__')[0])
+            logging.debug(f"path to config_gen_agent output : {workloads_configs}")
+            if os.path.isdir(workloads_configs): 
+                firstConfNumber = len(os.listdir(workloads_configs))+1
+                logging.debug(f"config_gen_agent firstConfNumber : {firstConfNumber}")
+            config_gen.main(input_file_path=input_file, output_directory=workloads_configs, conf_num=firstConfNumber)
+        else:
+            print(f"this template doesn't exist: \033[91m{input_file}\033[0m")
+    print(f"{YELLOW}========================================{RESET}")
     return config_output
 
 def mrbench_agent(config_params, config_file, config_output):
@@ -124,7 +128,6 @@ def mrbench_agent(config_params, config_file, config_output):
                     item_path = os.path.join(result_dir, item)
                     shutil.move(item_path, destination_dir_results)
                 response = "yes" # If no input after 20 seconds, consider it as "yes"
-
             if response == 'yes':
                 logging.info("answer to mrbench_agent remove request is YES")
                 # Remove all files and directories in the output directory
@@ -137,8 +140,9 @@ def mrbench_agent(config_params, config_file, config_output):
             else:
                 print("\033[91mInvalid input. Please enter 'yes' or 'no'\033[0m")
         else:
-            break
+            break 
     print(f"{YELLOW}========================================{RESET}") 
+
     if config_output is None:
         if(config_params.get('conf_dir')):
             config_output = config_params.get('conf_dir')
@@ -154,7 +158,7 @@ def mrbench_agent(config_params, config_file, config_output):
     conf_exist = 0
     swift_rings = {}
     swift_configs = {}
-    if conf_dict["workloads.xml"] is None:
+    if '.xml' not in os.path.basename(dir_path):
         logging.critical("There isn't any workload in mrbench_agent input config dictionary")
         print(f"\033[91mThere isn't any workload !\033[0m")
         exit()
@@ -162,7 +166,7 @@ def mrbench_agent(config_params, config_file, config_output):
         conf_exist = 1
     ring_exist = 0
     total_ring_index = 1
-    if len(ring_dirs)>1:
+    if len(ring_dirs):
         total_ring_index = len(ring_dirs)
         ring_exist = 1
     for ri in range(total_ring_index):
@@ -178,19 +182,18 @@ def mrbench_agent(config_params, config_file, config_output):
             if conf_exist:
                 m=1
                 for key in swift_configs:
-                    list_dir = os.listdir(conf_dict[key])
+                    list_dir = sorted(os.listdir(conf_dict[key]))
                     swift_configs[key] = os.path.join(config_output,key,list_dir[(i//m)%len(list_dir)])
                     m *= len(list_dir)
-                if conf_exist or ring_exist:
-                    merged_conf_ring = {**swift_rings, **swift_configs}
-                    logging.info(f"rings and configs dictionary is : {merged_conf_ring}")
-                    mrbench.copy_swift_conf(merged_conf_ring)
-                    #time.sleep(40)
+            if conf_exist or ring_exist:
+                merged_conf_ring = {**swift_rings, **swift_configs}
+                logging.info(f"rings and configs dictionary is : {merged_conf_ring}")
+                mrbench.copy_swift_conf(merged_conf_ring)
             for test_config in sorted(os.listdir(conf_dict["workloads.xml"])):
                 test_config_path = os.path.join(conf_dict["workloads.xml"], test_config)
                 logging.info(f"test config path in mrbench_agent submit function is : {test_config_path}")
                 start_time, end_time, result_file_path = mrbench.submit(test_config_path, result_dir)
-                
+
                 if '#' in os.path.basename(swift_configs[key]) and '#' in test_config:
                     with open(os.path.join(result_file_path, 'info.csv'), mode='w', newline='') as file:
                         writer = csv.writer(file)
@@ -215,7 +218,7 @@ def mrbench_agent(config_params, config_file, config_output):
                                     test_values.append(pair_split[1])
                         writer.writerow(swift_keys + test_keys)
                         writer.writerow(swift_values + test_values)
-                        
+
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter is not None:
                     if run_status_reporter == 'csv':
@@ -289,7 +292,8 @@ def main(config_file):
     if log_level is not None:
         log_level_upper = log_level.upper()
         if log_level_upper == "DEBUG" or "INFO" or "WARNING" or "ERROR" or "CRITICAL":
-            os.makedirs('/var/log/kara/', exist_ok=True)
+            log_dir = f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && chmod -R 777 /var/log/kara/"
+            log_dir_run = subprocess.run(log_dir, shell=True)
             logging.basicConfig(filename= '/var/log/kara/all.log', level=log_level_upper, format='%(asctime)s - %(levelname)s - %(message)s')
         else:
             print(f"\033[91mInvalid log level:{log_level}\033[0m")  
