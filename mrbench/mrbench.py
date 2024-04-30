@@ -116,7 +116,7 @@ def copy_swift_conf(swift_configs):
                         check_services = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} service --status-all'"
                         check_services_result = subprocess.run(check_services, shell=True, capture_output=True, text=True, check=True)
                         if "[ + ]  swift-account\n" or "[ + ]  swift-container\n" or "[ + ]  swift-object\n" or "[ + ]  swift-proxy\n" in check_services_result:
-                            time.sleep(10)
+                            time.sleep(20)
                             print("")
                             print(f"\033[92mcontainer {container_name} successfully restart\033[0m")
                             break
