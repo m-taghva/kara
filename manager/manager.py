@@ -190,12 +190,32 @@ def mrbench_agent(config_params, config_file, config_output):
                 test_config_path = os.path.join(conf_dict["workloads.xml"], test_config)
                 logging.info(f"test config path in mrbench_agent submit function is : {test_config_path}")
                 start_time, end_time, result_file_path = mrbench.submit(test_config_path, result_dir)
+                
                 if '#' in os.path.basename(swift_configs[key]) and '#' in test_config:
                     with open(os.path.join(result_file_path, 'info.csv'), mode='w', newline='') as file:
                         writer = csv.writer(file)
-                        writer.writerow(['swift_config', 'test_config'])
+                        swift_keys = []
+                        swift_values = []
                         for key in swift_configs:
-                            writer.writerow([os.path.basename(swift_configs[key]) , test_config])
+                            pairs = swift_configs[key].split('#')
+                            for pair in pairs:
+                                if ':' in pair:
+                                    pair_split = pair.split(':')
+                                    if len(pair_split) == 2:
+                                        swift_keys.append(pair_split[0])
+                                        swift_values.append(pair_split[1])  
+                        test_keys = []
+                        test_values = []
+                        pairs = test_config.split('#')
+                        for pair in pairs:
+                            if ':' in pair:
+                                pair_split = pair.split(':')
+                                if len(pair_split) == 2:
+                                    test_keys.append(pair_split[0])
+                                    test_values.append(pair_split[1])
+                        writer.writerow(swift_keys + test_keys)
+                        writer.writerow(swift_values + test_values)
+                        
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter is not None:
                     if run_status_reporter == 'csv':
