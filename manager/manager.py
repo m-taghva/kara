@@ -45,8 +45,8 @@ def config_gen_agent(config_params):
                 print(f"\033[91m{item}\033[0m")
             # Ask user if they want to remove the contents
             print("Do you want to remove these files and directories? (yes/no): ", end='', flush=True)
-            # Set up a timer for 20 seconds
-            rlist, _, _ = select.select([sys.stdin], [], [], 20)
+            # Set up a timer for 30 seconds
+            rlist, _, _ = select.select([sys.stdin], [], [], 30)
             if rlist:
                 response = input().lower() 
                 if response in ('y', 'yes'):
@@ -111,8 +111,8 @@ def mrbench_agent(config_params, config_file, config_output):
                 print(f"\033[91m{item}\033[0m")
             # Ask user if they want to remove the contents
             print("Do you want to remove these files and directories? (yes/no): ", end='', flush=True)
-            # Set up a timer for 20 seconds
-            rlist, _, _ = select.select([sys.stdin], [], [], 20)
+            # Set up a timer for 30 seconds
+            rlist, _, _ = select.select([sys.stdin], [], [], 30)
             if rlist:
                 response = input().lower() 
                 if response in ('y', 'yes'):
