@@ -90,6 +90,7 @@ def config_gen_agent(config_params):
             config_gen.main(input_file_path=input_file, output_directory=workloads_configs, conf_num=firstConfNumber)
         else:
             print(f"this template doesn't exist: \033[91m{input_file}\033[0m")
+            exit()
     print(f"{YELLOW}========================================{RESET}")
     return config_output
 
@@ -175,7 +176,7 @@ def mrbench_agent(config_params, config_file, config_output):
                 file_path = os.path.join(ring_dirs[ri], filename)
                 swift_rings[filename] = file_path
         for key in conf_dict:
-            if key != "workloads.xml" and key is not None:
+            if key != "workloads.xml" and key is not None and os.listdir(conf_dict[key]:
                 Total_index *=len(os.listdir(conf_dict[key]))
                 swift_configs[key]=""
         for i in range(Total_index):
