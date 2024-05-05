@@ -176,7 +176,7 @@ def mrbench_agent(config_params, config_file, config_output):
                 file_path = os.path.join(ring_dirs[ri], filename)
                 swift_rings[filename] = file_path
         for key in conf_dict:
-            if key != "workloads.xml" and key is not None and os.listdir(conf_dict[key]):
+            if key != ".xml" and key is not None and os.listdir(conf_dict[key]):
                 Total_index *=len(os.listdir(conf_dict[key]))
                 swift_configs[key]=""
         for i in range(Total_index):
@@ -194,7 +194,11 @@ def mrbench_agent(config_params, config_file, config_output):
                 test_config_path = os.path.join(conf_dict["workloads.xml"], test_config)
                 logging.info(f"test config path in mrbench_agent submit function is : {test_config_path}")
                 start_time, end_time, result_file_path = mrbench.submit(test_config_path, result_dir)
-
+                copy_test_config = f"sudo cp {test_config_path} {result_file_path}"
+                copy_test_config_process = subprocess.run(copy_test_config, shell=True)
+                copy_ring_conf_files = f"sudo cp {swift_configs[key]} {result_file_path} && sudo cp {swift_rings[filename]} {result_file_path}"
+                copy_ring_conf_files_process = subprocess.run(copy_ring_conf_files, shell=True)
+                
                 if '#' in os.path.basename(swift_configs[key]) and '#' in test_config:
                     with open(os.path.join(result_file_path, 'info.csv'), mode='w', newline='') as file:
                         writer = csv.writer(file)
