@@ -217,8 +217,10 @@ def mrbench_agent(config_params, config_file, config_output):
                                 if len(pair_split) == 2:
                                     test_keys.append(pair_split[0])
                                     test_values.append(pair_split[1])
-                        writer.writerow(swift_keys + test_keys)
-                        writer.writerow(swift_values + test_values)
+                        writer.writerow(['workload_configs'] + test_keys)
+                        writer.writerow(['workload_values'] + test_values)
+                        writer.writerow(['swift_configs'] + swift_keys)
+                        writer.writerow(['swift_values'] + swift_values)
 
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter is not None:
