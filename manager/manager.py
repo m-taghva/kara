@@ -176,7 +176,7 @@ def mrbench_agent(config_params, config_file, config_output):
                 file_path = os.path.join(ring_dirs[ri], filename)
                 swift_rings[filename] = file_path
         for key in conf_dict:
-            if key != "workloads.xml" and key is not None and os.listdir(conf_dict[key]:
+            if key != "workloads.xml" and key is not None and os.listdir(conf_dict[key]):
                 Total_index *=len(os.listdir(conf_dict[key]))
                 swift_configs[key]=""
         for i in range(Total_index):
