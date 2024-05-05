@@ -76,7 +76,6 @@ def config_gen_agent(config_params):
         else:
             break
     print(f"{YELLOW}========================================{RESET}")  
-
     for input_file in input_files:
         if os.path.exists(input_file):
             logging.info(f"config_gen_agent input_files : {input_file}")
@@ -99,7 +98,7 @@ def mrbench_agent(config_params, config_file, config_output):
     all_start_times = [] ; all_end_times = []
     result_dir = config_params.get('output_path')
     run_status_reporter = config_params.get('Status_Reporter', None)
-    run_monstaver = config_params.get('monstaver', False)
+    run_monstaver = config_params.get('monstaver', None)
     ring_dirs = config_params.get('ring_dirs', [])
     logging.info(f"ring directories in mrbench_agent : {ring_dirs}")
     while True:
@@ -143,7 +142,6 @@ def mrbench_agent(config_params, config_file, config_output):
         else:
             break 
     print(f"{YELLOW}========================================{RESET}") 
-
     if config_output is None:
         if(config_params.get('conf_dir')):
             config_output = config_params.get('conf_dir')
@@ -198,7 +196,6 @@ def mrbench_agent(config_params, config_file, config_output):
                 copy_test_config_process = subprocess.run(copy_test_config, shell=True)
                 copy_ring_conf_files = f"sudo cp {swift_configs[key]} {result_file_path} && sudo cp {swift_rings[filename]} {result_file_path}"
                 copy_ring_conf_files_process = subprocess.run(copy_ring_conf_files, shell=True)
-                
                 if '#' in os.path.basename(swift_configs[key]) and '#' in test_config:
                     with open(os.path.join(result_file_path, 'info.csv'), mode='w', newline='') as file:
                         writer = csv.writer(file)
@@ -225,15 +222,19 @@ def mrbench_agent(config_params, config_file, config_output):
                         writer.writerow(['workload_values'] + test_values)
                         writer.writerow(['swift_configs'] + swift_keys)
                         writer.writerow(['swift_values'] + swift_values)
-
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter is not None:
                     if run_status_reporter == 'csv':
                         status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=False)  
                     if run_status_reporter == 'csv,img':
-                        status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)  
-                if run_monstaver:
-                    monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True) 
+                        status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True) 
+                if  run_monstaver is not None:
+                    if run_monstaver == 'backup,info':
+                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True) 
+                    if run_monstaver == 'backup':
+                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True) 
+                    if run_monstaver == 'info':
+                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=False)
     # Extract first start time and last end time
     first_start_time = all_start_times[0] ; last_end_time = all_end_times[-1] 
     logging.debug(first_start_time,last_end_time)
@@ -250,13 +251,21 @@ def monstaver_agent(config_params, config_file, first_start_time, last_end_time)
             times = file.readlines()
             for time_range in times:
                 start_time, end_time = time_range.strip().split(',')
-                if operation == "backup":
+                if operation == "backup,info":
                     monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True,  backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
+                elif operation == 'backup':
+                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True) 
+                elif operation == 'info':
+                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=False)
                 elif operation == "restore":
-                    monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True)          
-    elif operation == "backup": 
-        if batch_mode:
-            monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
+                    monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True)   
+    elif batch_mode:       
+        if operation == "backup,info":
+            monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True,  backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
+        elif operation == 'backup':
+            monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True) 
+        elif operation == 'info':
+            monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=False)
     elif operation == "restore":
         monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True)
 
@@ -299,7 +308,7 @@ def main(config_file):
     if log_level is not None:
         log_level_upper = log_level.upper()
         if log_level_upper == "DEBUG" or "INFO" or "WARNING" or "ERROR" or "CRITICAL":
-            log_dir = f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && sudo chmod -R 777 /var/log/kara/"
+            log_dir = f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && chmod -R 777 /var/log/kara/"
             log_dir_run = subprocess.run(log_dir, shell=True)
             logging.basicConfig(filename= '/var/log/kara/all.log', level=log_level_upper, format='%(asctime)s - %(levelname)s - %(message)s')
         else:
