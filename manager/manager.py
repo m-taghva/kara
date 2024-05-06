@@ -4,7 +4,6 @@ import select
 import subprocess
 import time
 import yaml
-import csv
 import shutil
 import argparse
 import logging
@@ -196,30 +195,33 @@ def mrbench_agent(config_params, config_file, config_output):
                 copy_ring_conf_files = f"sudo cp -r {swift_configs[key]} {result_file_path} && sudo cp -r {swift_rings[filename]} {result_file_path}"
                 copy_ring_conf_files_process = subprocess.run(copy_ring_conf_files, shell=True)
                 if '#' in os.path.basename(swift_configs[key]) and '#' in test_config:
-                    with open(os.path.join(result_file_path, 'info.csv'), mode='w', newline='') as file:
-                        writer = csv.writer(file)
-                        swift_keys = []
-                        swift_values = []
-                        swift_pairs = os.path.basename(swift_configs[key]).split('#')
-                        for swift_pair in swift_pairs:
-                            if ':' in swift_pair:
-                                swift_pair_split = swift_pair.split(':')
-                                swift_keys.append(swift_pair_split[0])
-                                swift_values.append(swift_pair_split[1])    
-                        test_keys = []
-                        test_values = []
-                        test_pairs = test_config.split('#')
-                        for test_pair in test_pairs:
-                            if ':' in test_pair:
-                                test_pair_split = test_pair.split(':')
-                                test_keys.append(test_pair_split[0])
-                                test_values.append(test_pair_split[1])
-                        ring_file = os.path.basename(swift_rings[filename]).split('.gz')
-                        writer.writerow(['workload_config'] + test_keys)
-                        writer.writerow(['workload_config_value'] + test_values)
-                        writer.writerow(['swift_config'] + swift_keys)
-                        writer.writerow(['swift_config_value'] + swift_values)
-                        writer.writerow(['swift_ring_config'] + ring_file)
+                    data = {}
+                    swift_keys = []
+                    swift_values = []
+                    swift_pairs = os.path.basename(swift_configs[key]).split('#')
+                    for swift_pair in swift_pairs:
+                        if ':' in swift_pair:
+                            swift_pair_split = swift_pair.split(':')
+                            swift_keys.append(swift_pair_split[0])
+                            swift_values.append(swift_pair_split[1]) 
+                    data['swift_config'] = dict(zip(swift_keys, swift_values)) 
+
+                    test_keys = []
+                    test_values = []
+                    test_pairs = test_config.split('#')
+                    for test_pair in test_pairs:
+                        if ':' in test_pair:
+                            test_pair_split = test_pair.split(':')
+                            test_keys.append(test_pair_split[0])
+                            test_values.append(test_pair_split[1])
+                    data['workload_config'] = dict(zip(test_keys, test_values))
+
+                    ring_file = os.path.basename(swift_rings[filename]).split('.gz')
+                    data['ring_config'] = ring_file[0]
+
+                    with open(os.path.join(result_file_path, 'info.yaml'), 'w') as yaml_file:
+                        yaml.dump(data, yaml_file, default_flow_style=False)
+
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter is not None:
                     if run_status_reporter == 'csv':
