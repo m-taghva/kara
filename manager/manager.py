@@ -90,7 +90,6 @@ def config_gen_agent(config_params):
         else:
             print(f"this template doesn't exist: \033[91m{input_file}\033[0m")
             exit()
-    print(f"{YELLOW}========================================{RESET}")
     return config_output
 
 def mrbench_agent(config_params, config_file, config_output):
@@ -174,7 +173,7 @@ def mrbench_agent(config_params, config_file, config_output):
                 file_path = os.path.join(ring_dirs[ri], filename)
                 swift_rings[filename] = file_path
         for key in conf_dict:
-            if key != ".xml" and key is not None and os.listdir(conf_dict[key]):
+            if key != "workloads.xml" and key is not None and os.listdir(conf_dict[key]):
                 Total_index *=len(os.listdir(conf_dict[key]))
                 swift_configs[key]=""
         for i in range(Total_index):
@@ -192,36 +191,35 @@ def mrbench_agent(config_params, config_file, config_output):
                 test_config_path = os.path.join(conf_dict["workloads.xml"], test_config)
                 logging.info(f"test config path in mrbench_agent submit function is : {test_config_path}")
                 start_time, end_time, result_file_path = mrbench.submit(test_config_path, result_dir)
-                copy_test_config = f"sudo cp {test_config_path} {result_file_path}"
+                copy_test_config = f"sudo cp -r {test_config_path} {result_file_path}"
                 copy_test_config_process = subprocess.run(copy_test_config, shell=True)
-                copy_ring_conf_files = f"sudo cp {swift_configs[key]} {result_file_path} && sudo cp {swift_rings[filename]} {result_file_path}"
+                copy_ring_conf_files = f"sudo cp -r {swift_configs[key]} {result_file_path} && sudo cp -r {swift_rings[filename]} {result_file_path}"
                 copy_ring_conf_files_process = subprocess.run(copy_ring_conf_files, shell=True)
                 if '#' in os.path.basename(swift_configs[key]) and '#' in test_config:
                     with open(os.path.join(result_file_path, 'info.csv'), mode='w', newline='') as file:
                         writer = csv.writer(file)
                         swift_keys = []
                         swift_values = []
-                        for key in swift_configs:
-                            pairs = swift_configs[key].split('#')
-                            for pair in pairs:
-                                if ':' in pair:
-                                    pair_split = pair.split(':')
-                                    if len(pair_split) == 2:
-                                        swift_keys.append(pair_split[0])
-                                        swift_values.append(pair_split[1])  
+                        swift_pairs = os.path.basename(swift_configs[key]).split('#')
+                        for swift_pair in swift_pairs:
+                            if ':' in swift_pair:
+                                swift_pair_split = swift_pair.split(':')
+                                swift_keys.append(swift_pair_split[0])
+                                swift_values.append(swift_pair_split[1])    
                         test_keys = []
                         test_values = []
-                        pairs = test_config.split('#')
-                        for pair in pairs:
-                            if ':' in pair:
-                                pair_split = pair.split(':')
-                                if len(pair_split) == 2:
-                                    test_keys.append(pair_split[0])
-                                    test_values.append(pair_split[1])
-                        writer.writerow(['workload_configs'] + test_keys)
-                        writer.writerow(['workload_values'] + test_values)
-                        writer.writerow(['swift_configs'] + swift_keys)
-                        writer.writerow(['swift_values'] + swift_values)
+                        test_pairs = test_config.split('#')
+                        for test_pair in test_pairs:
+                            if ':' in test_pair:
+                                test_pair_split = test_pair.split(':')
+                                test_keys.append(test_pair_split[0])
+                                test_values.append(test_pair_split[1])
+                        ring_file = os.path.basename(swift_rings[filename]).split('.gz')
+                        writer.writerow(['workload_config'] + test_keys)
+                        writer.writerow(['workload_config_value'] + test_values)
+                        writer.writerow(['swift_config'] + swift_keys)
+                        writer.writerow(['swift_config_value'] + swift_values)
+                        writer.writerow(['swift_ring_config'] + ring_file)
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter is not None:
                     if run_status_reporter == 'csv':
