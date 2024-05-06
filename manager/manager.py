@@ -47,7 +47,7 @@ def config_gen_agent(config_params):
             # Set up a timer for 30 seconds
             rlist, _, _ = select.select([sys.stdin], [], [], 30)
             if rlist:
-                response = input().lower() 
+                response = input().lower()
                 if response in ('y', 'yes'):
                     response = 'yes'
                 elif response in ('n', 'no'):
@@ -74,7 +74,7 @@ def config_gen_agent(config_params):
                 print("\033[91mInvalid input. Please enter 'yes' or 'no'\033[0m")
         else:
             break
-    print(f"{YELLOW}========================================{RESET}")  
+    print(f"{YELLOW}========================================{RESET}")
     for input_file in input_files:
         if os.path.exists(input_file):
             logging.info(f"config_gen_agent input_files : {input_file}")
@@ -82,7 +82,7 @@ def config_gen_agent(config_params):
             # Create output directory for each input file
             workloads_configs = os.path.join(config_output, os.path.basename(input_file).split('__')[0])
             logging.debug(f"path to config_gen_agent output : {workloads_configs}")
-            if os.path.isdir(workloads_configs): 
+            if os.path.isdir(workloads_configs):
                 firstConfNumber = len(os.listdir(workloads_configs))+1
                 logging.debug(f"config_gen_agent firstConfNumber : {firstConfNumber}")
             config_gen.main(input_file_path=input_file, output_directory=workloads_configs, conf_num=firstConfNumber)
@@ -112,7 +112,7 @@ def mrbench_agent(config_params, config_file, config_output):
             # Set up a timer for 30 seconds
             rlist, _, _ = select.select([sys.stdin], [], [], 30)
             if rlist:
-                response = input().lower() 
+                response = input().lower()
                 if response in ('y', 'yes'):
                     response = 'yes'
                 elif response in ('n', 'no'):
@@ -138,8 +138,8 @@ def mrbench_agent(config_params, config_file, config_output):
             else:
                 print("\033[91mInvalid input. Please enter 'yes' or 'no'\033[0m")
         else:
-            break 
-    print(f"{YELLOW}========================================{RESET}") 
+            break
+    print(f"{YELLOW}========================================{RESET}")
     if config_output is None:
         if(config_params.get('conf_dir')):
             config_output = config_params.get('conf_dir')
@@ -147,7 +147,7 @@ def mrbench_agent(config_params, config_file, config_output):
             logging.critical("There isn't any conf_dir in scenario file")
             print(f"\033[91mThere isn't any conf_dir in scenario file !\033[0m")
             exit()
-    conf_dict = {}  
+    conf_dict = {}
     for dir_name in os.listdir(config_output):
         dir_path = os.path.join(config_output, dir_name)
         conf_dict[dir_name] = dir_path
@@ -185,7 +185,7 @@ def mrbench_agent(config_params, config_file, config_output):
             if conf_exist or ring_exist:
                 merged_conf_ring = {**swift_rings, **swift_configs}
                 logging.info(f"rings and configs dictionary is : {merged_conf_ring}")
-                mrbench.copy_swift_conf(merged_conf_ring)
+                ring_dict = mrbench.copy_swift_conf(merged_conf_ring)
             for test_config in sorted(os.listdir(conf_dict["workloads.xml"])):
                 test_config_path = os.path.join(conf_dict["workloads.xml"], test_config)
                 logging.info(f"test config path in mrbench_agent submit function is : {test_config_path}")
@@ -203,9 +203,8 @@ def mrbench_agent(config_params, config_file, config_output):
                         if ':' in swift_pair:
                             swift_pair_split = swift_pair.split(':')
                             swift_keys.append(swift_pair_split[0])
-                            swift_values.append(swift_pair_split[1]) 
-                    data['swift_config'] = dict(zip(swift_keys, swift_values)) 
-
+                            swift_values.append(swift_pair_split[1])
+                    data['swift_config'] = dict(zip(swift_keys, swift_values))
                     test_keys = []
                     test_values = []
                     test_pairs = test_config.split('#')
@@ -215,28 +214,25 @@ def mrbench_agent(config_params, config_file, config_output):
                             test_keys.append(test_pair_split[0])
                             test_values.append(test_pair_split[1])
                     data['workload_config'] = dict(zip(test_keys, test_values))
-
-                    ring_file = os.path.basename(swift_rings[filename]).split('.gz')
-                    data['ring_config'] = ring_file[0]
-
+                    data['ring_config'] = ring_dict
                     with open(os.path.join(result_file_path, 'info.yaml'), 'w') as yaml_file:
                         yaml.dump(data, yaml_file, default_flow_style=False)
 
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter is not None:
                     if run_status_reporter == 'csv':
-                        status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=False)  
+                        status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=False)
                     if run_status_reporter == 'csv,img':
-                        status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True) 
+                        status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)
                 if  run_monstaver is not None:
                     if run_monstaver == 'backup,info':
-                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True) 
+                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
                     if run_monstaver == 'backup':
-                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True) 
+                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True)
                     if run_monstaver == 'info':
                         monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=False)
     # Extract first start time and last end time
-    first_start_time = all_start_times[0] ; last_end_time = all_end_times[-1] 
+    first_start_time = all_start_times[0] ; last_end_time = all_end_times[-1]
     logging.debug(first_start_time,last_end_time)
     return first_start_time, last_end_time
 
@@ -254,16 +250,16 @@ def monstaver_agent(config_params, config_file, first_start_time, last_end_time)
                 if operation == "backup,info":
                     monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True,  backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
                 elif operation == 'backup':
-                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True) 
+                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True)
                 elif operation == 'info':
                         monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=False)
                 elif operation == "restore":
-                    monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True)   
-    elif batch_mode:       
+                    monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True)
+    elif batch_mode:
         if operation == "backup,info":
             monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True,  backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
         elif operation == 'backup':
-            monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True) 
+            monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True)
         elif operation == 'info':
             monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=False)
     elif operation == "restore":
@@ -312,7 +308,7 @@ def main(config_file):
             log_dir_run = subprocess.run(log_dir, shell=True)
             logging.basicConfig(filename= '/var/log/kara/all.log', level=log_level_upper, format='%(asctime)s - %(levelname)s - %(message)s')
         else:
-            print(f"\033[91mInvalid log level:{log_level}\033[0m")  
+            print(f"\033[91mInvalid log level:{log_level}\033[0m")
     else:
         print(f"\033[91mPlease enter log_level in the configuration file.\033[0m")
 
@@ -322,7 +318,7 @@ def main(config_file):
         config_output = None
         first_start_time = None
         last_end_time = None
-        for task in data_loaded['scenario']:            
+        for task in data_loaded['scenario']:
             try:
                 if 'Config_gen' in task:
                     config_params = task['Config_gen']
