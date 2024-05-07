@@ -56,13 +56,13 @@ def copy_swift_conf(swift_configs):
                         print("")
                         print(f"please wait for checking ring file [ {filename} ] inside {container_name}")
                         ring_dict = {}
-                        get_account_builder = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/account.builder > /dev/null 2>&1"
+                        get_account_builder = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/account.builder"
                         get_account_builder_process = subprocess.run(get_account_builder, shell=True, capture_output=True, text=True)
                         ring_dict['account.builder'] = get_account_builder_process.stdout
-                        get_container_builder = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/container.builder > /dev/null 2>&1"
+                        get_container_builder = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/container.builder"
                         get_container_builder_process = subprocess.run(get_container_builder, shell=True, capture_output=True, text=True)
                         ring_dict['container.builder'] = get_container_builder_process.stdout
-                        get_object_builder = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/object.builder > /dev/null 2>&1"
+                        get_object_builder = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/object.builder"
                         get_object_builder_process = subprocess.run(get_object_builder, shell=True, capture_output=True, text=True)
                         ring_dict['object.builder'] = get_object_builder_process.stdout
                         if diff_ring_result.stderr == "":
