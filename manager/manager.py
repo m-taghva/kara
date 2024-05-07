@@ -214,9 +214,11 @@ def mrbench_agent(config_params, config_file, config_output):
                             test_keys.append(test_pair_split[0])
                             test_values.append(test_pair_split[1])
                     data['workload_config'] = dict(zip(test_keys, test_values))
-                    data['ring_config'] = ring_dict
                     with open(os.path.join(result_file_path, 'info.yaml'), 'w') as yaml_file:
                         yaml.dump(data, yaml_file, default_flow_style=False)
+                    data_ring = {'ring_config': ring_dict}
+                    with open(os.path.join(result_file_path, 'info.yaml'), 'a') as yaml_file:
+                        yaml.dump(data_ring, yaml_file, default_flow_style=False)
 
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter is not None:
