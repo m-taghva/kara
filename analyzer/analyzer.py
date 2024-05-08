@@ -55,7 +55,6 @@ def merge_process(output_directory, selected_csv):
             remove_csv = subprocess.run(f"rm {output_directory}/merged.csv", shell=True)
     all_csv = []
     if '*' in selected_csv:
-        print(output_directory)
         parent_dir, file_name = os.path.split(selected_csv)
         for subdirectory in sorted(os.listdir(parent_dir)):
             subdirectory_path = os.path.join(parent_dir, subdirectory)
@@ -135,6 +134,8 @@ def main(merge, analyze, graph, csv_original, transformation_directory, output_d
     log_dir_run = subprocess.run(log_dir, shell=True)
     logging.basicConfig(filename= '/var/log/kara/all.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
     logging.info("\033[92m****** status_analyzer main function start ******\033[0m")
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory) 
     if analyze:
         analyze_and_save_csv(csv_original, transformation_directory)
     if merge:
@@ -172,7 +173,7 @@ if __name__ == "__main__":
     x_column = args.x_column ; y_column = args.y_column
     transformation_directory = args.transformation_directory.strip() if args.transformation_directory else None
     csv_original = args.csv_org.strip() if args.csv_org else None
-    output_directory = args.output_directory.strip()
+    output_directory = args.output_directory.strip() if args.output_directory else None
     if not os.path.exists(output_directory):
             os.makedirs(output_directory) 
     if args.selected_csv is not None:
