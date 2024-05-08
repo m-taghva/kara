@@ -250,20 +250,20 @@ def monstaver_agent(config_params, config_file, first_start_time, last_end_time)
             for time_range in times:
                 start_time, end_time = time_range.strip().split(',')
                 if operation == "backup,info":
-                    monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True,  backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
+                    monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=True,  backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
                 elif operation == 'backup':
-                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True)
+                        monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True)
                 elif operation == 'info':
-                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=False)
+                        monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=False)
                 elif operation == "restore":
                     monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True)
     elif batch_mode:
         if operation == "backup,info":
-            monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True,  backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
+            monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=True,  backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
         elif operation == 'backup':
-            monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True)
+            monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True)
         elif operation == 'info':
-            monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=False)
+            monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=False)
     elif operation == "restore":
         monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True)
 
