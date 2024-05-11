@@ -140,6 +140,11 @@ def mrbench_agent(config_params, config_file, config_output):
         else:
             break
     print(f"{YELLOW}========================================{RESET}")
+    if os.path.exists(f'{result_dir}/analyzed/merged.csv'):
+        remove_csv = subprocess.run(f"rm {result_dir}/analyzed/merged.csv", shell=True)
+    # make empty dir for merging csv
+    elif not os.path.exists(f"{result_dir}/analyzed/"):
+        make_analyzed_dir = subprocess.run(f"sudo mkdir {result_dir}/analyzed/ > /dev/null 2>&1", shell=True)
     if config_output is None:
         if(config_params.get('conf_dir')):
             config_output = config_params.get('conf_dir')
@@ -190,12 +195,11 @@ def mrbench_agent(config_params, config_file, config_output):
                 test_config_path = os.path.join(conf_dict["workloads.xml"], test_config)
                 logging.info(f"test config path in mrbench_agent submit function is : {test_config_path}")
                 start_time, end_time, result_file_path = mrbench.submit(test_config_path, result_dir)
-                copy_test_config = f"sudo cp -r {test_config_path} {result_file_path}"
-                copy_test_config_process = subprocess.run(copy_test_config, shell=True)
-                copy_ring_conf_files = f"sudo cp -r {swift_configs[key]} {result_file_path} && sudo cp -r {swift_rings[filename]} {result_file_path}"
-                copy_ring_conf_files_process = subprocess.run(copy_ring_conf_files, shell=True)
-                if '#' in os.path.basename(swift_configs[key]) and '#' in test_config:
+                subprocess.run(f"sudo cp -r {test_config_path} {result_file_path}", shell=True)
+                subprocess.run(f"sudo cp -r {swift_configs[key]} {result_file_path} && sudo cp -r {swift_rings[filename]} {result_file_path}", shell=True)
+                if '#' in os.path.basename(swift_configs[key]) and test_config.endswith("#"):
                     data = {}
+                    data['Time'] = f"{start_time},{end_time}"
                     swift_keys = []
                     swift_values = []
                     swift_pairs = os.path.basename(swift_configs[key]).split('#')
@@ -216,17 +220,27 @@ def mrbench_agent(config_params, config_file, config_output):
                     data['workload_config'] = dict(zip(test_keys, test_values))
                     with open(os.path.join(result_file_path, 'info.yaml'), 'w') as yaml_file:
                         yaml.dump(data, yaml_file, default_flow_style=False)
+                if ring_dict:
                     data_ring = {'ring_config': ring_dict}
                     with open(os.path.join(result_file_path, 'info.yaml'), 'a') as yaml_file:
                         yaml.dump(data_ring, yaml_file, default_flow_style=False)
-
+                merge_data = {**data, **data_ring}
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
-                if run_status_reporter is not None:
+                if run_status_reporter != 'none':
                     if run_status_reporter == 'csv':
-                        status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=False)
+                        output_csv  = status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=False)
                     if run_status_reporter == 'csv,img':
-                        status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)
-                if  run_monstaver is not None:
+                        output_csv = status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)
+                    if os.path.exists(output_csv):
+                        formatted_data = {}
+                        for section_name, section_data in merge_data.items():
+                            if isinstance(section_data, dict):
+                                for key, value in section_data.items():
+                                    formatted_data[f"{section_name}.{key}"] = value
+                            else:
+                                formatted_data[section_name] = section_data
+                        analyzer.merge_csv(csv_file=output_csv, output_directory=f"{result_dir}/analyzed", pairs_dict=formatted_data)
+                if run_monstaver != 'none':
                     if run_monstaver == 'backup,info':
                         monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
                     if run_monstaver == 'backup':
