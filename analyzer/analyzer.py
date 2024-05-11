@@ -19,9 +19,11 @@ def merge_csv(csv_file, output_directory, pairs_dict):
             all_keys = list(pairs_dict.keys())
             all_values = list(pairs_dict.values())
             for key, value in zip(all_keys, all_values):
-                csv_data.insert(0, key, value)        
-        # Append data to the merged.csv file
-        csv_data.to_csv(f'{output_directory}/merged.csv', index=False, mode='a', header=not os.path.exists(f'{output_directory}/merged.csv'))
+                csv_data.insert(0, key, value) 
+        if os.path.exists(f'{output_directory}/merged.csv'):      
+            csv_data.to_csv(f'{output_directory}/merged.csv', index=False, mode='a', header=False)
+        elif not os.path.exists(f'{output_directory}/merged.csv'):
+            csv_data.to_csv(f'{output_directory}/merged.csv', index=False, mode='a', header=True)
         print(f"Data from '{csv_file}' appended successfully to {YELLOW}'{output_directory}/merged.csv'{RESET}")    
     except FileNotFoundError:
         print(f"File '{csv_file}' not found. Skipping...")
