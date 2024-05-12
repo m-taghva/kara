@@ -85,9 +85,11 @@ def copy_swift_conf(swift_configs):
                                     print(f"\033[92mcopy ring file [ {filename} ] to {container_name} successful\033[0m")
                                 else: 
                                     print(f"\033[91mrings in {container_name} failed to sync\033[0m")
+                                    exit(1)
                         elif diff_ring_result.stderr != "":
                             print("")
                             print(f"\033[91mWARNING: your ring file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
+                            exit(1)
                     elif filename.endswith(".conf"):
                         diff_conf_command = f"ssh -p {port} {user}@{ip} 'sudo cat {inspect_value}/{filename}' | diff - {filepath}"
                         diff_conf_result = subprocess.run(diff_conf_command, shell=True, capture_output=True, text=True)
@@ -110,9 +112,11 @@ def copy_swift_conf(swift_configs):
                                     name_changer_process = subprocess.run(name_changer, shell=True)
                                 else:
                                     print(f"\033[91mconfigs in {container_name} failed to sync\033[0m")
+                                    exit(1)
                         elif diff_conf_result.stderr != "":
                             print("")
                             print(f"\033[91mWARNING: your config file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
+                            exit(1)
                     if each_scp_successful: 
                         all_scp_file_successful = True  
         else:
