@@ -23,7 +23,7 @@ def merge_csv(csv_file, output_directory, pairs_dict):
             if os.path.exists(f'{output_directory}/merged_info.csv'):
                 csv_data.to_csv(f'{output_directory}/merged_info.csv', index=False, mode='a', header=False)
             elif not os.path.exists(f'{output_directory}/merged_info.csv'):
-                csv_data.to_csv(f'{output_directory}/merged.csv', index=False, mode='w', header=True)
+                csv_data.to_csv(f'{output_directory}/merged_info.csv', index=False, mode='w', header=True)
         if os.path.exists(f'{output_directory}/merged.csv'):      
             csv_data.to_csv(f'{output_directory}/merged.csv', index=False, mode='a', header=False)
         elif not os.path.exists(f'{output_directory}/merged.csv'):
