@@ -20,6 +20,10 @@ def merge_csv(csv_file, output_directory, pairs_dict):
             all_values = list(pairs_dict.values())
             for key, value in zip(all_keys, all_values):
                 csv_data.insert(0, key, value) 
+            if os.path.exists(f'{output_directory}/merged_info.csv'):
+                csv_data.to_csv(f'{output_directory}/merged_info.csv', index=False, mode='a', header=False)
+            elif not os.path.exists(f'{output_directory}/merged_info.csv'):
+                csv_data.to_csv(f'{output_directory}/merged.csv', index=False, mode='w', header=True)
         if os.path.exists(f'{output_directory}/merged.csv'):      
             csv_data.to_csv(f'{output_directory}/merged.csv', index=False, mode='a', header=False)
         elif not os.path.exists(f'{output_directory}/merged.csv'):
