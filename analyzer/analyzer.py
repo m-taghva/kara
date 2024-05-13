@@ -17,7 +17,7 @@ def merge_csv(csv_file, output_directory, pairs_dict):
         csv_data = pd.read_csv(csv_file)
         if pairs_dict:  
             if not os.path.exists(f'{output_directory}/merged_info.csv'):
-                pd.DataFrame(pairs_dict, index=[0]).to_csv(f'{output_directory}/merged_info.csv', index=False)
+                pd.DataFrame(pairs_dict, index=[0]).to_csv(f'{output_directory}/merged_info.csv', index=False, mode='w', header=True)
             else:
                 pd.DataFrame(pairs_dict, index=[0]).to_csv(f'{output_directory}/merged_info.csv', index=False, mode='a', header=False)
             for key, value in pairs_dict.items():
