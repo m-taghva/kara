@@ -200,13 +200,14 @@ def mrbench_agent(config_params, config_file, config_output):
                     if conf_exist:
                         swift_keys = []
                         swift_values = []
-                        swift_pairs = os.path.basename(swift_configs[key]).split('#')
-                        for swift_pair in swift_pairs:
-                            if ':' in swift_pair:
-                                swift_pair_split = swift_pair.split(':')
-                                swift_keys.append(swift_pair_split[0])
-                                swift_values.append(swift_pair_split[1])
-                        data['swift_config'] = dict(zip(swift_keys, swift_values))
+                        for key in swift_configs:
+                            swift_pairs = os.path.basename(swift_configs[key]).split('#')
+                            for swift_pair in swift_pairs:
+                                if ':' in swift_pair:
+                                    swift_pair_split = swift_pair.split(':')
+                                    swift_keys.append(swift_pair_split[0])
+                                    swift_values.append(swift_pair_split[1])
+                            data['swift_config'] = dict(zip(swift_keys, swift_values))
                         subprocess.run(f"sudo cp -r {swift_configs[key]} {result_file_path}", shell=True)
                     test_keys = []
                     test_values = []
