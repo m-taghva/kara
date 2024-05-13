@@ -4,37 +4,42 @@ import os
 import pywikibot
 from bs4 import BeautifulSoup
 import logging
+import subprocess
+import csv
 
 #### make HTML template ####
-def read_template_file(template_file_path):
-    logging.info("Executing report_recorder read_template_file function")
-    with open(template_file_path, 'r') as template_file:
-        return template_file.read()
+def csv_to_html(csv_file):
+    html_csv = "<table border='1' class='wikitable'>\n"
+    with open(csv_file, 'r') as file:
+        csv_reader = csv.reader(file)
+        for i, row in enumerate(csv_reader):
+            html_csv += "<tr>\n"
+            tag = "th" if i == 0 else "td"
+            for column in row:
+                html_csv += f"<{tag}>{column}</{tag}>\n"
+            html_csv += "</tr>\n"
+    html_csv += "</table>"
+    return html_csv
 
-def create_html_template(template_content):
+def create_html_template(template_content, html_output):
     logging.info("Executing report_recorder create_html_template function")
     # Find all occurrences of {input_config} placeholders in the template
-    input_config_placeholders = re.finditer(r'{input_config}:(.+)', template_content)
-    # Iterate over the placeholders and replace them with content
-    for match in input_config_placeholders:
+    for match in re.finditer(r'{input_config}:(.+)', template_content):
+        # Iterate over the placeholders and replace them with content
         placeholder = match.group(0)
         file_path = match.group(1).strip()
-        input_config_content = read_file_content(file_path)
-        template_content = template_content.replace(placeholder, generate_p_tags(input_config_content))
-    return template_content
-
-def generate_p_tags(content):
-    logging.info("Executing report_recorder generate_p_tags function")
-    # Generate <p> tags for each line in the content
-    return "\n".join([f"<p>{line.strip()}</p>" for line in content])
-
-def read_file_content(file_path):
-    logging.info("Executing report_recorder read_file_content function")
-    try:
-        with open(file_path, 'r') as file:
-            return file.readlines()
-    except FileNotFoundError:
-        return [f"File not found: {file_path}"]
+        if '.csv' in os.path.basename(file_path):
+            html_csv = csv_to_html(file_path) 
+            html_data = html_csv
+        else:
+            with open(file_path, 'r') as file:
+                content_of_file = file.readlines()
+            for content_line in content_of_file:
+                html_data += f"<p>{content_line.replace(' ','&nbsp;')}</p>"
+    with open(html_output, 'w') as html_file:
+        html_file.write(html_data)
+        print(f"HTML template saved to: {html_output}")  
+    return html_data
 
 #### upload data and make wiki page ####
 def upload_data(site, title, content):
@@ -47,30 +52,21 @@ def upload_data(site, title, content):
     except pywikibot.exceptions.Error as e:
         logging.error(f"Error uploading page '{title}': {e}")
 
-def read_html_file(html_output):
-    logging.info("Executing report_recorder read_html_file function")
-    with open(html_output, 'r', encoding='utf-8') as file:
-        return file.read()
-
 def convert_html_to_wiki(html_content):
     logging.info("Executing report_recorder convert_html_to_wiki function")
-    # Use BeautifulSoup to parse the HTML
     soup = BeautifulSoup(html_content, 'html.parser')
     # Convert <a> tags to wiki links
     for a_tag in soup.find_all('a'):
         if 'href' in a_tag.attrs:
-            href = a_tag['href']
-            a_tag.replace_with(f'[{href}|{a_tag.text}]')
+            a_tag.replace_with(f"[{a_tag['href']}|{a_tag.text}]")
     # Convert <img> tags to wiki images
     for img_tag in soup.find_all('img'):
         if 'src' in img_tag.attrs:
-            src = img_tag['src']
-            img_tag.replace_with(f'[[File:{src}]]')
+            img_tag.replace_with(f"[[File:{img_tag['src']}]]")
     return str(soup)
 
 def upload_images(site, html_file_path):
     logging.info("Executing report_recorder upload_images function")
-    # Use BeautifulSoup to parse the HTML
     with open(html_file_path, 'r', encoding='utf-8') as file:
         soup = BeautifulSoup(file, 'html.parser')
     # Find image filenames in <img> tags
@@ -95,43 +91,50 @@ def upload_images(site, html_file_path):
         else:
             logging.warning(f"Image '{image_filename}' already exists on the wiki.")
 
-def main(input_template_file, html_output, page_title):
+def main(input_template, html_output, page_title, html_page, upload_operation, create_html):
     log_dir = f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && sudo chmod -R 777 /var/log/kara/"
     log_dir_run = subprocess.run(log_dir, shell=True)
     logging.basicConfig(filename= '/var/log/kara/all.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
     logging.info("\033[92m****** report_recorder main function start ******\033[0m")
-    # Read the HTML template from the user-specified file
-    template_content = read_template_file(input_template_file)
-    # Create HTML template
-    html_content = create_html_template(template_content)
-    # Save HTML file
-    with open(html_output, 'w') as html_file:
-        html_file.write(html_content)
-    print(f"HTML template saved to: {html_output}")
 
-    # Set up the wiki site
-    site = pywikibot.Site()
-    # Login if necessary
-    site.login()
-    # Read HTML file
-    html_content = read_html_file(html_output)
-    # Convert HTML to wiki format
-    wiki_content = convert_html_to_wiki(html_content)
-    # Upload converted data to the wiki
-    upload_data(site, page_title, wiki_content)
-    # Upload images to the wiki
-    upload_images(site, html_output)
+    if create_html:
+        with open(input_template, 'r') as template_content:
+            # Create HTML template
+            create_html_template(template_content.read(), html_output)
+
+    if upload_operation:
+        # Set up the wiki site
+        site = pywikibot.Site()
+        site.login()
+        with open(html_page, 'r', encoding='utf-8') as file:
+            html_content = file.read()
+        wiki_content = convert_html_to_wiki(html_content)
+        # Upload converted data to the wiki
+        upload_data(site, page_title, wiki_content)
+        # Upload images to the wiki
+        upload_images(site, html_page)
     logging.info("\033[92m****** report_recorder main function end ******\033[0m")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate HTML report with links to input text files.")
-    parser.add_argument("-it", "--input_template", required=True, help="Template HTML file path.")
-    parser.add_argument("-oh", "--html_output", required=True, help="Output HTML file path.")
-    parser.add_argument("-kt", "--page_title", required=True, help="Kateb page title.")
+    parser = argparse.ArgumentParser(description="Generate report for kateb")
+    parser.add_argument("-i", "--input_template", help="Template HTML file path.")
+    parser.add_argument("-o", "--html_output", help="Output HTML file name")
+    parser.add_argument("-p", "--html_page", help="HTML template for upload")
+    parser.add_argument("-t", "--page_title", help="Kateb page title.")
+    parser.add_argument("-U", "--upload_operation", action='store_true', help="upload page to kateb")
+    parser.add_argument("-H", "--create_html", action='store_true', help="create HTML page template")
     args = parser.parse_args()
-    input_template_file = args.input_template
+    if args.upload_operation and (args.html_page is None or args.page_title is None):
+        print("Error: Both -p (--html_page) and -t (--page_title) switches are required for upload operation -U")
+        exit(1)
+    if args.create_html and (args.input_template is None or args.html_output is None):
+        print("Error: Both -i (--input_template) and -o (--html_output) switches are required for generate HTML operation -H")
+        exit(1)
+    input_template = args.input_template 
     html_output = args.html_output
-    page_title = args.page_title
-
-    main(input_template_file, html_output, page_title)
+    page_title = args.page_title 
+    html_page = args.html_page
+    upload_operation = args.upload_operation
+    create_html = args.create_html
+    main(input_template, html_output, page_title, html_page, upload_operation, create_html)
