@@ -196,20 +196,20 @@ def mrbench_agent(config_params, config_file, config_output):
                 logging.info(f"manager:mrbench_agent: test config path in mrbench_agent submit function is : {test_config_path}")
                 start_time, end_time, result_file_path = mrbench.submit(test_config_path, result_dir)
                 subprocess.run(f"sudo cp -r {test_config_path} {result_file_path}", shell=True)
-                print(test_config_path)
-                subprocess.run(f"sudo cp -r {swift_configs[key]} {result_file_path} && sudo cp -r {swift_rings[filename]} {result_file_path}", shell=True)
                 if '#' in test_config or ':' in test_config:    
                     data = {}
                     data['Time'] = f"{start_time},{end_time}"
-                    swift_keys = []
-                    swift_values = []
-                    swift_pairs = os.path.basename(swift_configs[key]).split('#')
-                    for swift_pair in swift_pairs:
-                        if ':' in swift_pair:
-                            swift_pair_split = swift_pair.split(':')
-                            swift_keys.append(swift_pair_split[0])
-                            swift_values.append(swift_pair_split[1])
-                    data['swift_config'] = dict(zip(swift_keys, swift_values))
+                    if conf_exist:
+                        swift_keys = []
+                        swift_values = []
+                        swift_pairs = os.path.basename(swift_configs[key]).split('#')
+                        for swift_pair in swift_pairs:
+                            if ':' in swift_pair:
+                                swift_pair_split = swift_pair.split(':')
+                                swift_keys.append(swift_pair_split[0])
+                                swift_values.append(swift_pair_split[1])
+                        data['swift_config'] = dict(zip(swift_keys, swift_values))
+                        subprocess.run(f"sudo cp -r {swift_configs[key]} {result_file_path}", shell=True)
                     test_keys = []
                     test_values = []
                     test_pairs = test_config.split('#')
@@ -221,20 +221,21 @@ def mrbench_agent(config_params, config_file, config_output):
                     data['workload_config'] = dict(zip(test_keys, test_values))
                     with open(os.path.join(result_file_path, 'info.yaml'), 'w') as yaml_file:
                         yaml.dump(data, yaml_file, default_flow_style=False)
-                if ring_dict:
+                if ring_exist:
                     data_ring = {'ring_config': ring_dict}
+                    subprocess.run(f"sudo cp -r {swift_rings[filename]} {result_file_path}", shell=True)
                     with open(os.path.join(result_file_path, 'info.yaml'), 'a') as yaml_file:
                         yaml.dump(data_ring, yaml_file, default_flow_style=False)
-                merge_data = {**data, **data_ring}
+                    data = {**data, **data_ring}
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter != 'none':
                     if run_status_reporter == 'csv':
                         output_csv  = status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=False)
                     if run_status_reporter == 'csv,img':
                         output_csv = status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)
-                    if os.path.exists(output_csv):
+                    if os.path.exists(output_csv): 
                         formatted_data = {}
-                        for section_name, section_data in merge_data.items():
+                        for section_name, section_data in data.items():
                             if isinstance(section_data, dict):
                                 for name, val in section_data.items():
                                     formatted_data[f"{section_name}.{name}"] = val
