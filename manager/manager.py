@@ -139,10 +139,8 @@ def mrbench_agent(config_params, config_file, config_output):
         else:
             break
     print(f"{YELLOW}========================================{RESET}")
-    if os.path.exists(f'{result_dir}/analyzed/merged.csv'):
-        remove_csv = subprocess.run(f"rm {result_dir}/analyzed/merged.csv", shell=True)
     # make empty dir for merging csv
-    elif not os.path.exists(f"{result_dir}/analyzed/"):
+    if not os.path.exists(f"{result_dir}/analyzed/"):
         make_analyzed_dir = subprocess.run(f"sudo mkdir {result_dir}/analyzed/ > /dev/null 2>&1", shell=True)
     if config_output is None:
         if(config_params.get('conf_dir')):
