@@ -154,10 +154,9 @@ def mrbench_agent(config_params, config_file, config_output):
         dir_path = os.path.join(config_output, dir_name)
         conf_dict[dir_name] = dir_path
     logging.debug(f"manager:mrbench_agent: conf_dict: {conf_dict}")
-    Total_index = 1
     conf_exist = 0
     swift_configs = {}
-    if '.xml' not in os.path.basename(dir_path):
+    if conf_dict["workloads.xml"] is None:
         logging.critical("There isn't any workload in mrbench_agent input config dictionary")
         print(f"\033[91mThere isn't any workload !\033[0m")
         exit()
@@ -174,6 +173,7 @@ def mrbench_agent(config_params, config_file, config_output):
             for filename in os.listdir(ring_dirs[ri]):
                 file_path = os.path.join(ring_dirs[ri], filename)
                 swift_rings[filename] = file_path
+        Total_index = 1
         for key in conf_dict:
             if key != "workloads.xml" and key is not None and os.listdir(conf_dict[key]):
                 Total_index *=len(os.listdir(conf_dict[key]))
