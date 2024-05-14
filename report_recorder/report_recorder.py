@@ -8,6 +8,14 @@ import subprocess
 import csv
 
 #### make HTML template ####
+def dict_to_html(dict):
+    html_dict = "<table border='1' class='wikitable'>\n"
+    html_dict += "<tr><th>product_name</th><th>servers</th></tr>\n"
+    for key, value in dict.items():
+        html_dict += f"<tr><td>{key}</td><td>{value}</td></tr>\n"
+    html_dict += "</table>"
+    return html_dict
+
 def csv_to_html(csv_file):
     html_csv = "<table border='1' class='wikitable'>\n"
     with open(csv_file, 'r') as file:
@@ -97,13 +105,11 @@ def main(input_template, html_output, page_title, html_page, upload_operation, c
     log_dir = f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && sudo chmod -R 777 /var/log/kara/"
     log_dir_run = subprocess.run(log_dir, shell=True)
     logging.basicConfig(filename= '/var/log/kara/all.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-
     logging.info("\033[92m****** report_recorder main function start ******\033[0m")
     if create_html:
         with open(input_template, 'r') as template_content:
             # Create HTML template
             create_html_template(template_content.read(), html_output)
-
     if upload_operation:
         # Set up the wiki site
         site = pywikibot.Site()
