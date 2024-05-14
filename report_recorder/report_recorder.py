@@ -11,8 +11,7 @@ import csv
 def csv_to_html(csv_file):
     html_csv = "<table border='1' class='wikitable'>\n"
     with open(csv_file, 'r') as file:
-        csv_reader = csv.reader(file)
-        for i, row in enumerate(csv_reader):
+        for i, row in enumerate(csv.reader(file)):
             html_csv += "<tr>\n"
             tag = "th" if i == 0 else "td"
             for column in row:
@@ -23,6 +22,7 @@ def csv_to_html(csv_file):
 
 def create_html_template(template_content, html_output):
     logging.info("Executing report_recorder create_html_template function")
+    html_data = template_content # for replace placeholder with content of files
     # Find all occurrences of {input_config} placeholders in the template
     for match in re.finditer(r'{input_config}:(.+)', template_content):
         # Iterate over the placeholders and replace them with content
@@ -30,12 +30,14 @@ def create_html_template(template_content, html_output):
         file_path = match.group(1).strip()
         if '.csv' in os.path.basename(file_path):
             html_csv = csv_to_html(file_path) 
-            html_data = html_csv
+            html_data = html_data.replace(placeholder, html_csv)
         else:
             with open(file_path, 'r') as file:
                 content_of_file = file.readlines()
+            html_content = ""
             for content_line in content_of_file:
-                html_data += f"<p>{content_line.replace(' ','&nbsp;')}</p>"
+                html_content += f"<p>{content_line.replace(' ','&nbsp;')}</p>"
+            html_data = html_data.replace(placeholder, html_content)
     with open(html_output, 'w') as html_file:
         html_file.write(html_data)
         print(f"HTML template saved to: {html_output}")  
@@ -97,7 +99,6 @@ def main(input_template, html_output, page_title, html_page, upload_operation, c
     logging.basicConfig(filename= '/var/log/kara/all.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
     logging.info("\033[92m****** report_recorder main function start ******\033[0m")
-
     if create_html:
         with open(input_template, 'r') as template_content:
             # Create HTML template
