@@ -300,10 +300,10 @@ def status_analyzer_agent(config_params):
     analyze_csv = config_params.get('analyze_csv')
     transform_dir = config_params.get('transform')
     if merge:
-        analyzer.main(merge=True, output_directory=result_dir, selected_csv=merge_csv)
+        analyzer.main(merge=True, analyze=False, graph=False, csv_original=False, output_directory=result_dir, selected_csv=merge_csv, x_column=False, y_column=False)
         time.sleep(10)
     if analyze:
-        analyzer.main(analyze=True, csv_original=f"{result_dir}/{analyze_csv}", transformation_directory=transform_dir)
+        analyzer.main(merge=False, analyze=True, graph=False, csv_original=f"{result_dir}/{analyze_csv}", output_directory=False, transformation_directory=transform_dir, x_column=False, y_column=False)
 
 def report_recorder_agent(config_params):
     input_template = config_params.get('input_template')
