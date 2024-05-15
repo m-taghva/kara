@@ -17,7 +17,7 @@ def load(directory):
 
 #dmidecode -t 1
 def generate_brand_model(serverName):
-    result = load(serverName + "/hardware/server-manufacturer/dmidecode.txt")
+    result = load(f'/configs/{serverName}' + "/hardware/server-manufacturer/dmidecode.txt")
     manufacturer = ""
     productName = ""
     for line in result:
@@ -29,7 +29,7 @@ def generate_brand_model(serverName):
 
 # lscpu
 def generate_cpu_model(serverName):
-    result= load(serverName+"/hardware/cpu/lscpu.txt")
+    result= load(f'/configs/{serverName}' + "/hardware/cpu/lscpu.txt")
     coresPerSocket = ""
     socket = ""
     threads = ""
@@ -51,7 +51,7 @@ def generate_cpu_model(serverName):
 
 # lshw -short -C memory
 def generate_ram_model(serverName):
-    result = load(serverName + "/hardware/ram/lshw-brief.txt")
+    result = load(f'/configs/{serverName}' + "/hardware/ram/lshw-brief.txt")
     rams=[]
     for line in result:
         line = line.replace("  " , "")
@@ -68,7 +68,7 @@ def generate_ram_model(serverName):
 
 # lshw -json -C net
 def generate_net_model(serverName):
-    result = load(serverName + "/hardware/net/lshw.txt")
+    result = load(f'/configs/{serverName}' + "/hardware/net/lshw.txt")
     #print(result)
     Flag = False
     nets=[]
@@ -94,7 +94,7 @@ def generate_net_model(serverName):
 
 #dmidecode -t 2
 def generate_motherboard_model(serverName):
-    result = load(serverName + "/hardware/motherboard/dmidecode.txt")
+    result = load(f'/configs/{serverName}' + "/hardware/motherboard/dmidecode.txt")
     manufacturer = ""
     productName = ""
     for line in result:
@@ -105,7 +105,7 @@ def generate_motherboard_model(serverName):
     return manufacturer + productName
 
 def generate_disk_model(serverName):
-    result = load(serverName + "/hardware/disk/lshw-brief.txt")
+    result = load(f'/configs/{serverName}' + "/hardware/disk/lshw-brief.txt")
     disks= []
     for line in result:
         if "disk" in line:
@@ -134,7 +134,7 @@ def generate_model(server ,part ,spec):
         return "software not config"
 
 def compare(part ,spec):
-    cmd = ["ls" , directoryOfConfigs]
+    cmd = ["ls" , f'{configs_dir}/configs']
     result = subprocess.run(cmd, stdout=subprocess.PIPE, text=True)
     listOfServers = result.stdout.split("\n")
     listOfServers.pop()
@@ -179,6 +179,8 @@ def create_html_template(template_content, html_output):
         # Iterate over the placeholders and replace them with content
         address_placeholder = match.group(0)
         file_path = match.group(1).strip()
+        if '{backup_dir}' in file_path:
+            file_path = file_path.replace('{backup_dir}', configs_dir)
         if '.csv' in os.path.basename(file_path):
             html_csv = csv_to_html(file_path) 
             html_data = html_data.replace(address_placeholder, html_csv)
