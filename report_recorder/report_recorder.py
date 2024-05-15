@@ -6,6 +6,149 @@ from bs4 import BeautifulSoup
 import logging
 import subprocess
 import csv
+from collections import Counter
+import subprocess
+
+configs_dir = ""
+def load(directory):
+    with open(configs_dir + directory, 'r') as f:
+        content = f.readlines()
+    return content
+
+#dmidecode -t 1
+def generate_brand_model(serverName):
+    result = load(serverName + "/hardware/server-manufacturer/dmidecode.txt")
+    manufacturer = ""
+    productName = ""
+    for line in result:
+        if "Manufacturer" in line:
+            manufacturer = line.split(":")[1].replace("\n" , "")
+        if "Product Name" in line:
+            productName = line.split(":")[1].replace("\n" , "")
+    return manufacturer + productName
+
+# lscpu
+def generate_cpu_model(serverName):
+    result= load(serverName+"/hardware/cpu/lscpu.txt")
+    coresPerSocket = ""
+    socket = ""
+    threads = ""
+    model = ""
+    for line in result:
+        line = line.replace("  " , "").replace("\n","").split(":")
+        #print(line)
+        if "Core(s) per socket" in line[0]:
+            #print (line)
+            coresPerSocket=line[1]
+            #print ("("+  coresPerSocket+ ")")
+        if "Socket(s)" in line[0]:
+            socket=line[1]
+        if "Thread(s) per core" in line[0]:
+            threads = line[1]
+        if "Model name" in line[0]:
+            model = line[1]
+    return coresPerSocket + " cores x " + socket + " sockets x " + threads + " threads " + model
+
+# lshw -short -C memory
+def generate_ram_model(serverName):
+    result = load(serverName + "/hardware/ram/lshw-brief.txt")
+    rams=[]
+    for line in result:
+        line = line.replace("  " , "")
+        if "DIMM" in line:
+            if "empty" not in line:
+                model = line.split("memory ")[1]
+                rams.append(model)
+                #print (model)
+    counts = Counter(rams)
+    ram = ""
+    for item , count in counts.items():
+        ram+= str(count) + " " + item
+    return ram
+
+# lshw -json -C net
+def generate_net_model(serverName):
+    result = load(serverName + "/hardware/net/lshw.txt")
+    #print(result)
+    Flag = False
+    nets=[]
+    capacities = []
+    for line in result:
+        line = line.replace(",\n" , "")
+        if "id" in line:
+            Flag = True
+        if Flag is True:
+            if "product" in line:
+                nets.append( line.split(":")[1].replace("" , ""))
+            if "capacity" in line:
+                capacities.append(line.split(":")[1].replace("000000000" , "")+"Gbit/s")
+                Flag = False
+    netModel=[]
+    for i in range(len(nets)):
+        netModel.append(capacities[i] + " " + nets[i])
+    counts = Counter(netModel)
+    net = ""
+    for item, count in counts.items():
+        net += str(count) + " " + item + "\n"
+    return net
+
+#dmidecode -t 2
+def generate_motherboard_model(serverName):
+    result = load(serverName + "/hardware/motherboard/dmidecode.txt")
+    manufacturer = ""
+    productName = ""
+    for line in result:
+        if "Manufacturer" in line:
+            manufacturer = line.split(":")[1].replace("\n", "")
+        if "Product Name" in line:
+            productName = line.split(":")[1].replace("\n", "")
+    return manufacturer + productName
+
+def generate_disk_model(serverName):
+    result = load(serverName + "/hardware/disk/lshw-brief.txt")
+    disks= []
+    for line in result:
+        if "disk" in line:
+            disks.append(line.split("disk")[1].replace("  " , "").replace("\n" , ""))
+    counts = Counter(disks)
+    disksNames =""
+    for item , count in counts.items():
+        disksNames += str (count) + item + "\n"
+    return disksNames
+
+def generate_model(server ,part ,spec):
+    if part == "hardware":
+        if spec == "cpu":
+            return generate_cpu_model(server)
+        elif spec == "ram":
+            return generate_ram_model(server)
+        elif spec == "net":
+            return generate_net_model(server)
+        elif spec == "motherboard":
+            return generate_motherboard_model(server)
+        elif spec == "brand":
+            return generate_brand_model(server)
+        elif spec == "disk":
+            return generate_disk_model(server)
+    elif part == "software":
+        return "software not config"
+
+def compare(part ,spec):
+    cmd = ["ls" , directoryOfConfigs]
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, text=True)
+    listOfServers = result.stdout.split("\n")
+    listOfServers.pop()
+    #print(listOfServers)
+    dict = {}
+    for server in listOfServers:
+        #print(server)
+        model= generate_model(server ,part ,spec)
+        if model in dict:
+            if dict[model] is None:
+                dict[model] = []
+        else: dict[model]= []
+        dict[model].append(server)
+    return dict
 
 #### make HTML template ####
 def dict_to_html(dict):
@@ -34,18 +177,24 @@ def create_html_template(template_content, html_output):
     # Find all occurrences of {input_config} placeholders in the template
     for match in re.finditer(r'{input_config}:(.+)', template_content):
         # Iterate over the placeholders and replace them with content
-        placeholder = match.group(0)
+        address_placeholder = match.group(0)
         file_path = match.group(1).strip()
         if '.csv' in os.path.basename(file_path):
             html_csv = csv_to_html(file_path) 
-            html_data = html_data.replace(placeholder, html_csv)
+            html_data = html_data.replace(address_placeholder, html_csv)
         else:
             with open(file_path, 'r') as file:
                 content_of_file = file.readlines()
             html_content = ""
             for content_line in content_of_file:
                 html_content += f"<p>{content_line.replace(' ','&nbsp;')}</p>"
-            html_data = html_data.replace(placeholder, html_content)
+            html_data = html_data.replace(address_placeholder, html_content)
+    for config_info in re.finditer(r'{server_config}:(.+)', template_content):
+        config_placeholder = config_info.group(0)
+        part,spec = config_info.group(1).split(',')
+        dict = compare(part.strip(), spec.strip())
+        html_dict = dict_to_html(dict)
+        html_data = html_data.replace(config_placeholder, html_dict)
     with open(html_output, 'w') as html_file:
         html_file.write(html_data)
         print(f"HTML template saved to: {html_output}")  
@@ -101,12 +250,15 @@ def upload_images(site, html_file_path):
         else:
             logging.warning(f"Image '{image_filename}' already exists on the wiki.")
 
-def main(input_template, html_output, page_title, html_page, upload_operation, create_html):
+def main(input_template, html_output, page_title, html_page, directoryOfConfigs, upload_operation, create_html):
+    global configs_dir
     log_dir = f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && sudo chmod -R 777 /var/log/kara/"
     log_dir_run = subprocess.run(log_dir, shell=True)
     logging.basicConfig(filename= '/var/log/kara/all.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
     logging.info("\033[92m****** report_recorder main function start ******\033[0m")
     if create_html:
+        if os.path.exists(directoryOfConfigs):
+            configs_dir = directoryOfConfigs
         with open(input_template, 'r') as template_content:
             # Create HTML template
             create_html_template(template_content.read(), html_output)
@@ -123,25 +275,28 @@ def main(input_template, html_output, page_title, html_page, upload_operation, c
         upload_images(site, html_page)
     logging.info("\033[92m****** report_recorder main function end ******\033[0m")
 
+directoryOfConfigs = ""
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate report for kateb")
-    parser.add_argument("-i", "--input_template", help="Template HTML file path.")
+    parser.add_argument("-i", "--input_template", help="Template HTML file path")
     parser.add_argument("-o", "--html_output", help="Output HTML file name")
     parser.add_argument("-p", "--html_page", help="HTML template for upload")
     parser.add_argument("-t", "--page_title", help="Kateb page title.")
     parser.add_argument("-U", "--upload_operation", action='store_true', help="upload page to kateb")
     parser.add_argument("-H", "--create_html", action='store_true', help="create HTML page template")
+    parser.add_argument("-tc", "--directoryOfConfigs", help="directory of test configs")
     args = parser.parse_args()
     if args.upload_operation and (args.html_page is None or args.page_title is None):
         print("Error: Both -p (--html_page) and -t (--page_title) switches are required for upload operation -U")
         exit(1)
-    if args.create_html and (args.input_template is None or args.html_output is None):
-        print("Error: Both -i (--input_template) and -o (--html_output) switches are required for generate HTML operation -H")
+    if args.create_html and (args.input_template is None or args.html_output is None or args.directoryOfConfigs is None):
+        print("Error: these switch -i (--input_template) and -o (--html_output) and -tc (--directoryOfConfigs) are required for generate HTML operation -H")
         exit(1)
     input_template = args.input_template 
     html_output = args.html_output
     page_title = args.page_title 
     html_page = args.html_page
+    directoryOfConfigs = args.directoryOfConfigs
     upload_operation = args.upload_operation
     create_html = args.create_html
-    main(input_template, html_output, page_title, html_page, upload_operation, create_html)
+    main(input_template, html_output, page_title, html_page, directoryOfConfigs, upload_operation, create_html)
