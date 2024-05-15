@@ -209,7 +209,7 @@ def upload_data(site, page_title, wiki_content):
         page = pywikibot.Page(site, page_title)
         if not page.exists():
             page.text = wiki_content
-            page.save("Uploaded data using KARA")
+            page.save("Uploaded by KARA")
             #page.save(" برچسب: [[مدیاویکی:Visualeditor-descriptionpagelink|ویرایش‌گر دیداری]]")
             logging.info(f"Page '{page_title}' uploaded successfully.")
         else:
@@ -282,7 +282,6 @@ def main(input_template, html_output, page_title, html_page, directoryOfConfigs,
         upload_images(site, html_page)
     logging.info("\033[92m****** report_recorder main function end ******\033[0m")
 
-directoryOfConfigs = ""
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate report for kateb")
     parser.add_argument("-i", "--input_template", help="Template HTML file path")
