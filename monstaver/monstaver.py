@@ -721,9 +721,9 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
             else:
                 logging.info("monstaver can't connect to monster cloud storage")
                 print("\033[91mmonstaver can't connect to monster cloud storage\033[0m") 
-    backup_to_report = f"{backup_dir}/{time_dir_name}"
+    backup_to_report = f"{backup_dir}/{time_dir_name}/configs"
     return backup_to_report
-    
+
 def main(time_range, inputs, delete, backup_restore, hardware_info, os_info, swift_info, influx_backup):
     log_level = load_config(config_file)['log'].get('level')
     if log_level is not None:
@@ -735,14 +735,14 @@ def main(time_range, inputs, delete, backup_restore, hardware_info, os_info, swi
             print(f"\033[91mInvalid log level:{log_level}\033[0m")  
     else:
         print(f"\033[91mPlease enter log_level in the configuration file.\033[0m")
-    logging.info("\033[92m****** Monstaver main function start ******\033[0m")
+    logging.info("****** Monstaver main function start ******")
     data_loaded = load_config(config_file)
     if backup_restore: 
         restore(data_loaded)
+        return None
     else:
-        backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swift_info, influx_backup)
-    logging.info("\033[92m****** Monstaver main function end ******\033[0m")
-
+        return backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swift_info, influx_backup)
+    
 if __name__ == "__main__":
     # Command-line argument parsing
     argParser = argparse.ArgumentParser()
