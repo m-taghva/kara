@@ -203,15 +203,19 @@ def create_html_template(template_content, html_output):
     return html_data
 
 #### upload data and make wiki page ####
-def upload_data(site, title, content):
+def upload_data(site, page_title, wiki_content):
     logging.info("Executing report_recorder upload_data function")
     try:
-        page = pywikibot.Page(site, title)
-        page.text = content
-        page.save("Uploaded data using Pywikibot")
-        logging.info(f"Page '{title}' uploaded successfully.")
+        page = pywikibot.Page(site, page_title)
+        if not page.exists():
+            page.text = wiki_content
+            page.save("Uploaded data using Pywikibot")
+            logging.info(f"Page '{page_title}' uploaded successfully.")
+        else:
+            print(f"Page '{page_title}' already exists on the wiki.")
+            logging.warning(f"Page '{page_title}' already exists on the wiki.")
     except pywikibot.exceptions.Error as e:
-        logging.error(f"Error uploading page '{title}': {e}")
+        logging.error(f"Error uploading page '{page_title}': {e}")
 
 def convert_html_to_wiki(html_content):
     logging.info("Executing report_recorder convert_html_to_wiki function")
