@@ -451,8 +451,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/motherboard/ ; "
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/server-manufacturer ; "
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/os/{container_name}-etc-host/ ; " 
-            mkdir_hwoss_output += f"sudo mkdir -p  {backup_dir}/{time_dir_name}/configs/{container_name}/software/os/{container_name}-etc-container/ ; "
-
+            mkdir_hwoss_output += f"sudo mkdir -p  {backup_dir}/{time_dir_name}/configs/{container_name}/software/os/{container_name}-etc-container/  "
             mkdir_hwoss_process = subprocess.run(mkdir_hwoss_output, shell=True)
             if mkdir_hwoss_process.returncode == 0:
                 logging.info("monstaver - make hardware/os/swift sub directories successful")
@@ -473,7 +472,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                 get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/account.ring.gz > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/{container_name}-account-ring.txt ; "
                 get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/container.ring.gz > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/{container_name}-container-ring.txt ; "
                 get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/object.ring.gz > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/{container_name}-object-ring.txt ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/{container_name}-object-server.conf "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/{container_name}-object-server.conf ; "
                 get_swift_conf += f"ssh -p {port} {user}@{ip} docker inspect {container_name} > {backup_dir}/{time_dir_name}/configs/{container_name}/software/os/{container_name}-docker-inspect.txt "
                 get_swift_conf_process = subprocess.run(get_swift_conf, shell=True)
                 if get_swift_conf_process.returncode == 0:
