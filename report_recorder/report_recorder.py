@@ -68,7 +68,7 @@ def generate_ram_model(serverName):
 
 # lshw -json -C net
 def generate_net_model(serverName):
-    result = load(f'/configs/{serverName}' + "/hardware/net/lshw.txt")
+    result = load(f'/configs/{serverName}' + "/hardware/net/lshw-json.txt")
     #print(result)
     Flag = False
     nets=[]
@@ -104,6 +104,7 @@ def generate_motherboard_model(serverName):
             productName = line.split(":")[1].replace("\n", "")
     return manufacturer + productName
 
+# lshw -short -C disk
 def generate_disk_model(serverName):
     result = load(f'/configs/{serverName}' + "/hardware/disk/lshw-brief.txt")
     disks= []
@@ -112,8 +113,8 @@ def generate_disk_model(serverName):
             disks.append(line.split("disk")[1].replace("  " , "").replace("\n" , ""))
     counts = Counter(disks)
     disksNames =""
-    for item , count in counts.items():
-        disksNames += str (count) + item + "\n"
+    for item, count in counts.items():
+        disksNames += str(count) + item + "\n"
     return disksNames
 
 def generate_model(server ,part ,spec):
@@ -195,6 +196,7 @@ def create_html_template(template_content, html_output):
         config_placeholder = config_info.group(0)
         part,spec = config_info.group(1).split(',')
         dict = compare(part.strip(), spec.strip())
+        print(dict)
         html_dict = dict_to_html(dict)
         html_data = html_data.replace(config_placeholder, html_dict)
     with open(html_output, 'w') as html_file:
@@ -208,8 +210,8 @@ def upload_data(site, page_title, wiki_content):
     try:
         page = pywikibot.Page(site, page_title)
         if not page.exists():
-            page.text = wiki_content
-            page.save(summary="Uploaded by KARA", force=True, quiet=False, botflag=False)
+            page.text = wiki_content + "\n powered by KARA"
+            page.save(summary="Uploaded by KARA", force=True, quiet=True, botflag=True)
             #page.save(" برچسب: [[مدیاویکی:Visualeditor-descriptionpagelink|ویرایش‌گر دیداری]]")
             logging.info(f"Page '{page_title}' uploaded successfully.")
         else:
@@ -248,7 +250,7 @@ def upload_images(site, html_file_path):
             if file_page.exists():
                 raise ValueError("File already exists!")
             # Upload the file
-            success = file_page.upload(image_path, comment=f"Uploaded image '{image_filename}' using KARA")
+            success = file_page.upload(image_path, comment=f"Uploaded image '{image_filename}' using Pywikibot")
             if success:
                 print(f"File uploaded successfully! File page: {file_page.full_url()}")
             else:
@@ -282,6 +284,7 @@ def main(input_template, html_output, page_title, html_page, directoryOfConfigs,
         upload_images(site, html_page)
     logging.info("\033[92m****** report_recorder main function end ******\033[0m")
 
+directoryOfConfigs = ""
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate report for kateb")
     parser.add_argument("-i", "--input_template", help="Template HTML file path")
