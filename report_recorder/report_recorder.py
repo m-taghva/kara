@@ -209,7 +209,7 @@ def upload_data(site, page_title, wiki_content):
         page = pywikibot.Page(site, page_title)
         if not page.exists():
             page.text = wiki_content
-            page.save(summary="Uploaded by KARA", force=True, quiet=True, botflag=True)
+            page.save(summary="Uploaded by KARA", force=True, quiet=False, botflag=False)
             #page.save(" برچسب: [[مدیاویکی:Visualeditor-descriptionpagelink|ویرایش‌گر دیداری]]")
             logging.info(f"Page '{page_title}' uploaded successfully.")
         else:
@@ -248,7 +248,7 @@ def upload_images(site, html_file_path):
             if file_page.exists():
                 raise ValueError("File already exists!")
             # Upload the file
-            success = file_page.upload(image_path, comment=f"Uploaded image '{image_filename}' using Pywikibot")
+            success = file_page.upload(image_path, comment=f"Uploaded image '{image_filename}' using KARA")
             if success:
                 print(f"File uploaded successfully! File page: {file_page.full_url()}")
             else:
