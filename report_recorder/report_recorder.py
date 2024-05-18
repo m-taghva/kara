@@ -209,7 +209,7 @@ def upload_data(site, page_title, wiki_content):
         page = pywikibot.Page(site, page_title)
         if not page.exists():
             page.text = wiki_content
-            page.save("Uploaded by KARA")
+            page.save(summary="Uploaded by KARA", force=True, quiet=True, botflag=True)
             #page.save(" برچسب: [[مدیاویکی:Visualeditor-descriptionpagelink|ویرایش‌گر دیداری]]")
             logging.info(f"Page '{page_title}' uploaded successfully.")
         else:
