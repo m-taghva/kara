@@ -154,9 +154,15 @@ def compare(part ,spec):
 #### make HTML template ####
 def dict_to_html(dict):
     html_dict = "<table border='1' class='wikitable'>\n"
-    html_dict += "<tr><th>product_name</th><th>servers</th></tr>\n"
+    html_dict += "<tr><th> نام سرور </th><th> برند و مدل </th></tr>\n"
     for key, value in dict.items():
-        html_dict += f"<tr><td>{key}</td><td>{value}</td></tr>\n"
+        key_str = ''.join(key)
+        formatted_key = key_str.replace(' ', '_')
+        if isinstance(value, list):
+            value_str = ','.join(value)
+        else:
+            value_str = str(value)
+        html_dict += f"<tr><td>{value_str}</td><td>{formatted_key}</td></tr>\n"
     html_dict += "</table>"
     return html_dict
 
