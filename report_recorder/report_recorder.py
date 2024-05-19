@@ -64,7 +64,7 @@ def generate_ram_model(serverName):
 
 # lshw -json -C net
 def generate_net_model(serverName):
-    result = load(f'/configs/{serverName}' + "/hardware/net/lshw-json.txt")
+    result = load(f'/configs/{serverName}' + "/hardware/net/lshw.txt")
     #print(result)
     Flag = False
     nets=[]
