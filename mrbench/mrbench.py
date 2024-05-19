@@ -57,7 +57,7 @@ def copy_swift_conf(swift_configs):
                 inspect_value = container_info[0]['Config']['Labels'][key_to_extract]
                 for filename, filepath in swift_configs.items(): 
                     each_scp_successful = False 
-                    if filename.endswith(".gz") or filename.endswith(".builder"):
+                    if filename.endswith(".gz"):
                         diff_ring_command = f"ssh -p {port} {user}@{ip} 'sudo cat {inspect_value}/rings/{filename}' | diff - {filepath}"
                         diff_ring_result = subprocess.run(diff_ring_command, shell=True, capture_output=True, text=True)
                         print("")
@@ -85,11 +85,10 @@ def copy_swift_conf(swift_configs):
                                     print(f"\033[92mcopy ring file [ {filename} ] to {container_name} successful\033[0m")
                                 else: 
                                     print(f"\033[91mrings in {container_name} failed to sync\033[0m")
-                                    exit(1)
                         elif diff_ring_result.stderr != "":
                             print("")
                             print(f"\033[91mWARNING: your ring file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
-                            exit(1)
+                            #exit(1)
                     elif filename.endswith(".conf"):
                         diff_conf_command = f"ssh -p {port} {user}@{ip} 'sudo cat {inspect_value}/{filename}' | diff - {filepath}"
                         diff_conf_result = subprocess.run(diff_conf_command, shell=True, capture_output=True, text=True)
@@ -112,11 +111,10 @@ def copy_swift_conf(swift_configs):
                                     name_changer_process = subprocess.run(name_changer, shell=True)
                                 else:
                                     print(f"\033[91mconfigs in {container_name} failed to sync\033[0m")
-                                    exit(1)
                         elif diff_conf_result.stderr != "":
                             print("")
                             print(f"\033[91mWARNING: your config file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
-                            exit(1)
+                            #exit(1)
                     if each_scp_successful: 
                         all_scp_file_successful = True  
         else:
@@ -144,7 +142,7 @@ def copy_swift_conf(swift_configs):
                 print(f"\033[91mcontainer {container_name} failed to reatsrt\033[0m")
     print(f"{YELLOW}========================================{RESET}")
     return ring_dict 
-    
+
 def submit(workload_config_path, output_path):
     logging.info("Executing mrbench submit function")
     if not os.path.exists(output_path):
@@ -183,14 +181,12 @@ def submit(workload_config_path, output_path):
                 if "Total: 0 active workloads" in active_workload_check.stdout:
                     time.sleep(5) 
                     break
-            if os.path.exists(archive_file_path):   
-                result_path = create_test_dir(output_path, workload_name)
-                archive_workload_dir_name = f"{workload_id}-swift-sample"
+            if os.path.exists(archive_file_path):
+                archive_workload_dir_name = f"{workload_id}-swift-sample"  
+                start_time, end_time = save_time(f"{archive_path}{archive_workload_dir_name}/{archive_workload_dir_name}.csv")
+                result_path = create_test_dir(output_path, start_time, end_time)
                 print(f"Result Path: {result_path}")
-                cosbench_info = f"cosbench info > {result_path}/cosbench.info"
-                cosbench_info_result = subprocess.run(cosbench_info, shell=True, capture_output=True, text=True)
-                # run other functions 
-                start_time, end_time = save_time(f"{archive_path}{archive_workload_dir_name}/{archive_workload_dir_name}.csv", result_path)
+                cosbench_info_result = subprocess.run(f"cosbench info > {result_path}/cosbench.info", shell=True, capture_output=True, text=True)
                 copy_bench_files(archive_path, archive_workload_dir_name, result_path)
                 return  start_time, end_time, result_path
             else:
@@ -226,9 +222,11 @@ def submit(workload_config_path, output_path):
     else:
         print(f"\033[91mWARNING: workload file doesn't exist !\033[0m")
 
-def create_test_dir(result_path, workload_name):
+def create_test_dir(result_path, start_time, end_time):
     logging.info("Executing mrbench create_test_dir function")
-    result_file_path = os.path.join(result_path, workload_name)
+    test_time_dir = f"{start_time}:{end_time}"
+    result_file_path = os.path.join(result_path, test_time_dir.replace(" ","_"))
+    print(result_file_path)
     if os.path.exists(result_file_path):
         i = 1
         while os.path.exists(result_file_path + f"_{i}"):
@@ -237,7 +235,7 @@ def create_test_dir(result_path, workload_name):
     os.mkdir(result_file_path)
     return result_file_path
 
-def save_time(file, result_path):
+def save_time(file):
     logging.info("Executing mrbench save_time function")
     start_time = None
     end_time = None
@@ -255,11 +253,6 @@ def save_time(file, result_path):
         if first_main_launching_time and last_main_completed_time:
             start_time = first_main_launching_time.split('@')[1].strip()
             end_time = last_main_completed_time.split('@')[1].strip()
-            time_file = open(f"{result_path}/time", "w")
-            start_end_time = f"{start_time},{end_time}"
-            time_file.write(start_end_time)
-            time_file.close()
-            #return start_time,end_time
             print(f"Start Time: {start_time}")
             print(f"End Time: {end_time}")     
         return start_time, end_time        
@@ -292,8 +285,7 @@ def main(workload_config_path, output_path, swift_configs):
     if log_level is not None:
         log_level_upper = log_level.upper()
         if log_level_upper == "DEBUG" or "INFO" or "WARNING" or "ERROR" or "CRITICAL":
-            log_dir = f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && sudo chmod -R 777 /var/log/kara/"
-            log_dir_run = subprocess.run(log_dir, shell=True)
+            os.makedirs('/var/log/kara/', exist_ok=True)
             logging.basicConfig(filename= '/var/log/kara/all.log', level=log_level_upper, format='%(asctime)s - %(levelname)s - %(message)s')
         else:
             print(f"\033[91mInvalid log level:{log_level}\033[0m")  
