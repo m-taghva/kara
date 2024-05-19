@@ -4,7 +4,6 @@ import os
 import pywikibot
 from bs4 import BeautifulSoup
 import logging
-import subprocess
 import csv
 from collections import Counter
 import subprocess
@@ -35,10 +34,8 @@ def generate_cpu_model(serverName):
     threads = ""
     model = ""
     for line in result:
-        line = line.replace("  " , "").replace("\n","").split(":")
-        #print(line)
+        line = line.replace("  ", "").replace("\n","").split(":")
         if "Core(s) per socket" in line[0]:
-            #print (line)
             coresPerSocket=line[1]
             #print ("("+  coresPerSocket+ ")")
         if "Socket(s)" in line[0]:
@@ -54,12 +51,11 @@ def generate_ram_model(serverName):
     result = load(f'/configs/{serverName}' + "/hardware/ram/lshw-brief.txt")
     rams=[]
     for line in result:
-        line = line.replace("  " , "")
+        line = line.replace("  ", "")
         if "DIMM" in line:
             if "empty" not in line:
                 model = line.split("memory ")[1]
                 rams.append(model)
-                #print (model)
     counts = Counter(rams)
     ram = ""
     for item , count in counts.items():
@@ -85,7 +81,10 @@ def generate_net_model(serverName):
                 Flag = False
     netModel=[]
     for i in range(len(nets)):
-        netModel.append(capacities[i] + " " + nets[i])
+        if capacities[i] is not None:
+            netModel.append(capacities[i] + " " + nets[i])
+        else:
+            netModel.append(nets[i])
     counts = Counter(netModel)
     net = ""
     for item, count in counts.items():
@@ -110,7 +109,9 @@ def generate_disk_model(serverName):
     disks= []
     for line in result:
         if "disk" in line:
-            disks.append(line.split("disk")[1].replace("  " , "").replace("\n" , ""))
+            diskname = line.split("disk")[1].replace("  ", "").replace("\n", "")
+            if diskname != " ":
+                disks.append(diskname)
     counts = Counter(disks)
     disksNames =""
     for item, count in counts.items():
@@ -132,17 +133,15 @@ def generate_model(server ,part ,spec):
         elif spec == "disk":
             return generate_disk_model(server)
     elif part == "software":
-        return "software not config"
+        return "software not configed"
 
 def compare(part ,spec):
     cmd = ["ls" , f'{configs_dir}/configs']
     result = subprocess.run(cmd, stdout=subprocess.PIPE, text=True)
     listOfServers = result.stdout.split("\n")
     listOfServers.pop()
-    #print(listOfServers)
     dict = {}
     for server in listOfServers:
-        #print(server)
         model= generate_model(server ,part ,spec)
         if model in dict:
             if dict[model] is None:
@@ -202,7 +201,6 @@ def create_html_template(template_content, html_output):
         config_placeholder = config_info.group(0)
         part,spec = config_info.group(1).split(',')
         dict = compare(part.strip(), spec.strip())
-        print(dict)
         html_dict = dict_to_html(dict)
         html_data = html_data.replace(config_placeholder, html_dict)
     with open(html_output, 'w') as html_file:
@@ -217,11 +215,11 @@ def upload_data(site, page_title, wiki_content):
         page = pywikibot.Page(site, page_title)
         if not page.exists():
             page.text = wiki_content + "\n powered by KARA"
-            page.save(summary="Uploaded by KARA", force=True, quiet=True, botflag=True)
+            page.save(summary="Uploaded by KARA", force=True, quiet=False, botflag=False)
             #page.save(" برچسب: [[مدیاویکی:Visualeditor-descriptionpagelink|ویرایش‌گر دیداری]]")
             logging.info(f"Page '{page_title}' uploaded successfully.")
         else:
-            print(f"Page '{page_title}' already exists on the wiki.")
+            print(f"Page '\033[91m{page_title}\033[0m' already exists on the wiki.")
             logging.warning(f"Page '{page_title}' already exists on the wiki.")
     except pywikibot.exceptions.Error as e:
         logging.error(f"Error uploading page '{page_title}': {e}")
@@ -256,7 +254,7 @@ def upload_images(site, html_file_path):
             if file_page.exists():
                 raise ValueError("File already exists!")
             # Upload the file
-            success = file_page.upload(image_path, comment=f"Uploaded image '{image_filename}' using Pywikibot")
+            success = file_page.upload(image_path, comment=f"Uploaded image '{image_filename}' using KARA")
             if success:
                 print(f"File uploaded successfully! File page: {file_page.full_url()}")
             else:
@@ -274,6 +272,8 @@ def main(input_template, html_output, page_title, html_page, directoryOfConfigs,
     if create_html:
         if os.path.exists(directoryOfConfigs):
             configs_dir = directoryOfConfigs
+        else:
+            print(f"\033[91minput backup File not found\033[0m")
         with open(input_template, 'r') as template_content:
             # Create HTML template
             create_html_template(template_content.read(), html_output)
@@ -290,7 +290,6 @@ def main(input_template, html_output, page_title, html_page, directoryOfConfigs,
         upload_images(site, html_page)
     logging.info("\033[92m****** report_recorder main function end ******\033[0m")
 
-directoryOfConfigs = ""
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate report for kateb")
     parser.add_argument("-i", "--input_template", help="Template HTML file path")
@@ -302,16 +301,16 @@ if __name__ == "__main__":
     parser.add_argument("-tc", "--directoryOfConfigs", help="directory of test configs")
     args = parser.parse_args()
     if args.upload_operation and (args.html_page is None or args.page_title is None):
-        print("Error: Both -p (--html_page) and -t (--page_title) switches are required for upload operation -U")
+        print(f"\033[91mError: Both -p (--html_page) and -t (--page_title) switches are required for upload operation -U\033[0m")
         exit(1)
     if args.create_html and (args.input_template is None or args.html_output is None or args.directoryOfConfigs is None):
-        print("Error: these switch -i (--input_template) and -o (--html_output) and -tc (--directoryOfConfigs) are required for generate HTML operation -H")
+        print(f"\033[91mError: these switch -i (--input_template) and -o (--html_output) and -tc (--directoryOfConfigs) are required for generate HTML operation -H\033[0m")
         exit(1)
     input_template = args.input_template 
     html_output = args.html_output
     page_title = args.page_title 
     html_page = args.html_page
-    directoryOfConfigs = args.directoryOfConfigs
+    directoryOfConfigs = args.directoryOfConfigs       
     upload_operation = args.upload_operation
     create_html = args.create_html
     main(input_template, html_output, page_title, html_page, directoryOfConfigs, upload_operation, create_html)
