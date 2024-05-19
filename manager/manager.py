@@ -222,14 +222,17 @@ def mrbench_agent(config_params, config_file, config_output):
                     with open(os.path.join(result_file_path, 'info.yaml'), 'w') as yaml_file:
                         yaml.dump(data, yaml_file, default_flow_style=False)
                 if ring_exist:
-                    data_ring = {'ring_config': ring_dict}
+                    data_ring = {'ring': ring_dict}
                     subprocess.run(f"sudo cp -r {swift_rings[filename]} {result_file_path}", shell=True)
-                    with open(os.path.join(result_file_path, 'info.yaml'), 'a') as yaml_file:
+                    with open(os.path.join(result_file_path, 'ring-info.yaml'), 'w') as yaml_file:
                         yaml.dump(data_ring, yaml_file, default_flow_style=False)
                     ring_item = {}
                     for rkey,rvalue in ring_dict.items(): 
                         ring_item[rkey+"_nodes"]=len(set([v.split()[3] for v in rvalue.splitlines()[6:]]))
                         ring_item.update({"Ring."+rkey+"."+item.split(" ")[1]:item.split(" ")[0] for item in rvalue.splitlines()[1].split(", ")[:5]})
+                    ring_formated = {'ring': ring_item}
+                    with open(os.path.join(result_file_path, 'info.yaml'), 'a') as yaml_file:
+                        yaml.dump(ring_formated, yaml_file, default_flow_style=False)
                     data = {**data, **ring_item}
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter != 'none':
