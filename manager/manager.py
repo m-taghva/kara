@@ -313,10 +313,10 @@ def status_analyzer_agent(config_params):
     analyze_csv = config_params.get('analyze_csv')
     transform_dir = config_params.get('transform')
     if merge:
-        analyzer.main(merge=True, analyze=False, graph=False, csv_original=False, output_directory=result_dir, selected_csv=merge_csv, x_column=False, y_column=False)
+        analyzer.main(merge=True, analyze=False, graph=False, csv_original=None, output_directory=result_dir, selected_csv=merge_csv, x_column=None, y_column=None)
         time.sleep(10)
     if analyze:
-        analyzer.main(merge=False, analyze=True, graph=False, csv_original=f"{result_dir}/{analyze_csv}", output_directory=False, transformation_directory=transform_dir, x_column=False, y_column=False)
+        analyzer.main(merge=False, analyze=True, graph=False, csv_original=f"{result_dir}/{analyze_csv}", output_directory=None, transformation_directory=transform_dir, x_column=None, y_column=None)
 
 def report_recorder_agent(config_params, backup_to_report):
     create_html_operation = config_params.get('create_html_operation', True)
@@ -327,14 +327,14 @@ def report_recorder_agent(config_params, backup_to_report):
     kateb_page_title = config_params.get('kateb_page_title')
     if create_html_operation:
         if temp_configs_directory != " ":  
-            subprocess.run(f"python3 /root/monster/taghva/KARA/report_recorder/report_recorder.py -H -i {input_template} -o {output_html} -tc {temp_configs_directory}", shell=True) 
-            #report_recorder.main(create_html=True, input_template=input_template, html_output=output_html, directoryOfConfigs=temp_configs_directory)
+            #subprocess.run(f"python3 /root/monster/taghva/KARA/report_recorder/report_recorder.py -H -i {input_template} -o {output_html} -tc {temp_configs_directory}", shell=True) 
+            report_recorder.main(input_template=input_template, html_output=output_html, page_title=None, html_page=None, directoryOfConfigs=temp_configs_directory, upload_operation=False, create_html=True)
         elif temp_configs_directory is None:
-            subprocess.run(f"python3 /root/monster/taghva/KARA/report_recorder/report_recorder.py -H -i {input_template} -o {output_html} -tc {backup_to_report}", shell=True)
-            #report_recorder.main(create_html=True, input_template=input_template, html_output=output_html, directoryOfConfigs=backup_to_report)
+            #subprocess.run(f"python3 /root/monster/taghva/KARA/report_recorder/report_recorder.py -H -i {input_template} -o {output_html} -tc {backup_to_report}", shell=True)
+            report_recorder.main(input_template=input_template, html_output=output_html, page_title=None, html_page=None, directoryOfConfigs=backup_to_report, upload_operation=False, create_html=True)
     if upload_operation:
-        subprocess.run(f"python3 /root/monster/taghva/KARA/report_recorder/report_recorder.py -U -p {output_html} -t {kateb_page_title}", shell=True)
-        #report_recorder.main(upload_operation=True, html_page=output_html, page_title=kateb_page_title)
+        #subprocess.run(f"python3 /root/monster/taghva/KARA/report_recorder/report_recorder.py -U -p {output_html} -t {kateb_page_title}", shell=True)
+        report_recorder.main(input_template=None, html_output=None, page_title=kateb_page_title, html_page=output_html, directoryOfConfigs=None, upload_operation=True, create_html=False)
 
 def main(config_file):
     log_level = load_config(config_file)['log'].get('level')
