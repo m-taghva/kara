@@ -225,7 +225,11 @@ def mrbench_agent(config_params, config_file, config_output):
                     subprocess.run(f"sudo cp -r {swift_rings[filename]} {result_file_path}", shell=True)
                     with open(os.path.join(result_file_path, 'info.yaml'), 'a') as yaml_file:
                         yaml.dump(data_ring, yaml_file, default_flow_style=False)
-                    data = {**data, **data_ring}
+                    ring_item = {}
+                    for rkey,rvalue in ring_dict.items(): 
+                        ring_item[rkey+"_nodes"]=len(set([v.split()[3] for v in rvalue.splitlines()[6:]]))
+                        ring_item.update({"Ring."+rkey+"."+item.split(" ")[1]:item.split(" ")[0] for item in rvalue.splitlines()[1].split(", ")[:5]})
+                    data = {**data, **ring_item}
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter != 'none':
                     if run_status_reporter == 'csv':
@@ -251,8 +255,11 @@ def mrbench_agent(config_params, config_file, config_output):
     # Extract first start time and last end time
     first_start_time = all_start_times[0] ; last_end_time = all_end_times[-1]
     logging.debug(f"manager:mrbench_agent: {first_start_time},{last_end_time}")
-    return first_start_time, last_end_time, backup_to_report
-
+    if run_monstaver != 'none':
+        return first_start_time, last_end_time, backup_to_report
+    else:
+        return first_start_time, last_end_time
+        
 def status_reporter_agent(config_params):
     result_dir = config_params.get('output_path')
     times_file = config_params.get('times')
