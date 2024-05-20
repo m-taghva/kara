@@ -106,9 +106,9 @@ def main(metric_file, path_dir, time_range, img=False):
         start_time_name = start_timestamp_csv.replace(" ", "-") ; end_time_name = end_timestamp_csv.replace(" ", "-")
         output_csv = os.path.join(output_parent_dir, f"{start_time_name}_{end_time_name}.csv")
     else:
-        start_time_csv = start_time.replace(" ", "-")
-        end_time_csv = end_time.replace(" ", "-")
-        output_csv = os.path.join(output_parent_dir, f"{start_time_csv}_{end_time_csv}.csv")
+        start_time_csv = start_time.replace(" ", "_")
+        end_time_csv = end_time.replace(" ", "_")
+        output_csv = os.path.join(output_parent_dir, f"{start_time_csv},{end_time_csv}.csv")
     if os.path.exists(output_csv):
         os.remove(output_csv)
     # Generate metric_operation_mapping
