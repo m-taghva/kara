@@ -57,7 +57,7 @@ def copy_swift_conf(swift_configs):
                 inspect_value = container_info[0]['Config']['Labels'][key_to_extract]
                 for filename, filepath in swift_configs.items(): 
                     each_scp_successful = False 
-                    if filename.endswith(".gz"):
+                    if filename.endswith(".gz") or filename.endswith(".builder"):
                         diff_ring_command = f"ssh -p {port} {user}@{ip} 'sudo cat {inspect_value}/rings/{filename}' | diff - {filepath}"
                         diff_ring_result = subprocess.run(diff_ring_command, shell=True, capture_output=True, text=True)
                         print("")
