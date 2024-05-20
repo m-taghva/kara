@@ -184,7 +184,10 @@ def submit(workload_config_path, output_path):
             if os.path.exists(archive_file_path):
                 archive_workload_dir_name = f"{workload_id}-swift-sample"  
                 start_time, end_time = save_time(f"{archive_path}{archive_workload_dir_name}/{archive_workload_dir_name}.csv")
-                result_path = create_test_dir(output_path, start_time, end_time)
+                test_time_dir = f"{start_time}:{end_time}"
+                result_path = os.path.join(result_path, test_time_dir.replace(" ","_"))
+                if not os.path.exists(result_path):
+                    os.mkdir(result_path) 
                 print(f"Result Path: {result_path}")
                 cosbench_info_result = subprocess.run(f"cosbench info > {result_path}/cosbench.info", shell=True, capture_output=True, text=True)
                 copy_bench_files(archive_path, archive_workload_dir_name, result_path)
@@ -221,19 +224,6 @@ def submit(workload_config_path, output_path):
             return None, None, -1
     else:
         print(f"\033[91mWARNING: workload file doesn't exist !\033[0m")
-
-def create_test_dir(result_path, start_time, end_time):
-    logging.info("Executing mrbench create_test_dir function")
-    test_time_dir = f"{start_time}:{end_time}"
-    result_file_path = os.path.join(result_path, test_time_dir.replace(" ","_"))
-    print(result_file_path)
-    if os.path.exists(result_file_path):
-        i = 1
-        while os.path.exists(result_file_path + f"_{i}"):
-            i += 1
-        result_file_path += f"_{i}"
-    os.mkdir(result_file_path)
-    return result_file_path
 
 def save_time(file):
     logging.info("Executing mrbench save_time function")
