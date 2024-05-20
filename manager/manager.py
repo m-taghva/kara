@@ -193,9 +193,9 @@ def mrbench_agent(config_params, config_file, config_output):
             for test_config in sorted(os.listdir(conf_dict["workloads.xml"])):
                 test_config_path = os.path.join(conf_dict["workloads.xml"], test_config)
                 logging.info(f"manager:mrbench_agent: test config path in mrbench_agent submit function is : {test_config_path}")
-                start_time, end_time, result_file_path = mrbench.submit(test_config_path, result_dir)
-                subprocess.run(f"sudo cp -r {test_config_path} {result_file_path}", shell=True)
-                if '#' in test_config or ':' in test_config:    
+                start_time, end_time, result_path = mrbench.submit(test_config_path, result_dir)
+                subprocess.run(f"sudo cp -r {test_config_path} {result_path}", shell=True)
+                if '#' in test_config or ':' in test_config:
                     data = {}
                     data['Time'] = f"{start_time},{end_time}"
                     if conf_exist:
@@ -208,8 +208,8 @@ def mrbench_agent(config_params, config_file, config_output):
                                     swift_pair_split = swift_pair.split(':')
                                     swift_keys.append(swift_pair_split[0])
                                     swift_values.append(swift_pair_split[1])
-                            data['swift_config'] = dict(zip(swift_keys, swift_values))
-                        subprocess.run(f"sudo cp -r {swift_configs[key]} {result_file_path}", shell=True)
+                            data['swift'] = dict(zip(swift_keys, swift_values))
+                        subprocess.run(f"sudo cp -r {swift_configs[key]} {result_path}", shell=True)
                     test_keys = []
                     test_values = []
                     test_pairs = test_config.split('#')
@@ -218,28 +218,28 @@ def mrbench_agent(config_params, config_file, config_output):
                             test_pair_split = test_pair.split(':')
                             test_keys.append(test_pair_split[0])
                             test_values.append(test_pair_split[1])
-                    data['workload_config'] = dict(zip(test_keys, test_values))
-                    with open(os.path.join(result_file_path, 'info.yaml'), 'w') as yaml_file:
+                    data['workload'] = dict(zip(test_keys, test_values))
+                    with open(os.path.join(result_path, 'info.yaml'), 'w') as yaml_file:
                         yaml.dump(data, yaml_file, default_flow_style=False)
                 if ring_exist:
                     data_ring = {'ring': ring_dict}
-                    subprocess.run(f"sudo cp -r {swift_rings[filename]} {result_file_path}", shell=True)
-                    with open(os.path.join(result_file_path, 'ring-info.yaml'), 'w') as yaml_file:
+                    subprocess.run(f"sudo cp -r {swift_rings[filename]} {result_path}", shell=True)
+                    with open(os.path.join(result_path, 'ring-info.yaml'), 'w') as yaml_file:
                         yaml.dump(data_ring, yaml_file, default_flow_style=False)
                     ring_item = {}
                     for rkey,rvalue in ring_dict.items(): 
                         ring_item[rkey+"_nodes"]=len(set([v.split()[3] for v in rvalue.splitlines()[6:]]))
                         ring_item.update({"Ring."+rkey+"."+item.split(" ")[1]:item.split(" ")[0] for item in rvalue.splitlines()[1].split(", ")[:5]})
                     ring_formated = {'ring': ring_item}
-                    with open(os.path.join(result_file_path, 'info.yaml'), 'a') as yaml_file:
+                    with open(os.path.join(result_path, 'info.yaml'), 'a') as yaml_file:
                         yaml.dump(ring_formated, yaml_file, default_flow_style=False)
                     data = {**data, **ring_item}
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter != 'none':
                     if run_status_reporter == 'csv':
-                        output_csv  = status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=False)
+                        output_csv  = status_reporter.main(metric_file=None, path_dir=result_path, time_range=f"{start_time},{end_time}", img=False)
                     if run_status_reporter == 'csv,img':
-                        output_csv = status_reporter.main(metric_file=None, path_dir=result_file_path, time_range=f"{start_time},{end_time}", img=True)
+                        output_csv = status_reporter.main(metric_file=None, path_dir=result_path, time_range=f"{start_time},{end_time}", img=True)
                     if os.path.exists(output_csv): 
                         formatted_data = {}
                         for section_name, section_data in data.items():
@@ -251,20 +251,17 @@ def mrbench_agent(config_params, config_file, config_output):
                         analyzer.merge_csv(csv_file=output_csv, output_directory=f"{result_dir}/analyzed", pairs_dict=formatted_data)
                 if run_monstaver != 'none':
                     if run_monstaver == 'backup,info':
-                        backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
+                        backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
                     if run_monstaver == 'backup':
-                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True)
+                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, os_info=False, swift_info=False, influx_backup=True)
                     if run_monstaver == 'info':
-                        backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_file_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=False)
+                        backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=False)
                 else:
                     backup_to_report = None
     # Extract first start time and last end time
     first_start_time = all_start_times[0] ; last_end_time = all_end_times[-1]
     logging.debug(f"manager:mrbench_agent: {first_start_time},{last_end_time}")
-    if run_monstaver != 'none':
-        return first_start_time, last_end_time, backup_to_report
-    else:
-        return first_start_time, last_end_time
+    return first_start_time, last_end_time, backup_to_report
 
 def status_reporter_agent(config_params):
     result_dir = config_params.get('output_path')
@@ -332,7 +329,7 @@ def report_recorder_agent(config_params, backup_to_report):
         if temp_configs_directory != " ":  
             #subprocess.run(f"python3 /root/monster/taghva/KARA/report_recorder/report_recorder.py -H -i {input_template} -o {output_html} -tc {temp_configs_directory}", shell=True) 
             report_recorder.main(input_template=input_template, html_output=output_html, page_title=None, html_page=None, directoryOfConfigs=temp_configs_directory, upload_operation=False, create_html=True)
-        elif temp_configs_directory is None:
+        elif temp_configs_directory is None and backup_to_report is not None:
             #subprocess.run(f"python3 /root/monster/taghva/KARA/report_recorder/report_recorder.py -H -i {input_template} -o {output_html} -tc {backup_to_report}", shell=True)
             report_recorder.main(input_template=input_template, html_output=output_html, page_title=None, html_page=None, directoryOfConfigs=backup_to_report, upload_operation=False, create_html=True)
     if upload_operation:
@@ -368,7 +365,7 @@ def main(config_file):
                 elif 'Mrbench' in task:
                     config_params = task['Mrbench']
                     logging.info("manager:main: Executing mrbench_agent function")
-                    backup_to_report, first_start_time, last_end_time = mrbench_agent(config_params, config_file, config_output)
+                    first_start_time, last_end_time, backup_to_report = mrbench_agent(config_params, config_file, config_output)
                 elif 'Status-Reporter' in task:
                     config_params = task['Status-Reporter']
                     logging.info("manager:main: Executing status_reporter_agent function")
