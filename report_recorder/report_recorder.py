@@ -7,6 +7,11 @@ import logging
 import csv
 from collections import Counter
 import subprocess
+import sys
+pywiki_path = os.path.abspath("./../report_recorder/pywikibot")
+if pywiki_path not in sys.path:
+    sys.path.append(pywiki_path)
+import pywikibot
 
 configs_dir = ""
 def load(directory):
