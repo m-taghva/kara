@@ -196,20 +196,25 @@ def mrbench_agent(config_params, config_file, config_output):
                 start_time, end_time, result_path = mrbench.submit(test_config_path, result_dir)
                 subprocess.run(f"sudo cp -r {test_config_path} {result_path}", shell=True)
                 if '#' in test_config or ':' in test_config:
-                    data = {}
-                    data['Time'] = f"{start_time},{end_time}"
+                    data_time = {'Time': f"{start_time.replace(' ','_')},{end_time.replace(' ','_')}"}
+                    with open(os.path.join(result_path, 'info.yaml'), 'w') as yaml_file:
+                        yaml.dump(data_time, yaml_file, default_flow_style=False)
+                    data_swift = {}
                     if conf_exist:
-                        swift_keys = []
-                        swift_values = []
+                        subprocess.run(f"sudo cp -r {swift_configs[key]} {result_path}", shell=True)
                         for key in swift_configs:
+                            swift_keys = []
+                            swift_values = []
                             swift_pairs = os.path.basename(swift_configs[key]).split('#')
+                            key_split = key.split('.')[0]
                             for swift_pair in swift_pairs:
                                 if ':' in swift_pair:
-                                    swift_pair_split = swift_pair.split(':')
-                                    swift_keys.append(swift_pair_split[0])
-                                    swift_values.append(swift_pair_split[1])
-                            data['swift'] = dict(zip(swift_keys, swift_values))
-                        subprocess.run(f"sudo cp -r {swift_configs[key]} {result_path}", shell=True)
+                                    swift_keys.append(swift_pair.split(':')[0])
+                                    swift_values.append(swift_pair.split(':')[1])
+                                    data_swift[key_split] = dict(zip(swift_keys,swift_values))
+                        with open(os.path.join(result_path, 'info.yaml'), 'a') as yaml_file:
+                            yaml.dump(data_swift, yaml_file, default_flow_style=False)
+                    data_workload = {}
                     test_keys = []
                     test_values = []
                     test_pairs = test_config.split('#')
@@ -218,9 +223,10 @@ def mrbench_agent(config_params, config_file, config_output):
                             test_pair_split = test_pair.split(':')
                             test_keys.append(test_pair_split[0])
                             test_values.append(test_pair_split[1])
-                    data['workload'] = dict(zip(test_keys, test_values))
-                    with open(os.path.join(result_path, 'info.yaml'), 'w') as yaml_file:
-                        yaml.dump(data, yaml_file, default_flow_style=False)
+                    data_workload['workload'] = dict(zip(test_keys, test_values))
+                    with open(os.path.join(result_path, 'info.yaml'), 'a') as yaml_file:
+                        yaml.dump(data_workload, yaml_file, default_flow_style=False)
+                    data = {**data_time, **data_swift, **data_workload}
                 if ring_exist:
                     data_ring = {'ring': ring_dict}
                     subprocess.run(f"sudo cp -r {swift_rings[filename]} {result_path}", shell=True)
@@ -233,7 +239,7 @@ def mrbench_agent(config_params, config_file, config_output):
                     ring_formated = {'ring': ring_item}
                     with open(os.path.join(result_path, 'info.yaml'), 'a') as yaml_file:
                         yaml.dump(ring_formated, yaml_file, default_flow_style=False)
-                    data = {**data, **ring_item}
+                    data = {**data_time, **data_swift, **data_workload, **ring_item}
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter != 'none':
                     if run_status_reporter == 'csv':
