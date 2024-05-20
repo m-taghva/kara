@@ -185,7 +185,7 @@ def submit(workload_config_path, output_path):
                 archive_workload_dir_name = f"{workload_id}-swift-sample"  
                 start_time, end_time = save_time(f"{archive_path}{archive_workload_dir_name}/{archive_workload_dir_name}.csv")
                 test_time_dir = f"{start_time}:{end_time}"
-                result_path = os.path.join(result_path, test_time_dir.replace(" ","_"))
+                result_path = os.path.join(output_path, test_time_dir.replace(" ","_"))
                 if not os.path.exists(result_path):
                     os.mkdir(result_path) 
                 print(f"Result Path: {result_path}")
