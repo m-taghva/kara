@@ -107,14 +107,14 @@ def mrbench_agent(config_params, config_file, config_output):
     run_status_reporter = config_params.get('Status_Reporter', None)
     run_monstaver = config_params.get('monstaver', None)
     ring_dirs = config_params.get('ring_dirs', [])
-    logging.info(f"manager:mrbench_agent: ring directories in mrbench_agent : {ring_dirs}")
+    logging.info(f"manager - mrbench_agent: ring directories: {ring_dirs}")
     while True:
         if not os.path.exists(result_dir):
             os.makedirs(result_dir)
         if os.listdir(result_dir):
             print(f"Results directory {result_dir} is not empty and includes these files and directories:")
             for item in os.listdir(result_dir):
-                logging.info(f"manager:mrbench_agent: dir and file in {result_dir}: {item}")
+                logging.info(f"manager - mrbench_agent: dir and file in {result_dir}: {item}")
                 print(f"\033[91m{item}\033[0m")
             # Ask user if they want to remove the contents
             print("Do you want to remove these files and directories? (yes/no): ", end='', flush=True)
@@ -129,14 +129,14 @@ def mrbench_agent(config_params, config_file, config_output):
             else:
                 current_time_results = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
                 destination_dir_results = os.path.join(os.path.dirname(os.path.dirname(result_dir)), os.path.dirname(result_dir)+"_"+current_time_results)
-                logging.info(f"manager:mrbench_agent: user do not enter any answer so current files inside {result_dir} moved to : {destination_dir_results}")
+                logging.info(f"manager - mrbench_agent: user do not enter any answer so current files inside {result_dir} moved to : {destination_dir_results}")
                 os.makedirs(destination_dir_results)
                 for item in os.listdir(result_dir):
                     item_path = os.path.join(result_dir, item)
                     shutil.move(item_path, destination_dir_results)
                 response = "yes" # If no input after 20 seconds, consider it as "yes"
             if response == 'yes':
-                logging.info("manager:mrbench_agent: answer to mrbench_agent remove request is YES")
+                logging.info("manager - mrbench_agent: answer to remove request is YES")
                 # Remove all files and directories in the output directory
                 rm_result_dir = subprocess.run(f"sudo rm -rf {result_dir}/*", shell=True)
                 print("\033[92mContents removed successfully.\033[0m")
@@ -156,18 +156,18 @@ def mrbench_agent(config_params, config_file, config_output):
         if(config_params.get('conf_dir')):
             config_output = config_params.get('conf_dir')
         else:
-            logging.critical("manager:mrbench_agent: There isn't any conf_dir in scenario file")
+            logging.critical("manager - mrbench_agent: There isn't any conf_dir in scenario file")
             print(f"\033[91mThere isn't any conf_dir in scenario file !\033[0m")
             exit()
     conf_dict = {}
     for dir_name in os.listdir(config_output):
         dir_path = os.path.join(config_output, dir_name)
         conf_dict[dir_name] = dir_path
-    logging.debug(f"manager:mrbench_agent: conf_dict: {conf_dict}")
+    logging.debug(f"manager - mrbench_agent: conf_dict: {conf_dict}")
     conf_exist = 0
     swift_configs = {}
     if conf_dict["workloads.xml"] is None:
-        logging.critical("There isn't any workload in mrbench_agent input config dictionary")
+        logging.critical("manager - mrbench_agent: There isn't any workload in mrbench_agent input config dictionary")
         print(f"\033[91mThere isn't any workload !\033[0m")
         exit()
     if len(conf_dict)>1:
@@ -197,11 +197,11 @@ def mrbench_agent(config_params, config_file, config_output):
                     m *= len(list_dir)
             if conf_exist or ring_exist:
                 merged_conf_ring = {**swift_rings, **swift_configs}
-                logging.info(f"manager:mrbench_agent: rings and configs dictionary is : {merged_conf_ring}")
+                logging.info(f"manager - mrbench_agent: rings and configs dictionary is : {merged_conf_ring}")
                 ring_dict = mrbench.copy_swift_conf(merged_conf_ring)     
             for test_config in sorted(os.listdir(conf_dict["workloads.xml"])):
                 test_config_path = os.path.join(conf_dict["workloads.xml"], test_config)
-                logging.info(f"manager:mrbench_agent: test config path in mrbench_agent submit function is : {test_config_path}")
+                logging.info(f"manager - mrbench_agent: test config path in mrbench_agent submit function is : {test_config_path}")
                 start_time, end_time, result_path = mrbench.submit(test_config_path, result_dir)
                 subprocess.run(f"sudo cp -r {test_config_path} {result_path}", shell=True)
                 if '#' in test_config or ':' in test_config:
@@ -275,7 +275,7 @@ def mrbench_agent(config_params, config_file, config_output):
                     backup_to_report = None
     # Extract first start time and last end time
     first_start_time = all_start_times[0] ; last_end_time = all_end_times[-1]
-    logging.debug(f"manager:mrbench_agent: {first_start_time},{last_end_time}")
+    logging.debug(f"manager - mrbench_agent: {first_start_time},{last_end_time}")
     return first_start_time, last_end_time, backup_to_report
 
 def status_reporter_agent(config_params):
