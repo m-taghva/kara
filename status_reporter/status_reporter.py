@@ -108,7 +108,7 @@ def main(metric_file, path_dir, time_range, img=False):
     else:
         start_time_csv = start_time.replace(" ", "_")
         end_time_csv = end_time.replace(" ", "_")
-        output_csv = os.path.join(output_parent_dir, f"{start_time_csv},{end_time_csv}.csv")
+        output_csv = os.path.join(output_parent_dir, f"{start_time_csv}_{end_time_csv}.csv")
     if os.path.exists(output_csv):
         os.remove(output_csv)
     # Generate metric_operation_mapping
