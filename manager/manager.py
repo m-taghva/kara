@@ -230,6 +230,7 @@ def mrbench_agent(config_params, config_file, config_output):
                                     data_swift[key_split] = dict(zip(swift_keys,swift_values))
                         with open(os.path.join(result_path, 'info.yaml'), 'a') as yaml_file:
                             yaml.dump(data_swift, yaml_file, default_flow_style=False)
+                        logging.debug(f"manager - mrbench_agent: data_swift {data_swift}")
                     data_workload = {}
                     test_keys = []
                     test_values = []
@@ -242,6 +243,7 @@ def mrbench_agent(config_params, config_file, config_output):
                     data_workload['workload'] = dict(zip(test_keys, test_values))
                     with open(os.path.join(result_path, 'info.yaml'), 'a') as yaml_file:
                         yaml.dump(data_workload, yaml_file, default_flow_style=False)
+                    logging.debug(f"manager - mrbench_agent: data_workload {data_workload}")
                     data = {**data_time, **data_swift, **data_workload}
                 if ring_exist:
                     data_ring = {'ring': ring_dict}
@@ -255,6 +257,7 @@ def mrbench_agent(config_params, config_file, config_output):
                     ring_formated = {'ring': ring_item}
                     with open(os.path.join(result_path, 'info.yaml'), 'a') as yaml_file:
                         yaml.dump(ring_formated, yaml_file, default_flow_style=False)
+                    logging.debug(f"manager - mrbench_agent: ring_item {ring_item}")
                     data = {**data_time, **data_swift, **data_workload, **ring_item}
                 all_start_times.append(start_time) ; all_end_times.append(end_time)
                 if run_status_reporter != 'none':
