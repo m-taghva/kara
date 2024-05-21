@@ -14,12 +14,11 @@ import config_gen
 import status_reporter
 import monstaver
 import analyzer
-import report_recorder
+report_path = os.path.abspath("./../report_recorder/")
+if report_path not in sys.path:
+    sys.path.append(report_path)
 
-if not os.path.exists(f"./user-config.py"):
-    subprocess.run(f"sudo cp -r ./../report_recorder/user-config.py .", shell=True)
-else:
-    print(f"\033[91muser config file is required for run report_recorder\033[0m")
+import report_recorder
 
 pywiki_path = os.path.abspath("./../report_recorder/pywikibot")
 if pywiki_path not in sys.path:
@@ -348,6 +347,15 @@ def status_analyzer_agent(config_params):
         analyzer.main(merge=False, analyze=True, graph=False, csv_original=f"{result_dir}/{analyze_csv}", output_directory=None, transformation_directory=transform_dir, x_column=None, y_column=None)
 
 def report_recorder_agent(config_params, backup_to_report):
+    if not os.path.exists(f"./user-config.py"):
+        subprocess.run(f"sudo cp -r ./../report_recorder/user-config.py .", shell=True)
+    elif os.path.exists(f"./user-config.py"):
+        user_conf_diff = subprocess.run(f"diff ./user-config.py ./../report_recorder/user-config.py", shell=True, capture_output=True, text=True)
+        if user_conf_diff.stderr == "" and user_conf_diff.stdout != "":
+            subprocess.run(f"sudo cp -r ./../report_recorder/user-config.py .", shell=True)
+    else:
+        print(f"\033[91muser-config.py is required for run report_recorder\033[0m")
+        exit(1)
     create_html_operation = config_params.get('create_html_operation', True)
     input_template = config_params.get('input_html_template')
     output_html = config_params.get('output_html')
