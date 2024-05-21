@@ -285,7 +285,8 @@ def mrbench_agent(config_params, config_file, config_output):
                     backup_to_report = None
     # Extract first start time and last end time
     first_start_time = all_start_times[0] ; last_end_time = all_end_times[-1]
-    logging.debug(f"manager - mrbench_agent: {first_start_time},{last_end_time}")
+    logging.debug(f"manager - mrbench_agent: first_start_time,last_end_time: {first_start_time},{last_end_time}")
+    logging.debug(f"manager - mrbench_agent: backup_to_report: {backup_to_report}")
     return first_start_time, last_end_time, backup_to_report
 
 def status_reporter_agent(config_params):
