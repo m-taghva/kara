@@ -16,6 +16,15 @@ import monstaver
 import analyzer
 import report_recorder
 
+if not os.path.exists(f"./user-config.py"):
+    subprocess.run(f"sudo cp -r ./../report_recorder/user-config.py .", shell=True)
+else:
+    print(f"\033[91muser config file is required for run report_recorder\033[0m")
+
+pywiki_path = os.path.abspath("./../report_recorder/pywikibot")
+if pywiki_path not in sys.path:
+    sys.path.append(pywiki_path)
+
 # For font style
 BOLD = "\033[1m"
 RESET = "\033[0m"
@@ -326,9 +335,9 @@ def status_analyzer_agent(config_params):
 
 def report_recorder_agent(config_params, backup_to_report):
     create_html_operation = config_params.get('create_html_operation', True)
-    input_template = config_params.get('input_template')
+    input_template = config_params.get('input_html_template')
     output_html = config_params.get('output_html')
-    temp_configs_directory = config_params.get('temp_configs_directory')
+    temp_configs_directory = config_params.get('configs_directory')
     upload_operation = config_params.get('upload_operation', True)
     kateb_page_title = config_params.get('kateb_page_title')
     if create_html_operation:
