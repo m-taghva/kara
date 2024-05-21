@@ -50,7 +50,7 @@ def config_gen_agent(config_params):
         if os.listdir(config_output):
             print(f"Output directory {config_output} is not empty and includes these files and directories:")
             for item in os.listdir(config_output):
-                logging.info(f"dir and file in {config_output}: {item}")
+                logging.info(f"manager - config_gen_agent: dir and file in {config_output}: {item}")
                 print(f"\033[91m{item}\033[0m")
             # Ask user if they want to remove the contents
             print("Do you want to remove these files and directories? (yes/no): ", end='', flush=True)
@@ -65,14 +65,14 @@ def config_gen_agent(config_params):
             else:
                 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
                 destination_dir = os.path.join(os.path.dirname(os.path.dirname(config_output)), os.path.dirname(config_output)+"_"+current_time)
-                logging.info(f"user do not enter any answer so current files inside {config_output} moved to : {destination_dir}")
+                logging.info(f"manager - config_gen_agent: user do not enter any answer so current files inside {config_output} moved to : {destination_dir}")
                 os.makedirs(destination_dir)
                 for item in os.listdir(config_output):
                     item_path = os.path.join(config_output, item)
                     shutil.move(item_path, destination_dir)
                 response = "yes" # If no input after 20 seconds, consider it as "yes"
             if response == 'yes':
-                logging.info("answer to config_gen_agent remove request is YES")
+                logging.info("manager - config_gen_agent: answer to remove request is YES")
                 # Remove all files and directories in the output directory
                 rm_config_output_dir = subprocess.run(f"sudo rm -rf {config_output}/*", shell=True)
                 print("\033[92mContents removed successfully.\033[0m")
@@ -87,14 +87,14 @@ def config_gen_agent(config_params):
     print(f"{YELLOW}========================================{RESET}")
     for input_file in input_files:
         if os.path.exists(input_file):
-            logging.info(f"config_gen_agent input_files : {input_file}")
+            logging.info(f"manager - config_gen_agent: input_files : {input_file}")
             firstConfNumber = 1
             # Create output directory for each input file
             workloads_configs = os.path.join(config_output, os.path.basename(input_file).split('__')[0])
-            logging.debug(f"path to config_gen_agent output : {workloads_configs}")
+            logging.debug(f"manager - config_gen_agent: path to output : {workloads_configs}")
             if os.path.isdir(workloads_configs):
                 firstConfNumber = len(os.listdir(workloads_configs))+1
-                logging.debug(f"config_gen_agent firstConfNumber : {firstConfNumber}")
+                logging.debug(f"manager - config_gen_agent: firstConfNumber : {firstConfNumber}")
             config_gen.main(input_file_path=input_file, output_directory=workloads_configs, conf_num=firstConfNumber)
         else:
             print(f"this template doesn't exist: \033[91m{input_file}\033[0m")
@@ -364,7 +364,7 @@ def main(config_file):
     else:
         print(f"\033[91mPlease enter log_level in the configuration file.\033[0m")
 
-    logging.info("manager:main:\033[92m****** Manager_main function start ******\033[0m")
+    logging.info("****** Manager_main function start ******")
     data_loaded = load_config(config_file)
     if 'scenario' in data_loaded:
         config_output = None
@@ -375,27 +375,27 @@ def main(config_file):
             try:
                 if 'Config_gen' in task:
                     config_params = task['Config_gen']
-                    logging.info("manager:main: Executing config_gen_agent function")
+                    logging.info("**manager - main: Executing config_gen_agent function**")
                     config_output = config_gen_agent(config_params)
                 elif 'Mrbench' in task:
                     config_params = task['Mrbench']
-                    logging.info("manager:main: Executing mrbench_agent function")
+                    logging.info("**manager - main: Executing mrbench_agent function**")
                     first_start_time, last_end_time, backup_to_report = mrbench_agent(config_params, config_file, config_output)
                 elif 'Status-Reporter' in task:
                     config_params = task['Status-Reporter']
-                    logging.info("manager:main: Executing status_reporter_agent function")
+                    logging.info("**manager - main: Executing status_reporter_agent function**")
                     status_reporter_agent(config_params)
                 elif 'Monstaver' in task:
                     config_params = task['Monstaver']
-                    logging.info("manager:main: Executing monstaver_agent function")
+                    logging.info("**manager - main: Executing monstaver_agent function**")
                     backup_to_report = monstaver_agent(config_params, config_file, first_start_time, last_end_time)
                 elif 'Status_Analyzer' in task:
                     config_params = task['Status_Analyzer']
-                    logging.info("manager:main: Executing status_analyzer_agent function")
+                    logging.info("**manager - main: Executing status_analyzer_agent function**")
                     status_analyzer_agent(config_params)
                 elif 'Report_Recorder' in task:
                     config_params = task['Report_Recorder']
-                    logging.info("manager:main: Executing report_recorder_agent function")
+                    logging.info("**manager - main: Executing report_recorder_agent function**")
                     report_recorder_agent(config_params, backup_to_report)
                 else:
                     print(f"Unknown task: {task}")
@@ -403,7 +403,7 @@ def main(config_file):
                 print(f"Error executing task: {task}. Error: {str(e)}")
     else:
         print(f"\033[91mNo scenario found in the configuration file.\033[0m")
-    logging.info("manager:main:\033[92m****** Manager_main function end ******\033[0m")
+    logging.info("****** Manager_main function end ******")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='kara tools manager')
