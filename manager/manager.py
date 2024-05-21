@@ -297,8 +297,9 @@ def status_reporter_agent(config_params):
        with open(times_file, 'r') as file:
             times = file.readlines()
             for time_range in times:
+                logging.debug(f"manager - status_reporter_agent: time is {time_range}")
                 start_time, end_time = time_range.strip().split(',')
-                status_reporter.main(path_dir=result_dir, time_range=f"{start_time},{end_time}", img=image_generate)
+                output_csv = status_reporter.main(path_dir=result_dir, time_range=f"{start_time},{end_time}", img=image_generate)
 
 def monstaver_agent(config_params, config_file, first_start_time, last_end_time):
     operation = config_params.get('operation')
@@ -310,6 +311,7 @@ def monstaver_agent(config_params, config_file, first_start_time, last_end_time)
        with open(times_file, 'r') as file:
             times = file.readlines()
             for time_range in times:
+                logging.debug(f"manager - monstaver_agent: time range is {time_range}")
                 start_time, end_time = time_range.strip().split(',')
                 if operation == "backup,info":
                     backup_to_report = monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=False,  backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
@@ -329,6 +331,7 @@ def monstaver_agent(config_params, config_file, first_start_time, last_end_time)
     elif operation == "restore":
         monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True)
     if backup_to_report is not None:
+       logging.debug(f"manager - monstaver_agent: backup_to_report: {backup_to_report}")
        return backup_to_report
 
 def status_analyzer_agent(config_params):
