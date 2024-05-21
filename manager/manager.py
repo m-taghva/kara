@@ -177,6 +177,7 @@ def mrbench_agent(config_params, config_file, config_output):
     total_ring_index = 1
     if len(ring_dirs):
         total_ring_index = len(ring_dirs)
+        logging.debug(f"manager - mrbench_agent: total_ring_index {total_ring_index}")
         ring_exist = 1
     for ri in range(total_ring_index):
         swift_rings = {}
@@ -184,10 +185,12 @@ def mrbench_agent(config_params, config_file, config_output):
             for filename in os.listdir(ring_dirs[ri]):
                 file_path = os.path.join(ring_dirs[ri], filename)
                 swift_rings[filename] = file_path
+                logging.debug(f"manager - mrbench_agent: swift_rings {swift_rings}")
         Total_index = 1
         for key in conf_dict:
             if key != "workloads.xml" and key is not None and os.listdir(conf_dict[key]):
                 Total_index *=len(os.listdir(conf_dict[key]))
+                logging.debug(f"manager - mrbench_agent: Total_index {Total_index}")
                 swift_configs[key]=""
         for i in range(Total_index):
             if conf_exist:
@@ -195,6 +198,7 @@ def mrbench_agent(config_params, config_file, config_output):
                 for key in swift_configs:
                     list_dir = sorted(os.listdir(conf_dict[key]))
                     swift_configs[key] = os.path.join(config_output,key,list_dir[(i//m)%len(list_dir)])
+                    logging.debug(f"manager - mrbench_agent: swift_configs {swift_configs}")
                     m *= len(list_dir)
             if conf_exist or ring_exist:
                 merged_conf_ring = {**swift_rings, **swift_configs}
@@ -204,6 +208,8 @@ def mrbench_agent(config_params, config_file, config_output):
                 test_config_path = os.path.join(conf_dict["workloads.xml"], test_config)
                 logging.info(f"manager - mrbench_agent: test config path in mrbench_agent submit function is : {test_config_path}")
                 start_time, end_time, result_path = mrbench.submit(test_config_path, result_dir)
+                logging.info(f"manager - mrbench_agent: result_path of mrbench_agent submit function is: {result_path}")
+                logging.info(f"manager - mrbench_agent: start time and end time of test in mrbench_agent submit function is: {start_time},{end_time}")
                 subprocess.run(f"sudo cp -r {test_config_path} {result_path}", shell=True)
                 if '#' in test_config or ':' in test_config:
                     data_time = {'Time': f"{start_time.replace(' ','_')},{end_time.replace(' ','_')}"}
