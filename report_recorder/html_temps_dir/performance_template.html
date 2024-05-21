@@ -1,22 +1,39 @@
-<h2>مشخصات تست ها</h2>
+<h2>معماری کلاستر</h2>
 
-{server_config}: hardware,cpu
+<p>برند سرور های فیزیکی استفاده شده</p>
+<p>تعداد سرور ها و hostname ها</p>
 
-<p> در جدول زیر مشخصات تست‌های انجام شده آورده شده است:</p>
-{input_config}: /root/monster/taghva/KARA/results/analyzed/merged.csv
-<h2>نتایج تست ها</h2>
+{server_config}:hardware,brand
 
-<p> در جدول زیر خلاصه‌ای از نتایج تست‌های کارایی آورده شده است:</p>
-{input_config}: /root/monster/taghva/KARA/results/analyzed/test.txt
+<h2>مشخصات سخت افزاری</h2>
+<p>در این بخش مشخصات سخت افزاری هر کدام از سرور ها به تفصیل مورد بررسی قرار می گیرد. این مشخصات بر اساس قسمت های مختلف سخت افزار سرورها تقسیم بندی شده اند.</p>
 
-<p> در جدول زیر خلاصه‌ای از نتایج تست‌های کارایی آورده شده است:</p>
-{input_config}: {backup_dir}/other_info/results/analyzed/merged_info.csv 
+<h3>پردازنده</h3>
+{server_config}:hardware,cpu
 
-<p> !در جدول زیر خلاصه‌ای از نتایج تست‌های کارایی آورده شده است:</p>
-{input_config}: /root/monster/taghva/KARA/results/0001#workload1:8#objSize:89#/info.yaml
+<h3>حافظه اصلی</h3>
+{server_config}:hardware,ram
 
-<p> برای مشاهده جزئیات نتایج تست‌ها به سند <a href="https://www.w3schools.com/html/">تست‌های کارایی کلاستر کارا نسخه اول</a> مراجعه کنید.</p>
+<h3>شبکه</h3>
+{server_config}:hardware,net
+
+<h3>دیسک و کنترولر</h3>
+{server_config}:hardware,disk
+
+<h3>PCI</h3>
+<p> برای مشاهده اطلاعات به سند <a href="https://kateb.burna.ir/wiki/%D8%AA%D9%85%D9%BE%D9%84%DB%8C%D8%AA_%D8%AE%D8%B1%D9%88%D8%AC%DB%8C_%D8%A7%D8%A8%D8%B2%D8%A7%D8%B1_%DA%A9%D8%A7%D8%B1%D8%A7_%D8%A8%D8%B1%D8%A7%DB%8C_%D9%85%D8%B9%D8%B1%D9%81%DB%8C_%D9%85%D8%B4%D8%AE%D8%B5%D8%A7%D8%AA_%D8%B3%D8%AE%D8%AA_%D8%A7%D9%81%D8%B2%D8%A7%D8%B1%DB%8C">  اطلاعات pci </a> مراجعه کنید.</p>
+
+
+<h3>مادربورد</h3>
+{server_config}:hardware,motherboard
+
+<h3>تنظیمات RAID</h3>
+
+<p>این مشخصات بسته به برند سرور فیزیکی با دستورات متفاوتی گزارش می شود.</p>
+<p>به طور مثال برای سرور های HP از دستور ssacli استفاده می شود.</p>
+
+<p> برای مشاهده جزئیات نتایج تست‌ها به سند <a href="https://kateb.burna.ir/wiki/%D8%AA%D9%85%D9%BE%D9%84%DB%8C%D8%AA_%D8%AE%D8%B1%D9%88%D8%AC%DB%8C_%D8%A7%D8%A8%D8%B2%D8%A7%D8%B1_%DA%A9%D8%A7%D8%B1%D8%A7_%D8%A8%D8%B1%D8%A7%DB%8C_%D9%85%D8%B9%D8%B1%D9%81%DB%8C_%D9%85%D8%B4%D8%AE%D8%B5%D8%A7%D8%AA_%D8%B3%D8%AE%D8%AA_%D8%A7%D9%81%D8%B2%D8%A7%D8%B1%DB%8C">تست‌های کارایی کلاستر کارا نسخه اول</a> مراجعه کنید.</p>
 
 [[رده:تست]]
-[[رده:ابزارها]]
+[[رده:کارایی]]
 [[رده:هیولا]]
