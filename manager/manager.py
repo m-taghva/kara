@@ -211,7 +211,7 @@ def mrbench_agent(config_params, config_file, config_output):
                 logging.info(f"manager - mrbench_agent: start time and end time of test in mrbench_agent submit function is: {start_time},{end_time}")
                 subprocess.run(f"sudo cp -r {test_config_path} {result_path}", shell=True)
                 if '#' in test_config or ':' in test_config:
-                    data_time = {'Time': f"{start_time.replace(' ','_')},{end_time.replace(' ','_')}"}
+                    data_time = {'Time': f"{start_time.replace(' ','_')}_{end_time.replace(' ','_')}"}
                     with open(os.path.join(result_path, 'info.yaml'), 'w') as yaml_file:
                         yaml.dump(data_time, yaml_file, default_flow_style=False)
                     data_swift = {}
