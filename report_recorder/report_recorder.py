@@ -49,7 +49,7 @@ def generate_cpu_model(serverName):
             threads = line[1]
         if "Model name" in line[0]:
             model = line[1]
-    return coresPerSocket + " cores x " + socket + " sockets x " + threads + " threads " + model
+    return coresPerSocket + "xcores x " + socket + "xsockets x " + threads + "xthreads " + model
 
 # lshw -short -C memory
 def generate_ram_model(serverName):
@@ -64,13 +64,12 @@ def generate_ram_model(serverName):
     counts = Counter(rams)
     ram = ""
     for item , count in counts.items():
-        ram+= str(count) + " " + item
+        ram+= str(count) + "x" + item
     return ram
 
 # lshw -json -C net
 def generate_net_model(serverName):
-    result = load(f'/configs/{serverName}' + "/hardware/net/lshw.txt")
-    #print(result)
+    result = load(f'/configs/{serverName}' + "/hardware/net/lshw-json.txt")
     Flag = False
     nets=[]
     capacities = []
@@ -86,14 +85,14 @@ def generate_net_model(serverName):
                 Flag = False
     netModel=[]
     for i in range(len(nets)):
-        if capacities[i] is not None:
+        if i < len(capacities):
             netModel.append(capacities[i] + " " + nets[i])
         else:
             netModel.append(nets[i])
     counts = Counter(netModel)
     net = ""
     for item, count in counts.items():
-        net += str(count) + " " + item + "\n"
+        net += str(count) + "x" + item + "\n"
     return net
 
 #dmidecode -t 2
@@ -115,12 +114,12 @@ def generate_disk_model(serverName):
     for line in result:
         if "disk" in line:
             diskname = line.split("disk")[1].replace("  ", "").replace("\n", "")
-            if diskname != " ":
+            if diskname != "":
                 disks.append(diskname)
     counts = Counter(disks)
     disksNames =""
     for item, count in counts.items():
-        disksNames += str(count) + item + "\n"
+        disksNames += str(count) + "x" + item + "\n"
     return disksNames
 
 def generate_model(server ,part ,spec):
