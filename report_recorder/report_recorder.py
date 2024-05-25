@@ -255,6 +255,7 @@ def upload_data(site, page_title, wiki_content):
         if not page.exists():
             page.text = wiki_content
             page.save(summary="Uploaded by KARA", force=True, quiet=False, botflag=False)
+            #page.save(" برچسب: [[مدیاویکی:Visualeditor-descriptionpagelink|ویرایش‌گر دیداری]]")
             logging.info(f"Page '{page_title}' uploaded successfully.")
             sub_pages_title = re.findall(r'\[https?://[^/]+/[^/]+/([^|\s]+)(?:\|[^\]]+)?\]', wiki_content)
             for sub_page in sub_pages_title:
