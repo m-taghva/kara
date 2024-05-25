@@ -1,25 +1,30 @@
 import argparse
 import re
 import os
-import pywikibot
 from bs4 import BeautifulSoup
 import logging
 import csv
 from collections import Counter
 import subprocess
 import sys
+import pandas as pd
 pywiki_path = os.path.abspath("./../report_recorder/pywikibot")
 if pywiki_path not in sys.path:
     sys.path.append(pywiki_path)
 import pywikibot
+classification_path = os.path.abspath("./../report_recorder/")
+if classification_path not in sys.path:
+    sys.path.append(classification_path)
+import classification
 
+# read backup dir
 configs_dir = ""
 def load(directory):
     with open(configs_dir + directory, 'r') as f:
         content = f.readlines()
     return content
 
-#dmidecode -t 1
+# dmidecode -t 1
 def generate_brand_model(serverName):
     result = load(f'/configs/{serverName}' + "/hardware/server-manufacturer/dmidecode.txt")
     manufacturer = ""
@@ -95,7 +100,7 @@ def generate_net_model(serverName):
         net += str(count) + "x" + item + "\n"
     return net
 
-#dmidecode -t 2
+# dmidecode -t 2
 def generate_motherboard_model(serverName):
     result = load(f'/configs/{serverName}' + "/hardware/motherboard/dmidecode.txt")
     manufacturer = ""
@@ -154,10 +159,37 @@ def compare(part ,spec):
         dict[model].append(server)
     return dict
 
+def test_page_maker(merged_info_path):
+    sorted_unique_file = classification.csv_to_sorted_yaml(merged_info_path)
+    yaml_data = classification.yaml_reader(sorted_unique_file)
+    number_of_groups,array_of_groups = classification.group_generator(yaml_data,threshold=2)
+    mergedInfo = pd.read_csv(merged_info_path)
+    num_lines = mergedInfo.shape[0]
+    html_result = "<h2> نتایج تست های کارایی </h2>"
+    html_result +=  f"<p> بر روی این کلاستر {num_lines} تعداد تست انجام شده که در {number_of_groups} دسته تست طبقه بندی شده است. </p>"
+    for sharedInfo in array_of_groups:
+        mergedInfo2 = mergedInfo
+        testGroup = ' , '.join(f'{key} = {value}' for key, value in sharedInfo.items())
+        html_result += f"<h4> نتایج تست های گروه: {testGroup} </h4>"
+        for key, value in sharedInfo.items():
+            mergedInfo2 = mergedInfo2[mergedInfo2[key] == int(value)]
+            mergedInfo2 = mergedInfo2.drop(key,axis=1)
+        ### html of each original group ###
+        html_result += "<table border='1' class='wikitable'>\n"
+        for i, row in enumerate(mergedInfo2.to_csv().split("\n")):
+            html_result += "<tr>\n"
+            tag = "th" if i == 0 else "td"
+            for j , column in enumerate(row.split(",")):
+                if j:
+                    html_result += f"<{tag}>{column}</{tag}>\n"
+            html_result += "</tr>\n"
+        html_result += "</table>"
+        return html_result
+
 #### make HTML template ####
 def dict_to_html(dict):
     html_dict = "<table border='1' class='wikitable'>\n"
-    html_dict += "<tr><th> نام سرور </th><th> برند و مدل </th></tr>\n"
+    html_dict += "<tr><th> نام سرور </th><th> مشخصات </th></tr>\n"
     for key, value in dict.items():
         if isinstance(value, list):
             value_str = ','.join(value)
@@ -205,6 +237,11 @@ def create_html_template(template_content, html_output):
         dict = compare(part.strip(), spec.strip())
         html_dict = dict_to_html(dict)
         html_data = html_data.replace(config_placeholder, html_dict)
+    for test_info in re.finditer(r'{test_config}:(.+)', template_content):
+        test_placeholder = test_info.group(0)
+        analyzed_csv = test_info.group(1).strip()
+        html_result = test_page_maker(analyzed_csv)
+        html_data = html_data.replace(test_placeholder, html_result)
     with open(html_output, 'w') as html_file:
         html_file.write(html_data)
         print(f"HTML template saved to: {html_output}")  
@@ -218,20 +255,30 @@ def upload_data(site, page_title, wiki_content):
         if not page.exists():
             page.text = wiki_content
             page.save(summary="Uploaded by KARA", force=True, quiet=False, botflag=False)
-            #page.save(" برچسب: [[مدیاویکی:Visualeditor-descriptionpagelink|ویرایش‌گر دیداری]]")
             logging.info(f"Page '{page_title}' uploaded successfully.")
+            sub_pages_title = re.findall(r'\[https?://[^/]+/[^/]+/([^|\s]+)(?:\|[^\]]+)?\]', wiki_content)
+            for sub_page in sub_pages_title:
+                spage = pywikibot.Page(site, sub_page)
+                if not spage.exists():
+                    spage.text = 'default_content'
+                    spage.save(summary="Uploaded by KARA", force=True, quiet=False, botflag=False)
+                    logging.info(f"Page '{sub_page}' created successfully.")
         else:
             print(f"Page '\033[91m{page_title}\033[0m' already exists on the wiki.")
             logging.warning(f"Page '{page_title}' already exists on the wiki.")
     except pywikibot.exceptions.Error as e:
         logging.error(f"Error uploading page '{page_title}': {e}")
 
-def convert_html_to_wiki(html_content):
+def convert_html_to_wiki(html_content, page_title):
     logging.info("Executing report_recorder convert_html_to_wiki function")
     soup = BeautifulSoup(html_content, 'html.parser')
     # Convert <a> tags to wiki links
     for a_tag in soup.find_all('a'):
-        if 'href' in a_tag.attrs:
+        if '{title}' in a_tag['href']:
+            new_href = a_tag['href'].replace('{title}', page_title)
+            a_tag['href'] = new_href
+            a_tag.replace_with(f"[{new_href}|{a_tag.text}]")
+        else:
             a_tag.replace_with(f"[{a_tag['href']}|{a_tag.text}]")
     # Convert <img> tags to wiki images
     for img_tag in soup.find_all('img'):
@@ -277,15 +324,15 @@ def main(input_template, html_output, page_title, html_page, directoryOfConfigs,
         else:
             print(f"\033[91minput backup File not found\033[0m")
         with open(input_template, 'r') as template_content:
-            # Create HTML template
             create_html_template(template_content.read(), html_output)
+
     if upload_operation:
         # Set up the wiki site
         site = pywikibot.Site()
         site.login()
         with open(html_page, 'r', encoding='utf-8') as file:
             html_content = file.read()
-        wiki_content = convert_html_to_wiki(html_content)
+        wiki_content = convert_html_to_wiki(html_content, page_title)
         # Upload converted data to the wiki
         upload_data(site, page_title, wiki_content)
         # Upload images to the wiki
@@ -300,19 +347,19 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--page_title", help="Kateb page title.")
     parser.add_argument("-U", "--upload_operation", action='store_true', help="upload page to kateb")
     parser.add_argument("-H", "--create_html", action='store_true', help="create HTML page template")
-    parser.add_argument("-tc", "--directoryOfConfigs", help="directory of test configs")
+    parser.add_argument("-cd", "--directoryOfConfigs", help="directory of test configs")
     args = parser.parse_args()
     if args.upload_operation and (args.html_page is None or args.page_title is None):
         print(f"\033[91mError: Both -p (--html_page) and -t (--page_title) switches are required for upload operation -U\033[0m")
         exit(1)
-    if args.create_html and (args.input_template is None or args.html_output is None or args.directoryOfConfigs is None):
-        print(f"\033[91mError: these switch -i (--input_template) and -o (--html_output) and -tc (--directoryOfConfigs) are required for generate HTML operation -H\033[0m")
+    if args.create_html and (args.input_template is None or args.html_output is None):
+        print(f"\033[91mError: these switch -i (--input_template) and -o (--html_output) are required for generate HTML operation -H\033[0m")
         exit(1)
     input_template = args.input_template 
     html_output = args.html_output
     page_title = args.page_title 
     html_page = args.html_page
-    directoryOfConfigs = args.directoryOfConfigs       
+    directoryOfConfigs = args.directoryOfConfigs 
     upload_operation = args.upload_operation
     create_html = args.create_html
     main(input_template, html_output, page_title, html_page, directoryOfConfigs, upload_operation, create_html)
