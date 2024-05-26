@@ -58,7 +58,7 @@ def generate_cpu_model(serverName):
 
 # lshw -short -C memory
 def generate_ram_model(serverName):
-    result = load(f'/configs/{serverName}' + "/hardware/ram/lshw-brief.txt")
+    result = load(f'/configs/{serverName}' + "/hardware/memory/lshw-brief.txt")
     rams=[]
     for line in result:
         line = line.replace("  ", "")
@@ -257,7 +257,7 @@ def upload_data(site, page_title, wiki_content):
             page.save(summary="Uploaded by KARA", force=True, quiet=False, botflag=False)
             #page.save(" برچسب: [[مدیاویکی:Visualeditor-descriptionpagelink|ویرایش‌گر دیداری]]")
             logging.info(f"Page '{page_title}' uploaded successfully.")
-            sub_pages_title = re.findall(r'\[https?://[^/]+/[^/]+/([^|\s]+)(?:\|[^\]]+)?\]', wiki_content)
+            sub_pages_title = re.findall(r"https?://[^/]+/(.+)", wiki_content)
             for sub_page in sub_pages_title:
                 spage = pywikibot.Page(site, sub_page)
                 if not spage.exists():
