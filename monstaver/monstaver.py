@@ -444,7 +444,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/ ; "
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/ ; "
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/cpu/ ; "
-            mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/ram/ ; "
+            mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/memory/ ; "
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/net/ ; "
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/pci/ ; "
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/disk/ ; "
@@ -534,8 +534,8 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
             if hardware_info:
                 logging.info(f"monstaver - user select switch -hw for hardware info") 
                 lshw_command = f"ssh -p {port} {user}@{ip} sudo lshw -C cpu > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/cpu/lshw.txt ; "
-                lshw_command += f"ssh -p {port} {user}@{ip} sudo lshw -C memory > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/ram/lshw.txt ; "
-                lshw_command += f"ssh -p {port} {user}@{ip} sudo lshw -C memory -short > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/ram/lshw-brief.txt ; "
+                lshw_command += f"ssh -p {port} {user}@{ip} sudo lshw -C memory > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/memory/lshw.txt ; "
+                lshw_command += f"ssh -p {port} {user}@{ip} sudo lshw -C memory -short > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/memory/lshw-brief.txt ; "
                 lshw_command += f"ssh -p {port} {user}@{ip} sudo lshw -C net > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/net/lshw.txt ; "
                 lshw_command += f"ssh -p {port} {user}@{ip} sudo lshw -C net -json > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/net/lshw-json.txt ; "
                 lshw_command += f"ssh -p {port} {user}@{ip} sudo lshw -short -C disk > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/disk/lshw-brief.txt ; "
@@ -563,7 +563,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                     logging.error(f"lscpu failed on {container_name} host")
                     print(f"\033[91m lscpu failed on {container_name} host\033[0m")
 
-                lsmem_command = f"ssh -p {port} {user}@{ip} sudo lsmem > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/ram/lsmem.txt"
+                lsmem_command = f"ssh -p {port} {user}@{ip} sudo lsmem > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/memory/lsmem.txt"
                 lsmem_process = subprocess.run(lsmem_command, shell=True)
                 if lsmem_process.returncode == 0:
                     logging.info(f"monstaver - lsmem successful on {container_name} host")
