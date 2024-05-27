@@ -1,227 +1,425 @@
-import yaml
-import itertools
+import argparse
+import re
 import os
+from bs4 import BeautifulSoup
+import logging
 import csv
+from collections import Counter
+import subprocess
+import sys
 import pandas as pd
+pywiki_path = os.path.abspath("./../report_recorder/pywikibot")
+if pywiki_path not in sys.path:
+    sys.path.append(pywiki_path)
+import pywikibot
+classification_path = os.path.abspath("./../report_recorder/")
+if classification_path not in sys.path:
+    sys.path.append(classification_path)
+import classification
 
-################# CSV to sorted yaml descending-based ###########################################################################
-def csv_to_sorted_yaml(merged_info_file):
-    unique_values = {}
+# read backup dir
+configs_dir = ""
+def load(directory):
+    with open(configs_dir + directory, 'r') as f:
+        content = f.readlines()
+    return content
 
-    with open(merged_info_file, 'r') as f:
-        reader = csv.reader(f)
-        headers = next(reader)  # Skip the header row
-        
-        # Initialize sets for each column except the first
-        for header in headers[1:]:
-            unique_values[header] = set()
-        
-        for row in reader:
-            for i, value in enumerate(row[1:], start=1):  # Skip the first column
-                unique_values[headers[i]].add(int(value) if value.isdigit() else value)
+# dmidecode -t 1
+def generate_brand_model(serverName):
+    result = load(f'/configs/{serverName}' + "/hardware/server-manufacturer/dmidecode.txt")
+    manufacturer = ""
+    productName = ""
+    for line in result:
+        if "Manufacturer" in line:
+            manufacturer = line.split(":")[1].replace("\n" , "")
+        if "Product Name" in line:
+            productName = line.split(":")[1].replace("\n" , "")
+    return manufacturer + productName
 
-    # Convert sets to lists for YAML serialization
-    for key in unique_values:
-        unique_values[key] = list(unique_values[key])
+# lscpu
+def generate_cpu_model(serverName):
+    result= load(f'/configs/{serverName}' + "/hardware/cpu/lscpu.txt")
+    coresPerSocket = ""
+    socket = ""
+    threads = ""
+    model = ""
+    for line in result:
+        line = line.replace("  ", "").replace("\n","").split(":")
+        if "Core(s) per socket" in line[0]:
+            coresPerSocket=line[1]
+            #print ("("+  coresPerSocket+ ")")
+        if "Socket(s)" in line[0]:
+            socket=line[1]
+        if "Thread(s) per core" in line[0]:
+            threads = line[1]
+        if "Model name" in line[0]:
+            model = line[1]
+    return coresPerSocket + "xcores x " + socket + "xsockets x " + threads + "xthreads " + model
 
-    # Write the unique values to a YAML file without quotes
-    unique_file = 'unique_values.yaml'
-    with open(unique_file, 'w') as f:
-        yaml.dump(unique_values, f, default_flow_style=False, sort_keys=False)
+# lshw -short -C memory
+def generate_memory_model(serverName):
+    result = load(f'/configs/{serverName}' + "/hardware/memory/lshw-brief.txt")
+    rams=[]
+    for line in result:
+        line = line.replace("  ", "")
+        if "DIMM" in line:
+            if "empty" not in line:
+                model = line.split("memory ")[1]
+                rams.append(model)
+    counts = Counter(rams)
+    ram = ""
+    for item , count in counts.items():
+        ram+= str(count) + "x" + item
+    return ram
 
-    print(f"Unique values written to {unique_file}")
+# lshw -json -C net
+def generate_net_model(serverName):
+    result = load(f'/configs/{serverName}' + "/hardware/net/lshw-json.txt")
+    Flag = False
+    nets=[]
+    capacities = []
+    for line in result:
+        line = line.replace(",\n" , "")
+        if "id" in line:
+            Flag = True
+        if Flag is True:
+            if "product" in line:
+                nets.append( line.split(":")[1].replace("" , ""))
+            if "capacity" in line:
+                capacities.append(line.split(":")[1].replace("000000000" , "")+"Gbit/s")
+                Flag = False
+    netModel=[]
+    for i in range(len(nets)):
+        if i < len(capacities):
+            netModel.append(capacities[i] + " " + nets[i])
+        else:
+            netModel.append(nets[i])
+    counts = Counter(netModel)
+    net = ""
+    for item, count in counts.items():
+        net += str(count) + "x" + item + "\n"
+    return net
 
-    with open('unique_values.yaml', 'r') as f:
-        yaml_data = yaml.safe_load(f)
+# dmidecode -t 2
+def generate_motherboard_model(serverName):
+    result = load(f'/configs/{serverName}' + "/hardware/motherboard/dmidecode.txt")
+    manufacturer = ""
+    productName = ""
+    for line in result:
+        if "Manufacturer" in line:
+            manufacturer = line.split(":")[1].replace("\n", "")
+        if "Product Name" in line:
+            productName = line.split(":")[1].replace("\n", "")
+    return manufacturer + productName
 
-    # Convert the dictionary into a list of tuples (key, value) where the value is the length of the associated list
-    sorted_data = dict(sorted(yaml_data.items(), key=lambda x: len(x[1]), reverse=True))
-    # print (sorted_data)
-    # Write the sorted dictionary back to a YAML file
+# lshw -short -C disk
+def generate_disk_model(serverName):
+    result = load(f'/configs/{serverName}' + "/hardware/disk/lshw-brief.txt")
+    disks= []
+    for line in result:
+        if "disk" in line:
+            diskname = line.split("disk")[1].replace("  ", "").replace("\n", "")
+            if diskname != "":
+                disks.append(diskname)
+    counts = Counter(disks)
+    disksNames =""
+    for item, count in counts.items():
+        disksNames += str(count) + "x" + item + "\n"
+    return disksNames
 
-    sorted_file = "sorted_output.yaml"
-    with open(sorted_file, 'w') as f:
-        yaml.dump(sorted_data,f,sort_keys=False)
+def generate_model(server ,part ,spec):
+    if part == "hardware":
+        if spec == "cpu":
+            return generate_cpu_model(server)
+        elif spec == "memory":
+            return generate_memory_model(server)
+        elif spec == "net":
+            return generate_net_model(server)
+        elif spec == "motherboard":
+            return generate_motherboard_model(server)
+        elif spec == "brand":
+            return generate_brand_model(server)
+        elif spec == "disk":
+            return generate_disk_model(server)
+    elif part == "software":
+        return "software not configed"
 
-    print(f"YAML file sorted based on number of values in descending order in {sorted_file}")
-    return sorted_file
+def compare(part ,spec):
+    cmd = ["ls" , f'{configs_dir}/configs']
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, text=True)
+    listOfServers = result.stdout.split("\n")
+    listOfServers.pop()
+    dict = {}
+    for server in listOfServers:
+        model= generate_model(server ,part ,spec)
+        if model in dict:
+            if dict[model] is None:
+                dict[model] = []
+        else: dict[model]= []
+        dict[model].append(server)
+    return dict
 
-#######################################################################################################
-
-def generate_combinations(yaml_data):
-    # Get the values from each key in the YAML data
-    values_lists = list(yaml_data.values())
-
-    # Generate all possible combinations of values from the lists
-    combinations = list(itertools.product(*values_lists))
-
-    return combinations
-
-########################################################################################################
-# yaml reader
-def yaml_reader(input):
-    with open(input, 'r') as yaml_file:
-        yaml_data = yaml.safe_load(yaml_file)
-    return yaml_data
-########################################################################################################
-'''
-# Specify the file path
-file_path = "final.txt"
-
-# Check if the file exists before attempting to delete it
-if os.path.exists(file_path):
-    # Delete the file
-    os.remove(file_path)
-    print(f"File '{file_path}' deleted successfully.")
-else:
-    print(f"File '{file_path}' does not exist.")
-    
-
-
-
-# Read the YAML file
-with open('sorted_output.yaml', 'r') as yaml_file:
-    yaml_data = yaml.safe_load(yaml_file)
-
-# Initialize the multiplication result
-
-# Iterate over the keys in reverse order
-result=1
-for key in yaml_data.keys():
-    # Extract the values associated with the current key
-    values = yaml_data[key]
-    result *= len(values)
- 
-
-# Print the final result
-print("Total Number of Tests is: ", result)
-'''
-def group_generator (yaml_data,threshold):
-
-    keys_list = list(yaml_data.keys())
-    result=1
-    j=0
-
-    for i in range(len(keys_list)):
-        #print ("i is: ", i)
-        key = keys_list[i]
-        result*=len(yaml_data[keys_list[i]])
-
-    #print (yaml_data[keys_list[2]])
-        if result > threshold:
-            if j!=0:
-                j = i
-                break
-            else:
-                j=1
-        
-
-    print ("j is the index of group breaker: ", j)
-
-    keys_list1 = list(yaml_data.keys())
-
-    # Define the range from 0 to i (inclusive)
-    start_index = j 
-    end_index = len(yaml_data.keys())
-
-    # Get the sublist of keys
-    sublist = keys_list1[start_index:end_index]
-    #print (sublist)
-    #print (keys_list1[end_index])
-
-
-    new_yaml_data = {key: yaml_data[key] for key in sublist}
-    #print (new_yaml_data)
-    # Dump the new dictionary to a YAML file
-    with open('from_threshold_to_end.yaml', 'w') as f:
-        yaml.dump(new_yaml_data, f, default_flow_style=False,sort_keys=False)
-
-
-    with open('from_threshold_to_end.yaml', 'r') as yaml_file:
-        yaml_data1 = yaml.safe_load(yaml_file)
-
-    # Generate combinations
-    combinations1_number_of_group = generate_combinations(yaml_data1)
-
-    #########################################################################################################
-    '''
-    keys_list2 = list(yaml_data.keys())
-
-    # Define the range from 0 to i (inclusive)
-    start_index = 0
-    end_index = j
-
-    # Get the sublist of keys
-    sublist = keys_list2[start_index:end_index]
-
-    new_yaml_data = {key: yaml_data[key] for key in sublist}
-
-    # Dump the new dictionary to a YAML file
-    with open('from_start_to_threshold.yaml', 'w') as f:
-        yaml.dump(new_yaml_data, f, default_flow_style=False,sort_keys=False)
-
-
-    with open('from_start_to_threshold.yaml', 'r') as yaml_file:
-        yaml_data2 = yaml.safe_load(yaml_file)
-
-    # Generate combinations
-    combinations2_number_of_tests_within_each_group = generate_combinations(yaml_data2)
-
-
-    n=len(combinations1_number_of_group)
-    lists = [[] for _ in range(n)]
-
-'''
-    ###################################################################################
+def test_page_maker(merged_info_path, merged_path, page_title,tests_dir):
+    htmls_dict={}
     number_of_groups = 0
-    array_of_groups=[]
-    for combination1 in combinations1_number_of_group:
-        result_dict1=dict(zip(yaml_data1.keys(), combination1))
-        array_of_groups.append(result_dict1)
-        number_of_groups+=1 
-    
-    return number_of_groups,array_of_groups
-
- 
-'''
-    #with open("final.txt", "a") as file:
-        #print (result_dict1)
-        #
-        #file.write("\n\n")  
-        #file.write('New group of tests')
-        #file.write("\n\n")
-    for combination2 in combinations2_number_of_tests_within_each_group:
-        result_dict2=dict(zip(yaml_data2.keys(), combination2))
-        with open("final.txt", "a") as file:   
-            result_dict={}
-            result_dict.update(result_dict2)
-            result_dict.update(result_dict1)
-            lists[i].append(result_dict)
-            #print (result_dict)
-            file.write(str(result_dict))
-            file.write("\n")  
-   
-    print (array_of_groups)
-    with open("final_final.txt", "w") as file:
-        for i, lst in enumerate(lists):
-    # Write the index and the list to the file
-            file.write(f"{lst}\n")
-
-'''
-
-
-
-def group_classification(array_of_groups):
-    mergedInfo_path = './merged_info.csv'
-    info_path = './info.csv'
-    mergedInfo = pd.read_csv(mergedInfo_path)
-    #sharedInfoList = [{"swift_config.object_worker":"7","workload_config.concurrency":"8","swift_config.proxy_worker":"15"},{"swift_config.object_worker":"7","workload_config.concurrency":"16","workload_config.objSize":"128"}]
-
+    sorted_unique_file = classification.csv_to_sorted_yaml(merged_info_path)
+    yaml_data = classification.yaml_reader(sorted_unique_file)
+    array_of_groups = classification.group_generator(yaml_data,threshold=8)
+    mergedInfo = pd.read_csv(merged_info_path)
+    merged = pd.read_csv(merged_path)
+    num_lines = mergedInfo.shape[0]
+    html_result = "<h2> نتایج تست های کارایی </h2>"
+    html_result += f"<p> بر روی این کلاستر {num_lines} تعداد تست انجام شده که در **var** دسته تست طبقه بندی شده است. </p>"
     for sharedInfo in array_of_groups:
         mergedInfo2 = mergedInfo
-        testGroup = ' , '.join(f'{key} = {value}' for key, value in sharedInfo.items())
-        print(testGroup)
+        merged2 = merged
+        testGroup = ','.join(f'{key} = {value}' for key, value in sharedInfo.items())
         for key, value in sharedInfo.items():
-            mergedInfo2 = mergedInfo2[mergedInfo2[key] == int(value) ]
-        print(mergedInfo2)
-    print (len(mergedInfo2))
+            mergedInfo2 = mergedInfo2[mergedInfo2[key] == int(value)]
+            merged2 = merged2[merged2[key] == int(value)]
+            mergedInfo2 = mergedInfo2.drop(key,axis=1)
+            merged2 = merged2.drop(key,axis=1)
+        if merged2.empty:
+            continue    
+        else:
+            number_of_groups +=1
+            html_result += f"<h3> نتایج تست های گروه: {testGroup} </h3>"
+        html_result += "<table border='1' class='wikitable'>\n"
+        for i, row in enumerate(merged2.to_csv().split("\n")):
+            html_result += "<tr>\n"
+            tag = "th" if i == 0 else "td"
+            for j , column in enumerate(row.split(",")):
+                if j:
+                    html_result += f"<{tag}>{column}</{tag}>\n"
+            html_result += "</tr>\n"
+        html_result += "</table>"
+        format_tg = testGroup.strip().replace(' ','').replace('=','-').replace(',','-')
+        html_result += f"<a href=https://kateb.burna.ir/wiki/{page_title}--{format_tg}> نمایش جزئیات </a>"
+        ###### create subgroups within each original group  ######
+        mergedInfo2.to_csv(f'{testGroup}.csv',index=False)
+        sorted_unique_file_1 = classification.csv_to_sorted_yaml(f'{testGroup}.csv')
+        yaml_data_1 = classification.yaml_reader(sorted_unique_file_1)
+        array_of_groups_1 = classification.group_generator(yaml_data_1,threshold=4)
+        sub_html_result = classification.create_tests_details(mergedInfo2,merged2,testGroup,array_of_groups_1,tests_dir)
+        htmls_dict.update({f"{page_title}--{format_tg}":sub_html_result})
+    htmls_dict.update({page_title:html_result.replace("**var**",str(number_of_groups))})
+    #with open('overview.html', 'w') as file:
+        #file.write(html_result)
+    return htmls_dict
+
+#### make HTML template ####
+def dict_to_html(dict):
+    html_dict = "<table border='1' class='wikitable'>\n"
+    html_dict += "<tr><th> نام سرور </th><th> مشخصات </th></tr>\n"
+    for key, value in dict.items():
+        if isinstance(value, list):
+            value_str = ','.join(value)
+        else:
+            value_str = str(value)
+        html_dict += f"<tr><td>{value_str}</td><td>{key}</td></tr>\n"
+    html_dict += "</table>"
+    return html_dict
+
+def csv_to_html(csv_file):
+    html_csv = "<table border='1' class='wikitable'>\n"
+    with open(csv_file, 'r') as file:
+        for i, row in enumerate(csv.reader(file)):
+            html_csv += "<tr>\n"
+            tag = "th" if i == 0 else "td"
+            for column in row:
+                html_csv += f"<{tag}>{column}</{tag}>\n"
+            html_csv += "</tr>\n"
+    html_csv += "</table>"
+    return html_csv
+
+def create_hw_htmls(template_content, html_output, page_title): #page_title = cluster_name
+    logging.info("Executing report_recorder create_html_template function")
+    htmls_dict={}
+    hw_info_dict = {}
+    html_data = template_content.replace("{title}",f"{page_title}") # for replace placeholder with content of files
+    # Find all occurrences of {input_config} placeholders in the template
+    for match in re.finditer(r'{input_config}:(.+)', template_content):
+        # Iterate over the placeholders and replace them with content
+        address_placeholder = match.group(0)
+        file_path = match.group(1).strip()
+        if '{backup_dir}' in file_path:
+            file_path = file_path.replace('{backup_dir}', configs_dir)
+        if '.csv' in os.path.basename(file_path):
+            html_csv = csv_to_html(file_path) 
+            html_data = html_data.replace(address_placeholder, html_csv)
+        else:
+            with open(file_path, 'r') as file:
+                content_of_file = file.readlines()
+            html_content = ""
+            for content_line in content_of_file:
+                html_content += f"<p>{content_line.replace(' ','&nbsp;')}</p>"
+            html_data = html_data.replace(address_placeholder, html_content)
+    for config_info in re.finditer(r'{server_config}:(.+)', template_content):
+        config_placeholder = config_info.group(0)
+        part,spec = config_info.group(1).split(',')
+        dict = compare(part.strip(), spec.strip())
+        hw_info_dict.update({spec.strip():dict})
+        html_of_dict = dict_to_html(dict)
+        html_data = html_data.replace(config_placeholder, html_of_dict)
+    htmls_dict.update({page_title:html_data})
+    htmls_dict.update(sub_pages_maker(html_data,page_title,hw_info_dict))
+    for html_key,html_value in htmls_dict.items():
+        with open(os.path.join(html_output+"/"+html_key+".html"), 'w') as html_file:
+            html_file.write(html_value)
+            print(f"HTML template saved to: {html_output+'/'+html_key+'.html'}") 
+    return htmls_dict
+
+def create_test_htmls(template_content, html_output, page_title): #page_title = cluster_name + scenario_name
+    merged_info_path = "./../results/analyzed/merged_info.csv"
+    merged_path = "./../results/analyzed/merged.csv"
+    path_until_results = "./../results/"
+    htmls_dict = test_page_maker(merged_info_path, merged_path ,page_title ,path_until_results)
+    for html_key,html_value in htmls_dict.items():
+        with open(os.path.join(html_output+"/"+html_key+".html"), 'w') as html_file:
+            html_file.write(html_value)
+            print(f"HTML template saved to: {html_output+'/'+html_key+'.html'}") 
+    return htmls_dict
+
+#### upload data and make wiki page ####
+def convert_html_to_wiki(html_content):
+    logging.info("Executing report_recorder convert_html_to_wiki function")
+    soup = BeautifulSoup(html_content, 'html.parser')
+    # Convert <a> tags to wiki links
+    for a_tag in soup.find_all('a'):
+        a_tag.replace_with(f"[{a_tag['href']} |{a_tag.text}]")
+    # Convert <img> tags to wiki images
+    for img_tag in soup.find_all('img'):
+        if 'src' in img_tag.attrs:
+            img_tag.replace_with(f"[[File:{img_tag['src']}]]")
+    return str(soup)
+
+def sub_pages_maker(template_content , page_title ,hw_info_dict):
+    global configs_dir
+    htmls_list={}
+    s1 = configs_dir
+    sub_dir_path = os.path.join(s1,'configs/{serverName}/hardware/')
+    if page_title + "--CPU" in template_content:
+        htmls_list.update({page_title + "--CPU":one_sub_page_maker(sub_dir_path+'cpu/',hw_info_dict['cpu'])})
+    if page_title + "--Memory" in template_content:
+        htmls_list.update({page_title + "--Memory":one_sub_page_maker(sub_dir_path+'memory/',hw_info_dict['memory'])})
+    if page_title + "--Network" in template_content:
+        htmls_list.update({page_title + "--Network":one_sub_page_maker(sub_dir_path+'net/',hw_info_dict['net'])})
+    if page_title + "--Disk" in template_content:
+        htmls_list.update({page_title + "--Disk":one_sub_page_maker(sub_dir_path+'disk/',hw_info_dict['disk'])})
+    #if page_title + "--PCI" in template_content:
+    #    htmls_list.update({page_title + "--PCI":sub_page_maker(sub_dir_path+'pci/',hw_info_dict['pci'])})
+    return htmls_list
+
+def one_sub_page_maker(path_to_files,spec_dict):
+    html_content = ""
+    for i in os.listdir(path_to_files.replace("{serverName}",next(iter(spec_dict.values()))[0])):
+        html_content += f"<h2> {i} </h2>"
+        for key,value in spec_dict.items():
+            html_content += f"<h3> {value} </h3>"
+            p = path_to_files.replace("{serverName}",value[0])+i
+            if os.path.exists(p):
+                with open(p, 'r') as file:
+                    file_contents = file.readlines()
+                for file_content in file_contents:
+                    html_content += f"<p>{file_content.replace(' ','&nbsp;')}</p>"
+            else:
+                html_content += "<p> فایل مربوطه یافت نشد </p>"
+    html_content += "<p> </p>"
+    html_content += "[[رده:تست]]\n[[رده:کارایی]]\n[[رده:هیولا]]"
+    return html_content
+
+def upload_data(site, page_title, wiki_content):
+    logging.info("Executing report_recorder upload_data function")
+    try:
+        page = pywikibot.Page(site, page_title)
+        if not page.exists():
+            page.text = wiki_content
+            page.save(summary="Uploaded by KARA", force=True, quiet=False, botflag=False)
+            #page.save(" برچسب: [[مدیاویکی:Visualeditor-descriptionpagelink|ویرایش‌گر دیداری]]")
+            logging.info(f"Page '{page_title}' uploaded successfully.")
+        else:
+            print(f"Page '\033[91m{page_title}\033[0m' already exists on the wiki.")
+            logging.warning(f"Page '{page_title}' already exists on the wiki.")
+    except pywikibot.exceptions.Error as e:
+        logging.error(f"Error uploading page '{page_title}': {e}")
+
+def upload_images(site, html_content):
+    logging.info("Executing report_recorder upload_images function")
+    soup = BeautifulSoup(html_content, 'html.parser')
+    # Find image filenames in <img> tags
+    image_filenames = [img['src'] for img in soup.find_all('img') if 'src' in img.attrs]
+    # Upload each image to the wiki
+    for image_filename in image_filenames:
+        image_path = os.path.join(os.path.dirname(html_content), image_filename)
+        page = pywikibot.FilePage(site, f'File:{image_filename}')
+        if not page.exists():
+            # Create a FilePage object
+            file_page = pywikibot.FilePage(site, page.title())
+            # Check if the file already exists
+            if file_page.exists():
+                raise ValueError("File already exists!")
+            # Upload the file
+            success = file_page.upload(image_path, comment=f"Uploaded image '{image_filename}' using KARA")
+            if success:
+                print(f"File uploaded successfully! File page: {file_page.full_url()}")
+            else:
+                print("Upload failed.")
+            logging.info(f"Image '{image_filename}' uploaded successfully.")
+        else:
+            logging.warning(f"Image '{image_filename}' already exists on the wiki.")
+
+def main(input_template, html_output_path, cluster_name, scenario_name, main_html_page, directoryOfConfigs, upload_operation, create_html_operation):
+    global configs_dir
+    htmls_dict = {}
+    log_dir = f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && sudo chmod -R 777 /var/log/kara/"
+    log_dir_run = subprocess.run(log_dir, shell=True)
+    logging.basicConfig(filename= '/var/log/kara/all.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.info("\033[92m****** report_recorder main function start ******\033[0m")
+    if create_html_operation:
+        if directoryOfConfigs is not None:
+            if os.path.exists(directoryOfConfigs):
+                configs_dir = directoryOfConfigs
+            else:
+                print(f"\033[91minput backup File not found\033[0m")
+        if input_template:
+            with open(input_template, 'r') as template_content:
+                htmls_dict = create_hw_htmls(template_content.read(), html_output_path, cluster_name)  
+        htmls_dict.update(create_test_htmls("",html_output_path,cluster_name+"--"+scenario_name)) 
+    elif upload_operation:
+        with open(main_html_page, 'r', encoding='utf-8') as file:
+            htmls_dict = [{cluster_name:file.read()}]
+    if upload_operation:
+        # Set up the wiki site
+        site = pywikibot.Site()
+        site.login()
+        for title,content in htmls_dict.items():
+            wiki_content = convert_html_to_wiki(content)
+            # Upload converted data to the wiki
+            upload_data(site, title, wiki_content)
+            # Upload images to the wiki
+            upload_images(site, content)
+    logging.info("\033[92m****** report_recorder main function end ******\033[0m")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate report for kateb")
+    parser.add_argument("-i", "--input_template", help="Template HTML file path")
+    parser.add_argument("-o", "--html_output_path", help="Output HTML file name")
+    parser.add_argument("-p", "--main_html_page", help="HTML template for upload")
+    parser.add_argument("-cn", "--cluster_name", help="cluster_name set for title of Kateb HW page.")
+    parser.add_argument("-sn", "--scenario_name", help="set for title of Kateb test page.")
+    parser.add_argument("-U", "--upload_operation", action='store_true', help="upload page to kateb")
+    parser.add_argument("-H", "--create_html_operation", action='store_true', help="create HTML page template")
+    parser.add_argument("-cd", "--directoryOfConfigs", help="directory of test configs")
+    args = parser.parse_args()
+    input_template = args.input_template 
+    html_output_path = args.html_output_path
+    cluster_name = args.cluster_name
+    scenario_name = args.scenario_name 
+    main_html_page = args.main_html_page
+    if args.directoryOfConfigs:
+       directoryOfConfigs = args.directoryOfConfigs 
+    else:
+        directoryOfConfigs = None
+    upload_operation = args.upload_operation
+    create_html_operation = args.create_html_operation
+    main(input_template, html_output_path, cluster_name, scenario_name, main_html_page, directoryOfConfigs, upload_operation, create_html_operation)
