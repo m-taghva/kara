@@ -57,7 +57,7 @@ def generate_cpu_model(serverName):
     return coresPerSocket + "xcores x " + socket + "xsockets x " + threads + "xthreads " + model
 
 # lshw -short -C memory
-def generate_ram_model(serverName):
+def generate_memory_model(serverName):
     result = load(f'/configs/{serverName}' + "/hardware/memory/lshw-brief.txt")
     rams=[]
     for line in result:
@@ -131,8 +131,8 @@ def generate_model(server ,part ,spec):
     if part == "hardware":
         if spec == "cpu":
             return generate_cpu_model(server)
-        elif spec == "ram":
-            return generate_ram_model(server)
+        elif spec == "memory":
+            return generate_memory_model(server)
         elif spec == "net":
             return generate_net_model(server)
         elif spec == "motherboard":
@@ -159,24 +159,33 @@ def compare(part ,spec):
         dict[model].append(server)
     return dict
 
-def test_page_maker(merged_info_path):
+def test_page_maker(merged_info_path, merged_path, page_title,tests_dir):
+    htmls_dict={}
+    number_of_groups = 0
     sorted_unique_file = classification.csv_to_sorted_yaml(merged_info_path)
     yaml_data = classification.yaml_reader(sorted_unique_file)
-    number_of_groups,array_of_groups = classification.group_generator(yaml_data,threshold=2)
+    array_of_groups = classification.group_generator(yaml_data,threshold=8)
     mergedInfo = pd.read_csv(merged_info_path)
+    merged = pd.read_csv(merged_path)
     num_lines = mergedInfo.shape[0]
     html_result = "<h2> نتایج تست های کارایی </h2>"
-    html_result +=  f"<p> بر روی این کلاستر {num_lines} تعداد تست انجام شده که در {number_of_groups} دسته تست طبقه بندی شده است. </p>"
+    html_result += f"<p> بر روی این کلاستر {num_lines} تعداد تست انجام شده که در **var** دسته تست طبقه بندی شده است. </p>"
     for sharedInfo in array_of_groups:
         mergedInfo2 = mergedInfo
-        testGroup = ' , '.join(f'{key} = {value}' for key, value in sharedInfo.items())
-        html_result += f"<h4> نتایج تست های گروه: {testGroup} </h4>"
+        merged2 = merged
+        testGroup = ','.join(f'{key} = {value}' for key, value in sharedInfo.items())
         for key, value in sharedInfo.items():
             mergedInfo2 = mergedInfo2[mergedInfo2[key] == int(value)]
+            merged2 = merged2[merged2[key] == int(value)]
             mergedInfo2 = mergedInfo2.drop(key,axis=1)
-        ### html of each original group ###
+            merged2 = merged2.drop(key,axis=1)
+        if merged2.empty:
+            continue    
+        else:
+            number_of_groups +=1
+            html_result += f"<h3> نتایج تست های گروه: {testGroup} </h3>"
         html_result += "<table border='1' class='wikitable'>\n"
-        for i, row in enumerate(mergedInfo2.to_csv().split("\n")):
+        for i, row in enumerate(merged2.to_csv().split("\n")):
             html_result += "<tr>\n"
             tag = "th" if i == 0 else "td"
             for j , column in enumerate(row.split(",")):
@@ -184,7 +193,19 @@ def test_page_maker(merged_info_path):
                     html_result += f"<{tag}>{column}</{tag}>\n"
             html_result += "</tr>\n"
         html_result += "</table>"
-        return html_result
+        format_tg = testGroup.strip().replace(' ','').replace('=','-').replace(',','-')
+        html_result += f"<a href=https://kateb.burna.ir/wiki/{page_title}--{format_tg}> نمایش جزئیات </a>"
+        ###### create subgroups within each original group  ######
+        mergedInfo2.to_csv(f'{testGroup}.csv',index=False)
+        sorted_unique_file_1 = classification.csv_to_sorted_yaml(f'{testGroup}.csv')
+        yaml_data_1 = classification.yaml_reader(sorted_unique_file_1)
+        array_of_groups_1 = classification.group_generator(yaml_data_1,threshold=4)
+        sub_html_result = classification.create_tests_details(mergedInfo2,merged2,testGroup,array_of_groups_1,tests_dir)
+        htmls_dict.update({f"{page_title}--{format_tg}":sub_html_result})
+    htmls_dict.update({page_title:html_result.replace("**var**",str(number_of_groups))})
+    #with open('overview.html', 'w') as file:
+        #file.write(html_result)
+    return htmls_dict
 
 #### make HTML template ####
 def dict_to_html(dict):
@@ -211,9 +232,11 @@ def csv_to_html(csv_file):
     html_csv += "</table>"
     return html_csv
 
-def create_html_template(template_content, html_output):
+def create_hw_htmls(template_content, html_output, page_title): #page_title = cluster_name
     logging.info("Executing report_recorder create_html_template function")
-    html_data = template_content # for replace placeholder with content of files
+    htmls_dict={}
+    hw_info_dict = {}
+    html_data = template_content.replace("{title}",f"{page_title}") # for replace placeholder with content of files
     # Find all occurrences of {input_config} placeholders in the template
     for match in re.finditer(r'{input_config}:(.+)', template_content):
         # Iterate over the placeholders and replace them with content
@@ -235,19 +258,76 @@ def create_html_template(template_content, html_output):
         config_placeholder = config_info.group(0)
         part,spec = config_info.group(1).split(',')
         dict = compare(part.strip(), spec.strip())
-        html_dict = dict_to_html(dict)
-        html_data = html_data.replace(config_placeholder, html_dict)
-    for test_info in re.finditer(r'{test_config}:(.+)', template_content):
-        test_placeholder = test_info.group(0)
-        analyzed_csv = test_info.group(1).strip()
-        html_result = test_page_maker(analyzed_csv)
-        html_data = html_data.replace(test_placeholder, html_result)
-    with open(html_output, 'w') as html_file:
-        html_file.write(html_data)
-        print(f"HTML template saved to: {html_output}")  
-    return html_data
+        hw_info_dict.update({spec.strip():dict})
+        html_of_dict = dict_to_html(dict)
+        html_data = html_data.replace(config_placeholder, html_of_dict)
+    htmls_dict.update({page_title:html_data})
+    htmls_dict.update(sub_pages_maker(html_data,page_title,hw_info_dict))
+    for html_key,html_value in htmls_dict.items():
+        with open(os.path.join(html_output+"/"+html_key+".html"), 'w') as html_file:
+            html_file.write(html_value)
+            print(f"HTML template saved to: {html_output+'/'+html_key+'.html'}") 
+    return htmls_dict
+
+def create_test_htmls(template_content, html_output, page_title): #page_title = cluster_name + scenario_name
+    merged_info_path = "./../results/analyzed/merged_info.csv"
+    merged_path = "./../results/analyzed/merged.csv"
+    path_until_results = "./../results/"
+    htmls_dict = test_page_maker(merged_info_path, merged_path ,page_title ,path_until_results)
+    for html_key,html_value in htmls_dict.items():
+        with open(os.path.join(html_output+"/"+html_key+".html"), 'w') as html_file:
+            html_file.write(html_value)
+            print(f"HTML template saved to: {html_output+'/'+html_key+'.html'}") 
+    return htmls_dict
 
 #### upload data and make wiki page ####
+def convert_html_to_wiki(html_content):
+    logging.info("Executing report_recorder convert_html_to_wiki function")
+    soup = BeautifulSoup(html_content, 'html.parser')
+    # Convert <a> tags to wiki links
+    for a_tag in soup.find_all('a'):
+        a_tag.replace_with(f"[{a_tag['href']} |{a_tag.text}]")
+    # Convert <img> tags to wiki images
+    for img_tag in soup.find_all('img'):
+        if 'src' in img_tag.attrs:
+            img_tag.replace_with(f"[[File:{img_tag['src']}]]")
+    return str(soup)
+
+def sub_pages_maker(template_content , page_title ,hw_info_dict):
+    global configs_dir
+    htmls_list={}
+    s1 = configs_dir
+    sub_dir_path = os.path.join(s1,'configs/{serverName}/hardware/')
+    if page_title + "--CPU" in template_content:
+        htmls_list.update({page_title + "--CPU":one_sub_page_maker(sub_dir_path+'cpu/',hw_info_dict['cpu'])})
+    if page_title + "--Memory" in template_content:
+        htmls_list.update({page_title + "--Memory":one_sub_page_maker(sub_dir_path+'memory/',hw_info_dict['memory'])})
+    if page_title + "--Network" in template_content:
+        htmls_list.update({page_title + "--Network":one_sub_page_maker(sub_dir_path+'net/',hw_info_dict['net'])})
+    if page_title + "--Disk" in template_content:
+        htmls_list.update({page_title + "--Disk":one_sub_page_maker(sub_dir_path+'disk/',hw_info_dict['disk'])})
+    #if page_title + "--PCI" in template_content:
+    #    htmls_list.update({page_title + "--PCI":sub_page_maker(sub_dir_path+'pci/',hw_info_dict['pci'])})
+    return htmls_list
+
+def one_sub_page_maker(path_to_files,spec_dict):
+    html_content = ""
+    for i in os.listdir(path_to_files.replace("{serverName}",next(iter(spec_dict.values()))[0])):
+        html_content += f"<h2> {i} </h2>"
+        for key,value in spec_dict.items():
+            html_content += f"<h3> {value} </h3>"
+            p = path_to_files.replace("{serverName}",value[0])+i
+            if os.path.exists(p):
+                with open(p, 'r') as file:
+                    file_contents = file.readlines()
+                for file_content in file_contents:
+                    html_content += f"<p>{file_content.replace(' ','&nbsp;')}</p>"
+            else:
+                html_content += "<p> فایل مربوطه یافت نشد </p>"
+    html_content += "<p> </p>"
+    html_content += "[[رده:تست]]\n[[رده:کارایی]]\n[[رده:هیولا]]"
+    return html_content
+
 def upload_data(site, page_title, wiki_content):
     logging.info("Executing report_recorder upload_data function")
     try:
@@ -257,45 +337,20 @@ def upload_data(site, page_title, wiki_content):
             page.save(summary="Uploaded by KARA", force=True, quiet=False, botflag=False)
             #page.save(" برچسب: [[مدیاویکی:Visualeditor-descriptionpagelink|ویرایش‌گر دیداری]]")
             logging.info(f"Page '{page_title}' uploaded successfully.")
-            sub_pages_title = re.findall(r"https?://[^/]+/(.+)", wiki_content)
-            for sub_page in sub_pages_title:
-                spage = pywikibot.Page(site, sub_page)
-                if not spage.exists():
-                    spage.text = 'default_content'
-                    spage.save(summary="Uploaded by KARA", force=True, quiet=False, botflag=False)
-                    logging.info(f"Page '{sub_page}' created successfully.")
         else:
             print(f"Page '\033[91m{page_title}\033[0m' already exists on the wiki.")
             logging.warning(f"Page '{page_title}' already exists on the wiki.")
     except pywikibot.exceptions.Error as e:
         logging.error(f"Error uploading page '{page_title}': {e}")
 
-def convert_html_to_wiki(html_content, page_title):
-    logging.info("Executing report_recorder convert_html_to_wiki function")
-    soup = BeautifulSoup(html_content, 'html.parser')
-    # Convert <a> tags to wiki links
-    for a_tag in soup.find_all('a'):
-        if '{title}' in a_tag['href']:
-            new_href = a_tag['href'].replace('{title}', page_title)
-            a_tag['href'] = new_href
-            a_tag.replace_with(f"[{new_href}|{a_tag.text}]")
-        else:
-            a_tag.replace_with(f"[{a_tag['href']}|{a_tag.text}]")
-    # Convert <img> tags to wiki images
-    for img_tag in soup.find_all('img'):
-        if 'src' in img_tag.attrs:
-            img_tag.replace_with(f"[[File:{img_tag['src']}]]")
-    return str(soup)
-
-def upload_images(site, html_file_path):
+def upload_images(site, html_content):
     logging.info("Executing report_recorder upload_images function")
-    with open(html_file_path, 'r', encoding='utf-8') as file:
-        soup = BeautifulSoup(file, 'html.parser')
+    soup = BeautifulSoup(html_content, 'html.parser')
     # Find image filenames in <img> tags
     image_filenames = [img['src'] for img in soup.find_all('img') if 'src' in img.attrs]
     # Upload each image to the wiki
     for image_filename in image_filenames:
-        image_path = os.path.join(os.path.dirname(html_file_path), image_filename)
+        image_path = os.path.join(os.path.dirname(html_content), image_filename)
         page = pywikibot.FilePage(site, f'File:{image_filename}')
         if not page.exists():
             # Create a FilePage object
@@ -313,54 +368,58 @@ def upload_images(site, html_file_path):
         else:
             logging.warning(f"Image '{image_filename}' already exists on the wiki.")
 
-def main(input_template, html_output, page_title, html_page, directoryOfConfigs, upload_operation, create_html):
+def main(input_template, html_output_path, cluster_name, scenario_name, main_html_page, directoryOfConfigs, upload_operation, create_html_operation):
     global configs_dir
+    htmls_dict = {}
     log_dir = f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && sudo chmod -R 777 /var/log/kara/"
     log_dir_run = subprocess.run(log_dir, shell=True)
     logging.basicConfig(filename= '/var/log/kara/all.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
     logging.info("\033[92m****** report_recorder main function start ******\033[0m")
-    if create_html:
-        if os.path.exists(directoryOfConfigs):
-            configs_dir = directoryOfConfigs
-        else:
-            print(f"\033[91minput backup File not found\033[0m")
-        with open(input_template, 'r') as template_content:
-            create_html_template(template_content.read(), html_output)
-
+    if create_html_operation:
+        if directoryOfConfigs is not None:
+            if os.path.exists(directoryOfConfigs):
+                configs_dir = directoryOfConfigs
+            else:
+                print(f"\033[91minput backup File not found\033[0m")
+        if input_template:
+            with open(input_template, 'r') as template_content:
+                htmls_dict = create_hw_htmls(template_content.read(), html_output_path, cluster_name)  
+        htmls_dict.update(create_test_htmls("",html_output_path,cluster_name+"--"+scenario_name)) 
+    elif upload_operation:
+        with open(main_html_page, 'r', encoding='utf-8') as file:
+            htmls_dict = [{cluster_name:file.read()}]
     if upload_operation:
         # Set up the wiki site
         site = pywikibot.Site()
         site.login()
-        with open(html_page, 'r', encoding='utf-8') as file:
-            html_content = file.read()
-        wiki_content = convert_html_to_wiki(html_content, page_title)
-        # Upload converted data to the wiki
-        upload_data(site, page_title, wiki_content)
-        # Upload images to the wiki
-        upload_images(site, html_page)
+        for title,content in htmls_dict.items():
+            wiki_content = convert_html_to_wiki(content)
+            # Upload converted data to the wiki
+            upload_data(site, title, wiki_content)
+            # Upload images to the wiki
+            upload_images(site, content)
     logging.info("\033[92m****** report_recorder main function end ******\033[0m")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate report for kateb")
     parser.add_argument("-i", "--input_template", help="Template HTML file path")
-    parser.add_argument("-o", "--html_output", help="Output HTML file name")
-    parser.add_argument("-p", "--html_page", help="HTML template for upload")
-    parser.add_argument("-t", "--page_title", help="Kateb page title.")
+    parser.add_argument("-o", "--html_output_path", help="Output HTML file name")
+    parser.add_argument("-p", "--main_html_page", help="HTML template for upload")
+    parser.add_argument("-cn", "--cluster_name", help="cluster_name set for title of Kateb HW page.")
+    parser.add_argument("-sn", "--scenario_name", help="set for title of Kateb test page.")
     parser.add_argument("-U", "--upload_operation", action='store_true', help="upload page to kateb")
-    parser.add_argument("-H", "--create_html", action='store_true', help="create HTML page template")
+    parser.add_argument("-H", "--create_html_operation", action='store_true', help="create HTML page template")
     parser.add_argument("-cd", "--directoryOfConfigs", help="directory of test configs")
     args = parser.parse_args()
-    if args.upload_operation and (args.html_page is None or args.page_title is None):
-        print(f"\033[91mError: Both -p (--html_page) and -t (--page_title) switches are required for upload operation -U\033[0m")
-        exit(1)
-    if args.create_html and (args.input_template is None or args.html_output is None):
-        print(f"\033[91mError: these switch -i (--input_template) and -o (--html_output) are required for generate HTML operation -H\033[0m")
-        exit(1)
     input_template = args.input_template 
-    html_output = args.html_output
-    page_title = args.page_title 
-    html_page = args.html_page
-    directoryOfConfigs = args.directoryOfConfigs 
+    html_output_path = args.html_output_path
+    cluster_name = args.cluster_name
+    scenario_name = args.scenario_name 
+    main_html_page = args.main_html_page
+    if args.directoryOfConfigs:
+       directoryOfConfigs = args.directoryOfConfigs 
+    else:
+        directoryOfConfigs = None
     upload_operation = args.upload_operation
-    create_html = args.create_html
-    main(input_template, html_output, page_title, html_page, directoryOfConfigs, upload_operation, create_html)
+    create_html_operation = args.create_html_operation
+    main(input_template, html_output_path, cluster_name, scenario_name, main_html_page, directoryOfConfigs, upload_operation, create_html_operation)
