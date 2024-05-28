@@ -161,19 +161,25 @@ def compare(part ,spec):
 
 def test_page_maker(merged_file, merged_info_file, all_test_dir, page_title):
     htmls_dict={}
-    number_of_groups = 0
-    sorted_unique_file = classification.csv_to_sorted_yaml(merged_info_file)
-    yaml_data = classification.yaml_reader(sorted_unique_file)
-    array_of_groups = classification.group_generator(yaml_data,threshold=8)
     mergedInfo = pd.read_csv(merged_info_file)
     merged = pd.read_csv(merged_file)
+    original_columns_merged_info = mergedInfo.columns.tolist()
+    mergedInfo = mergedInfo.loc[:, mergedInfo.nunique() != 1]
+    removed_columns_mergedInfo = [col for col in original_columns_merged_info if col not in mergedInfo.columns]
+    merged = merged.drop(columns=removed_columns_mergedInfo, errors='ignore')
     num_lines = mergedInfo.shape[0]
+
+    number_of_groups = 0
+    sorted_unique = classification.csv_to_sorted_yaml(mergedInfo)
+    array_of_groups = classification.group_generator(sorted_unique,threshold=8)
+    
+
     html_result = "<h2> نتایج تست های کارایی </h2>"
     html_result += f"<p> بر روی این کلاستر {num_lines} تعداد تست انجام شده که در **var** دسته تست طبقه بندی شده است. </p>"
     for sharedInfo in array_of_groups:
         mergedInfo2 = mergedInfo
         merged2 = merged
-        testGroup = ','.join(f'{key} = {value}' for key, value in sharedInfo.items())
+        testGroup = ' , '.join(f'{key} = {value}' for key, value in sharedInfo.items())
         for key, value in sharedInfo.items():
             mergedInfo2 = mergedInfo2[mergedInfo2[key] == int(value)]
             merged2 = merged2[merged2[key] == int(value)]
@@ -182,9 +188,9 @@ def test_page_maker(merged_file, merged_info_file, all_test_dir, page_title):
         if merged2.empty:
             continue    
         else:
-            number_of_groups +=1
-            html_result += f"<h3> نتایج تست های گروه: {testGroup} </h3>"
-        html_result += "<table border='1' class='wikitable'>\n"
+            number_of_groups+=1
+            html_result+= f"<h3> نتایج تست های گروه: {testGroup} </h3>"
+        html_result+= "<table border='1' class='wikitable'>\n"
         for i, row in enumerate(merged2.to_csv().split("\n")):
             html_result += "<tr>\n"
             tag = "th" if i == 0 else "td"
@@ -196,10 +202,8 @@ def test_page_maker(merged_file, merged_info_file, all_test_dir, page_title):
         format_tg = testGroup.strip().replace(' ','').replace('=','-').replace(',','-')
         html_result += f"<a href=https://kateb.burna.ir/wiki/{page_title}--{format_tg}> نمایش جزئیات </a>"
         ###### create subgroups within each original group  ######
-        mergedInfo2.to_csv(f'{testGroup}.csv',index=False)
-        sorted_unique_file_1 = classification.csv_to_sorted_yaml(f'{testGroup}.csv')
-        yaml_data_1 = classification.yaml_reader(sorted_unique_file_1)
-        array_of_groups_1 = classification.group_generator(yaml_data_1,threshold=4)
+        sorted_unique_file_1 = classification.csv_to_sorted_yaml(mergedInfo2)
+        array_of_groups_1 = classification.group_generator(sorted_unique_file_1,threshold=4)
         sub_html_result = classification.create_tests_details(mergedInfo2,merged2,testGroup,array_of_groups_1,all_test_dir)
         htmls_dict.update({f"{page_title}--{format_tg}":sub_html_result+"[[رده:تست]]\n[[رده:کارایی]]\n[[رده:هیولا]]"})
     htmls_dict.update({page_title:html_result.replace("**var**",str(number_of_groups))+"[[رده:تست]]\n[[رده:کارایی]]\n[[رده:هیولا]]"})
