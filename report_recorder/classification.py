@@ -65,85 +65,49 @@ def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_paramet
     return html_result
 
 ##########################################################################################################
-def csv_to_sorted_yaml(merged_info_file):
+def csv_to_sorted_yaml(mergedInfo):
     unique_values = {}
-    with open(merged_info_file, 'r') as f:
-        reader = csv.reader(f)
-        headers = next(reader)  # Skip the header row   
-        # Initialize sets for each column except the first
-        for header in headers[1:]:
-            unique_values[header] = set()    
-        for row in reader:
-            for i, value in enumerate(row[1:], start=1):  # Skip the first column
-                unique_values[headers[i]].add(int(value) if value.isdigit() else value)
-    # Convert sets to lists for YAML serialization
-    for key in unique_values:
-        unique_values[key] = list(unique_values[key]) 
-    unique_file = f'unique_yaml_{os.path.basename(merged_info_file)}.yaml'
-    with open(unique_file, 'w') as f:
-        yaml.dump(unique_values, f, default_flow_style=False, sort_keys=False)
-    #print(f"Unique values written to {unique_file}")
-    with open(unique_file, 'r') as f:
-        yaml_data = yaml.safe_load(f)
-    # Convert the dictionary into a list of tuples (key, value) where the value is the length of the associated list
-    sorted_data = dict(sorted(yaml_data.items(), key=lambda x: len(x[1]), reverse=True))
-    sorted_file = f'sorted_yaml_{os.path.basename(merged_info_file)}.yaml'
-    with open(sorted_file, 'w') as f:
-        yaml.dump(sorted_data,f,sort_keys=False)
-    #print(f"YAML file sorted based on number of values in descending order in {sorted_file}")
-    return sorted_file
+    headers = mergedInfo.columns.tolist()  # Skip the header row
+    for header in headers[1:]:
+        unique_values.update({header:mergedInfo[header].unique()})
+    sorted_dict = dict(sorted(unique_values.items(), key=lambda x: len(x[1]),reverse=True))    
+    return sorted_dict
 
 #######################################################################################################
-
 def generate_combinations(yaml_data):
     values_lists = list(yaml_data.values())
-    # Generate all possible combinations of values from the lists
     combinations = list(itertools.product(*values_lists))
     return combinations
 
 ########################################################################################################
-# yaml reader
-def yaml_reader(input):
-    with open(input, 'r') as yaml_file:
-        yaml_data = yaml.safe_load(yaml_file)
-    return yaml_data
-########################################################################################################
-
 def group_generator (yaml_data,threshold):
     keys_list = list(yaml_data.keys())
     result=1
     j=1
+
     if (len(keys_list)==1):
         j=0
+
     else:
         for i in range(len(keys_list)):
             key = keys_list[i]
             result*=len(yaml_data[key])
             j = i
             if result > threshold:
-                #print ("j first is: ", j)
-                break       
-    #print (f"j is the index of group breaker: {j}, result is {result} ")
+                break     
     keys_list1 = list(yaml_data.keys())
-    # Define the range from 0 to i (inclusive)
     start_index = j 
     end_index = len(yaml_data.keys())
-    # Get the sublist of keys
     sublist = keys_list1[start_index:end_index]
     new_yaml_data = {key: yaml_data[key] for key in sublist}
-    with open('from_threshold_to_end.yaml', 'w') as f:
-        yaml.dump(new_yaml_data, f, default_flow_style=False,sort_keys=False)
-    with open('from_threshold_to_end.yaml', 'r') as yaml_file:
-        yaml_data1 = yaml.safe_load(yaml_file)
     # Generate combinations
-    combinations1_number_of_group = generate_combinations(yaml_data1)
+    combinations1_number_of_group = generate_combinations(new_yaml_data)
     #print (f"combinations1_number_of_group is {combinations1_number_of_group}")
 
     ###################################################################################
-
     array_of_groups=[]
     for combination1 in combinations1_number_of_group:
-        result_dict1=dict(zip(yaml_data1.keys(), combination1))
+        result_dict1=dict(zip(new_yaml_data.keys(), combination1))
         array_of_groups.append(result_dict1)
     return array_of_groups
 def group_classification(array_of_groups):
@@ -153,8 +117,6 @@ def group_classification(array_of_groups):
     for sharedInfo in array_of_groups:
         mergedInfo2 = mergedInfo
         testGroup = ' , '.join(f'{key} = {value}' for key, value in sharedInfo.items())
-        #print(testGroup)
+#        print(testGroup)
         for key, value in sharedInfo.items():
             mergedInfo2 = mergedInfo2[mergedInfo2[key] == int(value) ]
-        #print(mergedInfo2)
-    #print (len(mergedInfo2))
