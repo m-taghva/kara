@@ -159,14 +159,14 @@ def compare(part ,spec):
         dict[model].append(server)
     return dict
 
-def test_page_maker(merged_info_path, merged_path, page_title,tests_dir):
+def test_page_maker(merged_file, merged_info_file, all_test_dir, page_title):
     htmls_dict={}
     number_of_groups = 0
-    sorted_unique_file = classification.csv_to_sorted_yaml(merged_info_path)
+    sorted_unique_file = classification.csv_to_sorted_yaml(merged_info_file)
     yaml_data = classification.yaml_reader(sorted_unique_file)
     array_of_groups = classification.group_generator(yaml_data,threshold=8)
-    mergedInfo = pd.read_csv(merged_info_path)
-    merged = pd.read_csv(merged_path)
+    mergedInfo = pd.read_csv(merged_info_file)
+    merged = pd.read_csv(merged_file)
     num_lines = mergedInfo.shape[0]
     html_result = "<h2> نتایج تست های کارایی </h2>"
     html_result += f"<p> بر روی این کلاستر {num_lines} تعداد تست انجام شده که در **var** دسته تست طبقه بندی شده است. </p>"
@@ -200,11 +200,9 @@ def test_page_maker(merged_info_path, merged_path, page_title,tests_dir):
         sorted_unique_file_1 = classification.csv_to_sorted_yaml(f'{testGroup}.csv')
         yaml_data_1 = classification.yaml_reader(sorted_unique_file_1)
         array_of_groups_1 = classification.group_generator(yaml_data_1,threshold=4)
-        sub_html_result = classification.create_tests_details(mergedInfo2,merged2,testGroup,array_of_groups_1,tests_dir)
-        htmls_dict.update({f"{page_title}--{format_tg}":sub_html_result})
-    htmls_dict.update({page_title:html_result.replace("**var**",str(number_of_groups))})
-    #with open('overview.html', 'w') as file:
-        #file.write(html_result)
+        sub_html_result = classification.create_tests_details(mergedInfo2,merged2,testGroup,array_of_groups_1,all_test_dir)
+        htmls_dict.update({f"{page_title}--{format_tg}":sub_html_result+"[[رده:تست]]\n[[رده:کارایی]]\n[[رده:هیولا]]"})
+    htmls_dict.update({page_title:html_result.replace("**var**",str(number_of_groups))+"[[رده:تست]]\n[[رده:کارایی]]\n[[رده:هیولا]]"})
     return htmls_dict
 
 #### make HTML template ####
@@ -269,11 +267,8 @@ def create_hw_htmls(template_content, html_output, page_title): #page_title = cl
             print(f"HTML template saved to: {html_output+'/'+html_key+'.html'}") 
     return htmls_dict
 
-def create_test_htmls(template_content, html_output, page_title): #page_title = cluster_name + scenario_name
-    merged_info_path = "./../results/analyzed/merged_info.csv"
-    merged_path = "./../results/analyzed/merged.csv"
-    path_until_results = "./../results/"
-    htmls_dict = test_page_maker(merged_info_path, merged_path ,page_title ,path_until_results)
+def create_test_htmls(template_content, html_output, page_title, merged_file, merged_info_file, all_test_dir): #page_title = cluster_name + scenario_name
+    htmls_dict = test_page_maker(merged_file, merged_info_file, all_test_dir, page_title)
     for html_key,html_value in htmls_dict.items():
         with open(os.path.join(html_output+"/"+html_key+".html"), 'w') as html_file:
             html_file.write(html_value)
@@ -290,7 +285,7 @@ def convert_html_to_wiki(html_content):
     # Convert <img> tags to wiki images
     for img_tag in soup.find_all('img'):
         if 'src' in img_tag.attrs:
-            img_tag.replace_with(f"[[File:{img_tag['src']}]]")
+            img_tag.replace_with(f"[[File:{os.path.basename(img_tag['src'])}|800px|thumb|center|{os.path.basename(img_tag['src']).split('_2024')[0]}]]") #replace(_2024) hazf shavaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad
     return str(soup)
 
 def sub_pages_maker(template_content , page_title ,hw_info_dict):
@@ -306,14 +301,15 @@ def sub_pages_maker(template_content , page_title ,hw_info_dict):
         htmls_list.update({page_title + "--Network":one_sub_page_maker(sub_dir_path+'net/',hw_info_dict['net'])})
     if page_title + "--Disk" in template_content:
         htmls_list.update({page_title + "--Disk":one_sub_page_maker(sub_dir_path+'disk/',hw_info_dict['disk'])})
-    #if page_title + "--PCI" in template_content:
-    #    htmls_list.update({page_title + "--PCI":sub_page_maker(sub_dir_path+'pci/',hw_info_dict['pci'])})
+    if page_title + "--PCI" in template_content:
+        #htmls_list.update({page_title + "--PCI":sub_page_maker(sub_dir_path+'pci/',hw_info_dict['pci'])})
+        htmls_list.update({page_title + "--PCI":one_sub_page_maker(sub_dir_path+'pci/',hw_info_dict['cpu'])})
     return htmls_list
 
 def one_sub_page_maker(path_to_files,spec_dict):
     html_content = ""
     for i in os.listdir(path_to_files.replace("{serverName}",next(iter(spec_dict.values()))[0])):
-        html_content += f"<h2> {i} </h2>"
+        html_content += f"<h2> {str(i).replace('.txt','')} </h2>"
         for key,value in spec_dict.items():
             html_content += f"<h3> {value} </h3>"
             p = path_to_files.replace("{serverName}",value[0])+i
@@ -333,7 +329,7 @@ def upload_data(site, page_title, wiki_content):
     try:
         page = pywikibot.Page(site, page_title)
         if not page.exists():
-            page.text = wiki_content
+            page.text = wiki_content + '\n powered by KARA'
             page.save(summary="Uploaded by KARA", force=True, quiet=False, botflag=False)
             #page.save(" برچسب: [[مدیاویکی:Visualeditor-descriptionpagelink|ویرایش‌گر دیداری]]")
             logging.info(f"Page '{page_title}' uploaded successfully.")
@@ -346,19 +342,15 @@ def upload_data(site, page_title, wiki_content):
 def upload_images(site, html_content):
     logging.info("Executing report_recorder upload_images function")
     soup = BeautifulSoup(html_content, 'html.parser')
-    # Find image filenames in <img> tags
-    image_filenames = [img['src'] for img in soup.find_all('img') if 'src' in img.attrs]
+    image_paths = [img['src'] for img in soup.find_all('img') if 'src' in img.attrs]
     # Upload each image to the wiki
-    for image_filename in image_filenames:
-        image_path = os.path.join(os.path.dirname(html_content), image_filename)
+    for image_path in image_paths:
+        image_filename = os.path.basename(image_path)
         page = pywikibot.FilePage(site, f'File:{image_filename}')
         if not page.exists():
-            # Create a FilePage object
             file_page = pywikibot.FilePage(site, page.title())
-            # Check if the file already exists
             if file_page.exists():
                 raise ValueError("File already exists!")
-            # Upload the file
             success = file_page.upload(image_path, comment=f"Uploaded image '{image_filename}' using KARA")
             if success:
                 print(f"File uploaded successfully! File page: {file_page.full_url()}")
@@ -368,23 +360,23 @@ def upload_images(site, html_content):
         else:
             logging.warning(f"Image '{image_filename}' already exists on the wiki.")
 
-def main(input_template, html_output_path, cluster_name, scenario_name, main_html_page, directoryOfConfigs, upload_operation, create_html_operation):
+def main(input_template, html_output_path, cluster_name, scenario_name, main_html_page, configs_directory, upload_operation, create_html_operation, merged_file, merged_info_file, all_test_dir):
     global configs_dir
     htmls_dict = {}
-    log_dir = f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && sudo chmod -R 777 /var/log/kara/"
-    log_dir_run = subprocess.run(log_dir, shell=True)
+    log_maker = subprocess.run(f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && sudo chmod -R 777 /var/log/kara/", shell=True)
     logging.basicConfig(filename= '/var/log/kara/all.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
     logging.info("\033[92m****** report_recorder main function start ******\033[0m")
     if create_html_operation:
-        if directoryOfConfigs is not None:
-            if os.path.exists(directoryOfConfigs):
-                configs_dir = directoryOfConfigs
+        if configs_directory is not None:
+            if os.path.exists(configs_directory):
+                configs_dir = configs_directory
             else:
                 print(f"\033[91minput backup File not found\033[0m")
         if input_template:
             with open(input_template, 'r') as template_content:
-                htmls_dict = create_hw_htmls(template_content.read(), html_output_path, cluster_name)  
-        htmls_dict.update(create_test_htmls("",html_output_path,cluster_name+"--"+scenario_name)) 
+                htmls_dict = create_hw_htmls(template_content.read(), html_output_path, cluster_name+'--HW')  
+        if merged_file and merged_info_file and  all_test_dir:
+            htmls_dict.update(create_test_htmls("",html_output_path,cluster_name+"--"+scenario_name, merged_file, merged_info_file, all_test_dir)) 
     elif upload_operation:
         with open(main_html_page, 'r', encoding='utf-8') as file:
             htmls_dict = [{cluster_name:file.read()}]
@@ -409,17 +401,23 @@ if __name__ == "__main__":
     parser.add_argument("-sn", "--scenario_name", help="set for title of Kateb test page.")
     parser.add_argument("-U", "--upload_operation", action='store_true', help="upload page to kateb")
     parser.add_argument("-H", "--create_html_operation", action='store_true', help="create HTML page template")
-    parser.add_argument("-cd", "--directoryOfConfigs", help="directory of test configs")
+    parser.add_argument("-cd", "--configs_directory", help="directory of backup include test configs")
+    parser.add_argument("-m", "--merged_file", help="path to merged.csv file")
+    parser.add_argument("-mi", "--merged_info_file", help="path to merged_info.csv file")
+    parser.add_argument("-td", "--all_test_dir", help="directory of all tests")
     args = parser.parse_args()
     input_template = args.input_template 
     html_output_path = args.html_output_path
     cluster_name = args.cluster_name
     scenario_name = args.scenario_name 
     main_html_page = args.main_html_page
-    if args.directoryOfConfigs:
-       directoryOfConfigs = args.directoryOfConfigs 
+    merged_file = args.merged_file
+    merged_info_file = args.merged_info_file
+    all_test_dir = args.all_test_dir
+    if args.configs_directory:
+       configs_directory = args.configs_directory 
     else:
-        directoryOfConfigs = None
+        configs_directory = None
     upload_operation = args.upload_operation
     create_html_operation = args.create_html_operation
-    main(input_template, html_output_path, cluster_name, scenario_name, main_html_page, directoryOfConfigs, upload_operation, create_html_operation)
+    main(input_template, html_output_path, cluster_name, scenario_name, main_html_page, configs_directory, upload_operation, create_html_operation, merged_file, merged_info_file, all_test_dir)
