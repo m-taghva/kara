@@ -65,3 +65,15 @@ fi
 zip_file="$KARA_DIR/KARA/report_recorder/report_recorder_bot.zip"
 zip_destination="$KARA_DIR/KARA/report_recorder"
 unzip "$zip_file" -d "$zip_destination"
+
+#### copy user-config.py to manager dir
+if [ ! -f "$KARA_DIR/KARA/manager/user-config.py" ]; then
+    sudo cp -r $KARA_DIR/KARA/report_recorder/user-config.py $KARA_DIR/KARA/manager/
+elif [ -f "$KARA_DIR/KARA/manager/user-config.py" ]; then
+    user_conf_diff=$(diff $KARA_DIR/KARA/manager/user-config.py $KARA_DIR/KARA/report_recorder/user-config.py)
+    if [ $? -eq 0 ] && [ ! -z "$user_conf_diff" ]; then
+        sudo cp -r $KARA_DIR/KARA/report_recorder/user-config.py $KARA_DIR/KARA/manager/
+    fi
+else
+    echo -e "\033[91muser-config.py is required for run report_recorder\033[0m"
+fi
