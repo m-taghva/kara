@@ -356,23 +356,13 @@ def report_recorder_agent(config_params, backup_to_report, result_dir):
     upload_to_kateb = config_params.get('upload_to_kateb', True)
     cluster_name = config_params.get('cluster_name')
     scenario_name = config_params.get('scenario_name')
-
-    if create_html:
-        if backup_to_report is not None:
-            # for HW report
-            report_recorder.main(input_template=f"{html_templates_path}/hardware.html", htmls_path=output_path, cluster_name=cluster_name, scenario_name=None, configs_directory=backup_to_report, upload_operation=False, create_html_operation=True, merged_file=None , merged_info_file=None , all_test_dir=None)
-        else:
-            print("please take a backup for report hardware data to kateb")   
-        # for test report
-        report_recorder.main(input_template=None, htmls_path=output_path, cluster_name=cluster_name, scenario_name=scenario_name, configs_directory=None, upload_operation=False, create_html_operation=True, merged_file=f"{result_dir}/analyzed/merged.csv" , merged_info_file=f"{result_dir}/analyzed/merged_info.csv" , all_test_dir=result_dir)
-    if upload_to_kateb:
-        if backup_to_report is not None:
-            # for HW report
-            report_recorder.main(input_template=f"{html_templates_path}/hardware.html", htmls_path=output_path, cluster_name=cluster_name, scenario_name=None, configs_directory=backup_to_report, upload_operation=True, create_html_operation=False, merged_file=None , merged_info_file=None , all_test_dir=None)
-        else:
-            print("please take a backup for report hardware data to kateb")   
-        # for test report
-        report_recorder.main(input_template=None, htmls_path=output_path, cluster_name=cluster_name, scenario_name=scenario_name, configs_directory=None, upload_operation=True, create_html_operation=False, merged_file=f"{result_dir}/analyzed/merged.csv" , merged_info_file=f"{result_dir}/analyzed/merged_info.csv" , all_test_dir=result_dir)
+    if backup_to_report is not None:
+        # for HW report
+        report_recorder.main(input_template=f"{html_templates_path}/hardware.html", htmls_path=output_path, cluster_name=cluster_name, scenario_name=None, configs_directory=backup_to_report, upload_operation=upload_to_kateb, create_html_operation=create_html, merged_file=None , merged_info_file=None , all_test_dir=None)
+    else:
+        print("please take a backup for report hardware data to kateb")   
+    # for test report
+    report_recorder.main(input_template=None, htmls_path=output_path, cluster_name=cluster_name, scenario_name=scenario_name, configs_directory=None, upload_operation=upload_to_kateb, create_html_operation=create_html, merged_file=f"{result_dir}/analyzed/merged.csv" , merged_info_file=f"{result_dir}/analyzed/merged_info.csv" , all_test_dir=result_dir)
 
 def main(config_file):
     log_level = load_config(config_file)['log'].get('level')
