@@ -364,7 +364,7 @@ def upload_images(site, html_content):
         else:
             logging.warning(f"Image '{image_filename}' already exists on the wiki.")
 
-def main(input_template, html_output_path, cluster_name, scenario_name, main_html_page, configs_directory, upload_operation, create_html_operation, merged_file, merged_info_file, all_test_dir):
+def main(input_template, htmls_path, cluster_name, scenario_name, configs_directory, upload_operation, create_html_operation, merged_file, merged_info_file, all_test_dir):
     global configs_dir
     htmls_dict = {}
     log_maker = subprocess.run(f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && sudo chmod -R 777 /var/log/kara/", shell=True)
@@ -378,12 +378,13 @@ def main(input_template, html_output_path, cluster_name, scenario_name, main_htm
                 print(f"\033[91minput backup File not found\033[0m")
         if input_template:
             with open(input_template, 'r') as template_content:
-                htmls_dict = create_hw_htmls(template_content.read(), html_output_path, cluster_name+'--HW')  
+                htmls_dict = create_hw_htmls(template_content.read(), htmls_path, cluster_name+'--HW')  
         if merged_file and merged_info_file and  all_test_dir:
-            htmls_dict.update(create_test_htmls("",html_output_path,cluster_name+"--"+scenario_name, merged_file, merged_info_file, all_test_dir)) 
+            htmls_dict.update(create_test_htmls("",htmls_path,cluster_name+"--"+scenario_name, merged_file, merged_info_file, all_test_dir)) 
     elif upload_operation:
-        with open(main_html_page, 'r', encoding='utf-8') as file:
-            htmls_dict = [{cluster_name:file.read()}]
+        for html_file in os.listdir(htmls_path):
+            with open(os.path.join(htmls_path,html_file), 'r', encoding='utf-8') as file:
+                htmls_dict = [{cluster_name+html_file:file.read()}]
     if upload_operation:
         # Set up the wiki site
         site = pywikibot.Site()
@@ -400,7 +401,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate report for kateb")
     parser.add_argument("-i", "--input_template", help="Template HTML file path")
     parser.add_argument("-o", "--html_output_path", help="Output HTML file name")
-    parser.add_argument("-p", "--main_html_page", help="HTML template for upload")
     parser.add_argument("-cn", "--cluster_name", help="cluster_name set for title of Kateb HW page.")
     parser.add_argument("-sn", "--scenario_name", help="set for title of Kateb test page.")
     parser.add_argument("-U", "--upload_operation", action='store_true', help="upload page to kateb")
@@ -411,10 +411,9 @@ if __name__ == "__main__":
     parser.add_argument("-td", "--all_test_dir", help="directory of all tests")
     args = parser.parse_args()
     input_template = args.input_template 
-    html_output_path = args.html_output_path
+    htmls_path = args.htmls_path
     cluster_name = args.cluster_name
     scenario_name = args.scenario_name 
-    main_html_page = args.main_html_page
     merged_file = args.merged_file
     merged_info_file = args.merged_info_file
     all_test_dir = args.all_test_dir
@@ -424,4 +423,4 @@ if __name__ == "__main__":
         configs_directory = None
     upload_operation = args.upload_operation
     create_html_operation = args.create_html_operation
-    main(input_template, html_output_path, cluster_name, scenario_name, main_html_page, configs_directory, upload_operation, create_html_operation, merged_file, merged_info_file, all_test_dir)
+    main(input_template, htmls_path, cluster_name, scenario_name, configs_directory, upload_operation, create_html_operation, merged_file, merged_info_file, all_test_dir)
