@@ -348,12 +348,6 @@ def status_analyzer_agent(config_params):
 
 def report_recorder_agent(config_params, backup_to_report):
     if not os.path.exists(f"./user-config.py"):
-        subprocess.run(f"sudo cp -r ./../report_recorder/user-config.py .", shell=True)
-    elif os.path.exists(f"./user-config.py"):
-        user_conf_diff = subprocess.run(f"diff ./user-config.py ./../report_recorder/user-config.py", shell=True, capture_output=True, text=True)
-        if user_conf_diff.stderr == "" and user_conf_diff.stdout != "":
-            subprocess.run(f"sudo cp -r ./../report_recorder/user-config.py .", shell=True)
-    else:
         print(f"\033[91muser-config.py is required for run report_recorder\033[0m")
         exit(1)
     create_html_operation = config_params.get('create_html_operation', True)
