@@ -335,37 +335,44 @@ def monstaver_agent(config_params, config_file, first_start_time, last_end_time)
 
 def status_analyzer_agent(config_params):
     result_dir = config_params.get('input_path')
-    merge = config_params.get('merge', False)
+    merge = config_params.get('merge', True)
     merge_csv = config_params.get('merge_csv')
-    analyze = config_params.get('analyze', False)
+    analyze = config_params.get('analyze', True)
     analyze_csv = config_params.get('analyze_csv')
     transform_dir = config_params.get('transform')
     if merge:
-        analyzer.main(merge=True, analyze=False, graph=False, csv_original=None, output_directory=result_dir, selected_csv=merge_csv, x_column=None, y_column=None)
+        analyzer.main(merge=True, analyze=False, graph=False, csv_original=None, output_directory=result_dir, selected_csv=merge_csv, transformation_directory=None ,x_column=None, y_column=None)
         time.sleep(10)
     if analyze:
-        analyzer.main(merge=False, analyze=True, graph=False, csv_original=f"{result_dir}/{analyze_csv}", output_directory=None, transformation_directory=transform_dir, x_column=None, y_column=None)
+        analyzer.main(merge=False, analyze=True, graph=False, csv_original=analyze_csv, output_directory=None, selected_csv=None, transformation_directory=transform_dir, x_column=None, y_column=None)
 
-def report_recorder_agent(config_params, backup_to_report):
+def report_recorder_agent(config_params, backup_to_report, result_dir):
     if not os.path.exists(f"./user-config.py"):
         print(f"\033[91muser-config.py is required for run report_recorder\033[0m")
         exit(1)
-    create_html_operation = config_params.get('create_html_operation', True)
-    input_template = config_params.get('input_html_template')
-    output_html = config_params.get('output_html')
-    temp_configs_directory = config_params.get('configs_directory')
-    upload_operation = config_params.get('upload_operation', True)
-    kateb_page_title = config_params.get('kateb_page_title')
-    if create_html_operation:
-        if temp_configs_directory != " ":  
-            #subprocess.run(f"python3 /root/monster/taghva/KARA/report_recorder/report_recorder.py -H -i {input_template} -o {output_html} -tc {temp_configs_directory}", shell=True) 
-            report_recorder.main(input_template=input_template, html_output=output_html, page_title=None, html_page=None, directoryOfConfigs=temp_configs_directory, upload_operation=False, create_html=True)
-        elif temp_configs_directory is None and backup_to_report is not None:
-            #subprocess.run(f"python3 /root/monster/taghva/KARA/report_recorder/report_recorder.py -H -i {input_template} -o {output_html} -tc {backup_to_report}", shell=True)
-            report_recorder.main(input_template=input_template, html_output=output_html, page_title=None, html_page=None, directoryOfConfigs=backup_to_report, upload_operation=False, create_html=True)
-    if upload_operation:
-        #subprocess.run(f"python3 /root/monster/taghva/KARA/report_recorder/report_recorder.py -U -p {output_html} -t {kateb_page_title}", shell=True)
-        report_recorder.main(input_template=None, html_output=None, page_title=kateb_page_title, html_page=output_html, directoryOfConfigs=None, upload_operation=True, create_html=False)
+    create_html = config_params.get('create_html', True)
+    html_templates_path = config_params.get('html_templates_path')
+    output_path = config_params.get('output_path')
+    upload_to_kateb = config_params.get('upload_to_kateb', True)
+    cluster_name = config_params.get('cluster_name')
+    scenario_name = config_params.get('scenario_name')
+
+    if create_html:
+        if backup_to_report is not None:
+            # for HW report
+            report_recorder.main(input_template=f"{html_templates_path}/hardware.html", htmls_path=output_path, cluster_name=cluster_name, scenario_name=None, configs_directory=backup_to_report, upload_operation=False, create_html_operation=True, merged_file=None , merged_info_file=None , all_test_dir=None)
+        else:
+            print("please take a backup for report hardware data to kateb")   
+        # for test report
+        report_recorder.main(input_template=None, htmls_path=output_path, cluster_name=cluster_name, scenario_name=scenario_name, configs_directory=None, upload_operation=False, create_html_operation=True, merged_file=f"{result_dir}/analyzed/merged.csv" , merged_info_file=f"{result_dir}/analyzed/merged_info.csv" , all_test_dir=result_dir)
+    if upload_to_kateb:
+        if backup_to_report is not None:
+            # for HW report
+            report_recorder.main(input_template=f"{html_templates_path}/hardware.html", htmls_path=output_path, cluster_name=cluster_name, scenario_name=None, configs_directory=backup_to_report, upload_operation=True, create_html_operation=False, merged_file=None , merged_info_file=None , all_test_dir=None)
+        else:
+            print("please take a backup for report hardware data to kateb")   
+        # for test report
+        report_recorder.main(input_template=None, htmls_path=output_path, cluster_name=cluster_name, scenario_name=scenario_name, configs_directory=None, upload_operation=True, create_html_operation=False, merged_file=f"{result_dir}/analyzed/merged.csv" , merged_info_file=f"{result_dir}/analyzed/merged_info.csv" , all_test_dir=result_dir)
 
 def main(config_file):
     log_level = load_config(config_file)['log'].get('level')
