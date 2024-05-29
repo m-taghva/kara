@@ -62,15 +62,6 @@ def copy_swift_conf(swift_configs):
                         diff_ring_result = subprocess.run(diff_ring_command, shell=True, capture_output=True, text=True)
                         print("")
                         print(f"please wait for checking ring file [ {filename} ] inside {container_name}")
-                        if "account" in filename:
-                            ring_command = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/account.builder"
-                            ring_dict['account'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
-                        elif "container" in filename:
-                            ring_command = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/container.builder"
-                            ring_dict['container'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
-                        else:
-                            ring_command = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/object.builder"
-                            ring_dict['object'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
                         if diff_ring_result.stderr == "":
                             if diff_ring_result.stdout != "":
                                 mkdir_tmp_rings = f"ssh -p {port} {user}@{ip} 'sudo mkdir -p /tmp/rings/ > /dev/null 2>&1 && sudo chmod -R 777 /tmp/rings/'"
@@ -89,6 +80,16 @@ def copy_swift_conf(swift_configs):
                             print("")
                             print(f"\033[91mWARNING: your ring file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
                             #exit(1)
+                        if "account" in filename:
+                            ring_command = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/account.builder"
+                            ring_dict['account'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
+                        elif "container" in filename:
+                            ring_command = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/container.builder"
+                            ring_dict['container'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
+                        else:
+                            ring_command = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/object.builder"
+                            ring_dict['object'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
+                            
                     elif filename.endswith(".conf"):
                         diff_conf_command = f"ssh -p {port} {user}@{ip} 'sudo cat {inspect_value}/{filename}' | diff - {filepath}"
                         diff_conf_result = subprocess.run(diff_conf_command, shell=True, capture_output=True, text=True)
