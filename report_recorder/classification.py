@@ -4,8 +4,7 @@ import csv
 import pandas as pd
 import os
 
-################# CSV to sorted yaml descending-based ###########################################################################
-
+################# CSV to sorted yaml descending-based ##############################################################
 def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_parameters,tests_dir):
     img_metrics = ['netdata_disk_sdb_writes_mean','netdata_statsd_timer_swift_object_server_put_timing_events_mean']
     html_result =  f"<p> در این سند جزئیات مربوط به تست های گروه {test_group} آمده است</p>"
@@ -23,11 +22,12 @@ def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_paramet
                 mergedTests2 = mergedTests2.drop(columns=key)
             if mergedTestsInfo2.empty:
                 break
-            else:
-                html_result+= f"<h2> نتایج تست های گروه: {testGroup} </h2>"
-                html_result+= f"<h3> نتایج سرور: {serverName} </h3>"
+            html_result+= f"<h2> نتایج تست های گروه: {testGroup} </h2>"
             mergedTestsInfo2.reset_index()
             test_rows = [pd.DataFrame([row], columns=mergedTestsInfo2.columns) for _, row in mergedTestsInfo2.iterrows()]
+            num_of_tests_within_groups = len(test_rows)
+            html_result+=f"<p> در این گروه {num_of_tests_within_groups} تست انجام شده است که نتایج آن در ادامه قرار داده شده است.  </p>"
+            html_result+= f"<h3> نتایج سرور: {serverName} </h3>"
             for test in test_rows:
                 trow = test.iloc[0]
                 row_dict = trow.to_dict()
@@ -62,6 +62,17 @@ def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_paramet
                         html_result += f"<{tag}>{column}</{tag}>\n"
                 html_result += "</tr>\n"
             html_result += "</table>"    
+    html_result+= "<h2> جمع بندی نتایج</h2>"
+    html_result+= f"<p> در این سند نتایج مربوط به {len(mergedTestsInfo)} تست گزارش شده است. همه تست ها دارای مقدار {test_group} هستند که برای {', '.join(array_of_parameters[0].keys())} های مختلف مورد بررسی قرار گرفتند. جدول زیر خلاصه ای از نتایج این تستها را نشان می دهد. </p>"  
+    html_result+= "<table border='1' class='wikitable'>\n"
+    for i, row in enumerate(mergedTests.to_csv().split("\n")):
+        html_result += "<tr>\n"
+        tag = "th" if i == 0 else "td"
+        for j , column in enumerate(row.split(",")):
+            if j:
+                html_result += f"<{tag}>{column}</{tag}>\n"
+        html_result += "</tr>\n"
+    html_result += "</table>"  
     return html_result
 
 ##########################################################################################################
@@ -84,17 +95,17 @@ def group_generator (yaml_data,threshold):
     keys_list = list(yaml_data.keys())
     result=1
     j=1
-
     if (len(keys_list)==1):
         j=0
-
     else:
         for i in range(len(keys_list)):
             key = keys_list[i]
             result*=len(yaml_data[key])
             j = i
-            if result > threshold:
-                break     
+            if result > threshold and result < 2*threshold:
+                continue
+            if result > 2*threshold:
+                break
     keys_list1 = list(yaml_data.keys())
     start_index = j 
     end_index = len(yaml_data.keys())
@@ -102,21 +113,8 @@ def group_generator (yaml_data,threshold):
     new_yaml_data = {key: yaml_data[key] for key in sublist}
     # Generate combinations
     combinations1_number_of_group = generate_combinations(new_yaml_data)
-    #print (f"combinations1_number_of_group is {combinations1_number_of_group}")
-
-    ###################################################################################
     array_of_groups=[]
     for combination1 in combinations1_number_of_group:
         result_dict1=dict(zip(new_yaml_data.keys(), combination1))
         array_of_groups.append(result_dict1)
     return array_of_groups
-def group_classification(array_of_groups):
-    mergedInfo_path = './merged_info.csv'
-    info_path = './info.csv'
-    mergedInfo = pd.read_csv(mergedInfo_path)
-    for sharedInfo in array_of_groups:
-        mergedInfo2 = mergedInfo
-        testGroup = ' , '.join(f'{key} = {value}' for key, value in sharedInfo.items())
-#        print(testGroup)
-        for key, value in sharedInfo.items():
-            mergedInfo2 = mergedInfo2[mergedInfo2[key] == int(value) ]
