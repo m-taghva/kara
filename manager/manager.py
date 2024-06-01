@@ -384,6 +384,7 @@ def main(config_file):
         first_start_time = None
         last_end_time = None
         backup_to_report = None
+        result_dir = None
         for task in data_loaded['scenario']:
             try:
                 if 'Config_gen' in task:
@@ -393,11 +394,11 @@ def main(config_file):
                 elif 'Mrbench' in task:
                     config_params = task['Mrbench']
                     logging.info("**manager - main: Executing mrbench_agent function**")
-                    first_start_time, last_end_time, backup_to_report = mrbench_agent(config_params, config_file, config_output)
+                    first_start_time, last_end_time, backup_to_report, result_dir = mrbench_agent(config_params, config_file, config_output)
                 elif 'Status-Reporter' in task:
                     config_params = task['Status-Reporter']
                     logging.info("**manager - main: Executing status_reporter_agent function**")
-                    status_reporter_agent(config_params)
+                    result_dir = status_reporter_agent(config_params)
                 elif 'Monstaver' in task:
                     config_params = task['Monstaver']
                     logging.info("**manager - main: Executing monstaver_agent function**")
@@ -409,7 +410,7 @@ def main(config_file):
                 elif 'Report_Recorder' in task:
                     config_params = task['Report_Recorder']
                     logging.info("**manager - main: Executing report_recorder_agent function**")
-                    report_recorder_agent(config_params, backup_to_report)
+                    report_recorder_agent(config_params, backup_to_report, result_dir)
                 else:
                     print(f"Unknown task: {task}")
             except Exception as e:
