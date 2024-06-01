@@ -261,8 +261,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
         if default_input_paths:
             inputs = default_input_paths
         else:
-            inputs = []
-            
+            inputs = []      
     backup_dir = data_loaded['default'].get('backup_output')
     start_time_str, end_time_str = time_range.split(',')
     logging.info(f"monstaver - start time & end time of backup: {start_time_str}, {end_time_str}")
@@ -272,7 +271,6 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
     influx_steps = 6 if influx_backup else 0
     total_steps = (len(data_loaded['db_sources']) * influx_steps + sum([len(data_loaded["db_sources"][x]["databases"]) for x in data_loaded["db_sources"]]) + len(data_loaded['swift']) * 6) - 1
     with alive_bar(total_steps, title=f'\033[1mProcessing Backup\033[0m:\033[92m {start_time_str} - {end_time_str}\033[0m') as bar:
-
         #create dbs-swif-other_info sub dirs in {time} directory 
         subprocess.run(f"sudo mkdir -p {backup_dir}", shell=True)
         os.makedirs(f"{backup_dir}/{time_dir_name}", exist_ok=True)
@@ -280,7 +278,6 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
         os.makedirs(f"{backup_dir}/{time_dir_name}/other_info", exist_ok=True)
         os.makedirs(f"{backup_dir}/{time_dir_name}/configs", exist_ok=True)
         subprocess.run(f"sudo chmod -R 777 {backup_dir}", shell=True)
-        
         if influx_backup:
             logging.info(f"monstaver - user select switch -ib for backup") 
             database_names = [db_name for config in data_loaded.get('db_sources', {}).values() if isinstance(config, dict) and 'databases' in config for db_name in config['databases']]
@@ -295,7 +292,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                     # Perform backup using influxd backup command
                     start_time = time.time()
                     backup_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd backup -portable -db {db_name} -start {start_time_backup} -end {end_time_backup} {influx_volume}/{time_dir_name}/{container_name}/{db_name} > /dev/null 2>&1'"
-                    backup_process = subprocess.run(backup_command, shell=True)
+                    backup_process = subprocess.run(backup_command, shell=True, timeout=240)
                     end_time = time.time() 
                     response_time = end_time - start_time
                     if response_time > 120:  # Check if the time taken exceeds 2 minutes (120 seconds)
@@ -440,9 +437,10 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
             port = value['ssh_port']
          
             # make hardware/os/swift sub directories
-            mkdir_hwoss_output = f"ssh -p {port} {user}@{ip} sudo mkdir -p {backup_dir}-tmp/{time_dir_name}/configs/{container_name}/software/os/{container_name}-etc-container/ ; "
-            mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/ ; "
-            mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/ ; "
+            mkdir_hwoss_output = f"ssh -p {port} {user}@{ip} sudo mkdir -p {backup_dir}-tmp/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/ ; "
+            mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/services/ ; "
+            mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/ ; "
+            mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/ ; "
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/cpu/ ; "
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/memory/ ; "
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/net/ ; "
@@ -450,30 +448,31 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/disk/ ; "
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/motherboard/ ; "
             mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/server-manufacturer ; "
-            mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/os/{container_name}-etc-host/ ; " 
-            mkdir_hwoss_output += f"sudo mkdir -p  {backup_dir}/{time_dir_name}/configs/{container_name}/software/os/{container_name}-etc-container/  "
+            mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-host/ ; " 
+            mkdir_hwoss_output += f"sudo mkdir -p  {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/ "
             mkdir_hwoss_process = subprocess.run(mkdir_hwoss_output, shell=True)
             if mkdir_hwoss_process.returncode == 0:
-                logging.info("monstaver - make hardware/os/swift sub directories successful")
+                logging.info("monstaver - make hardware/software sub directories successful")
                 bar()
             else:
-                logging.critical("mkdir hardware/os/swift sub directories failed")
-                print("\033[91mmkdir hardware/os/swift sub directories failed.\033[0m")
+                logging.critical("mkdir hardware/software sub directories failed")
+                print("\033[91mmkdir hardware/software sub directories failed.\033[0m")
                 sys.exit(1)
 
             # get swift config files and monster services
             if swift_info:
                 logging.info(f"monstaver - user select switch -sw for swift info") 
-                get_swift_conf = f"ssh -p {port} {user}@{ip} 'docker exec {container_name} swift-init all status' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/{container_name}-swift-status.txt ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} 'docker exec {container_name} service --status-all' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/{container_name}-services-container.txt 2>&1 ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/container-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/{container_name}-container-server.conf ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/account-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/{container_name}-account-server.conf ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/proxy-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/{container_name}-proxy-server.conf ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/account.ring.builder > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/{container_name}-account-ring.txt ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/container.ring.builder > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/{container_name}-container-ring.txt ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/object.ring.builder > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/{container_name}-object-ring.txt ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/{container_name}-object-server.conf ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker inspect {container_name} > {backup_dir}/{time_dir_name}/configs/{container_name}/software/os/{container_name}-docker-inspect.txt "
+                get_swift_conf = f"ssh -p {port} {user}@{ip} 'docker exec {container_name} swift-init all status' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/services/{container_name}-swift-status.txt ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} 'docker exec {container_name} service --status-all' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/services/{container_name}-services-container.txt 2>&1 ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/container-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-container-server.conf ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/account-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-account-server.conf ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/proxy-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-proxy-server.conf ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/account.ring.gz > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-account-ring.txt ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/container.ring.gz > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-container-ring.txt ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/object.ring.gz > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-object-ring.txt ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-object-server.conf ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} docker inspect {container_name} > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-docker-inspect.txt ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} docker ps -a --format '{{.ID}} {{.Image}}' | awk '{{print $2}}' | sort > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/image-versions.txt 2>&1 "
                 get_swift_conf_process = subprocess.run(get_swift_conf, shell=True)
                 if get_swift_conf_process.returncode == 0:
                     logging.info("monstaver - all swift configs copy to swift dir")
@@ -491,7 +490,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                 docker_compose_file = inspect_result[0]['Config']['Labels'].get('com.docker.compose.project.config_files')
                 docker_compose_path = inspect_result[0]['Config']['Labels'].get('com.docker.compose.project.working_dir')
                 docker_compose_result = os.path.join(docker_compose_path,docker_compose_file)
-            copy_compose_file = f"scp -r -P {port} {user}@{ip}:{docker_compose_result} {backup_dir}/{time_dir_name}/configs/{container_name}/software/os/ > /dev/null 2>&1"
+            copy_compose_file = f"scp -r -P {port} {user}@{ip}:{docker_compose_result} {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/ > /dev/null 2>&1"
             copy_compose_file_process = subprocess.run(copy_compose_file, shell=True)
             if copy_compose_file_process.returncode == 0:
                 logging.info("monstaver - extract docker compose file path and copy to os dir successful")
@@ -501,7 +500,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                 print("\033[91mfailure in copy compose file\033[0m")
 
             # copy etc dir from container to host
-            get_etc_command =  f"ssh -p {port} {user}@{ip} 'sudo docker cp {container_name}:/etc  {backup_dir}-tmp/{time_dir_name}/configs/{container_name}/software/os/{container_name}-etc-container/'"
+            get_etc_command =  f"ssh -p {port} {user}@{ip} 'sudo docker cp {container_name}:/etc  {backup_dir}-tmp/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/'"
             get_etc_process = subprocess.run(get_etc_command, shell=True)
             if get_etc_process.returncode == 0:
                 logging.info(f"monstaver - copy monster etc of {container_name} to hos successful")
@@ -511,7 +510,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                 print(f"\033[91mfailure in copy monster etc of {container_name} to host\033[0m")
 
             # copy container etc dir from host to your server
-            mv_etc_cont_command = f"scp -r -P {port} {user}@{ip}:{backup_dir}-tmp/{time_dir_name}/configs/{container_name}/os/{container_name}-etc-container/etc/*  {backup_dir}/{time_dir_name}/configs/{container_name}/software/os/{container_name}-etc-container/ > /dev/null 2>&1"
+            mv_etc_cont_command = f"scp -r -P {port} {user}@{ip}:{backup_dir}-tmp/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/etc/*  {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/ > /dev/null 2>&1"
             mv_etc_cont_process = subprocess.run(mv_etc_cont_command, shell=True)
             if mv_etc_cont_process.stderr is None:
                 logging.info(f"monstaver - copy container etc dir from host {container_name} to your server successful")
@@ -521,7 +520,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                 print(f"\033[91mfailure in copy container etc dir from host {container_name} to your server\033[0m")
             
             # copy host etc dir from host to your server
-            mv_etc_host_command = f"scp -r -P {port} {user}@{ip}:/etc/*  {backup_dir}/{time_dir_name}/configs/{container_name}/software/os/{container_name}-etc-host/ > /dev/null 2>&1"
+            mv_etc_host_command = f"scp -r -P {port} {user}@{ip}:/etc/*  {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-host/ > /dev/null 2>&1"
             mv_etc_host_process = subprocess.run(mv_etc_host_command, shell=True)
             if mv_etc_host_process.stderr is None:
                 logging.info(f"monstaver - copy host etc from host {container_name} to your server successful")
@@ -603,7 +602,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
             #### Execute commands to gather OS information ####
             if os_info:
                 logging.info(f"monstaver - user select switch -os for software info") 
-                sysctl_command = f"ssh -p {port} {user}@{ip} sudo sysctl -a > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-sysctl-host.txt"
+                sysctl_command = f"ssh -p {port} {user}@{ip} sudo sysctl -a > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/sysctl.txt"
                 sysctl_process = subprocess.run(sysctl_command, shell=True)
                 if sysctl_process.returncode == 0:
                     logging.info(f"monstaver - sysctl -a successful on {container_name}")
@@ -612,7 +611,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                     logging.error(f"monstaver - sysctl failed on {container_name}")
                     print(f"\033[91m sysctl failed on {container_name}\033[0m")
 
-                ps_aux_command = f"ssh -p {port} {user}@{ip} sudo ps -aux > {backup_dir}/{time_dir_name}/configs/{container_name}/software/os/{container_name}-ps-aux-host.txt"
+                ps_aux_command = f"ssh -p {port} {user}@{ip} sudo ps -aux > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/ps-aux.txt"
                 ps_aux_process = subprocess.run(ps_aux_command, shell=True)
                 if ps_aux_process.returncode == 0:
                     logging.info(f"monstaver - ps -aux successful on {container_name}")
@@ -621,7 +620,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                     logging.error(f"monstaver - ps_aux failed on {container_name}")          
                     print(f"\033[91m ps_aux failed on {container_name}\033[0m")
 
-                list_unit_command = f"ssh -p {port} {user}@{ip} sudo systemctl list-units > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-list-units-host.txt"
+                list_unit_command = f"ssh -p {port} {user}@{ip} sudo systemctl list-units > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/systemctl.txt"
                 list_unit_process = subprocess.run(list_unit_command, shell=True)
                 if list_unit_process.returncode == 0:
                     logging.info(f"monstaver - systemctl list-units successful on {container_name}")
@@ -630,7 +629,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                     logging.error(f"monstaver - systemctl list-units failed on {container_name}")           
                     print(f"\033[91msystemctl list-units failed on {container_name}\033[0m")
 
-                lsmod_command = f"ssh -p {port} {user}@{ip} sudo lsmod > {backup_dir}/{time_dir_name}/configs/{container_name}/software/os/{container_name}-lsmod-host.txt"
+                lsmod_command = f"ssh -p {port} {user}@{ip} sudo lsmod > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/lsmod.txt"
                 lsmod_process = subprocess.run(lsmod_command, shell=True)
                 if lsmod_process.returncode == 0:
                     logging.info(f"monstaver - lsmod successful on {container_name}")
@@ -642,7 +641,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                     logging.error(f"monstaver - lsmod failed on {container_name}")
                     print(f"\033[91mlsmod failed on {container_name}\033[0m")
                 
-                lsof_command = f"ssh -p {port} {user}@{ip} sudo lsof > {backup_dir}/{time_dir_name}/configs/{container_name}/software/os/{container_name}-lsof-host.txt 2>&1"
+                lsof_command = f"ssh -p {port} {user}@{ip} sudo lsof > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/lsof.txt 2>&1"
                 lsof_process = subprocess.run(lsof_command, shell=True)
                 if lsof_process.returncode == 0:
                     logging.info(f"monstaver - lsof successful on {container_name}")
@@ -721,7 +720,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
             else:
                 logging.info("monstaver can't connect to monster cloud storage")
                 print("\033[91mmonstaver can't connect to monster cloud storage\033[0m") 
-    backup_to_report = f"{backup_dir}/{time_dir_name}"
+    backup_to_report = f"{backup_dir}/{time_dir_name}/configs"
     return backup_to_report
 
 def main(time_range, inputs, delete, backup_restore, hardware_info, os_info, swift_info, influx_backup):
