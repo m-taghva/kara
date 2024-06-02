@@ -20,7 +20,7 @@ if report_path not in sys.path:
 
 import report_recorder
 
-pywiki_path = os.path.abspath("./../report_recorder/pywikibot")
+pywiki_path = os.path.abspath("./../report_recorder/pywikibot/")
 if pywiki_path not in sys.path:
     sys.path.append(pywiki_path)
 
