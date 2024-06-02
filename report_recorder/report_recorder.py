@@ -8,7 +8,7 @@ from collections import Counter
 import subprocess
 import sys
 import pandas as pd
-pywiki_path = os.path.abspath("./../report_recorder/pywikibot")
+pywiki_path = os.path.abspath("./../report_recorder/pywikibot/")
 if pywiki_path not in sys.path:
     sys.path.append(pywiki_path)
 import pywikibot
@@ -19,14 +19,16 @@ import classification
 
 # read backup dir
 configs_dir = ""
+listOfServers = []
 def load(directory):
     with open(configs_dir + directory, 'r') as f:
         content = f.readlines()
     return content
 
+#### HARDWARE info ####
 # dmidecode -t 1
 def generate_brand_model(serverName):
-    result = load(f'/configs/{serverName}' + "/hardware/server-manufacturer/dmidecode.txt")
+    result = load(f'/configs/{serverName}'+"/hardware/server-manufacturer/dmidecode.txt")
     manufacturer = ""
     productName = ""
     for line in result:
@@ -54,11 +56,11 @@ def generate_cpu_model(serverName):
             threads = line[1]
         if "Model name" in line[0]:
             model = line[1]
-    return coresPerSocket + "xcores x " + socket + "xsockets x " + threads + "xthreads " + model
+    return coresPerSocket + "xcores x " + socket + "xsockets x " + threads + "xthreads " + model + "Z"
 
 # lshw -short -C memory
 def generate_memory_model(serverName):
-    result = load(f'/configs/{serverName}' + "/hardware/memory/lshw-brief.txt")
+    result = load(f'/configs/{serverName}'+"/hardware/memory/lshw-brief.txt")
     rams=[]
     for line in result:
         line = line.replace("  ", "")
@@ -74,7 +76,7 @@ def generate_memory_model(serverName):
 
 # lshw -json -C net
 def generate_net_model(serverName):
-    result = load(f'/configs/{serverName}' + "/hardware/net/lshw-json.txt")
+    result = load(f'/configs/{serverName}'+"/hardware/net/lshw-json.txt")
     Flag = False
     nets=[]
     capacities = []
@@ -102,7 +104,7 @@ def generate_net_model(serverName):
 
 # dmidecode -t 2
 def generate_motherboard_model(serverName):
-    result = load(f'/configs/{serverName}' + "/hardware/motherboard/dmidecode.txt")
+    result = load(f'/configs/{serverName}'+"/hardware/motherboard/dmidecode.txt")
     manufacturer = ""
     productName = ""
     for line in result:
@@ -114,7 +116,7 @@ def generate_motherboard_model(serverName):
 
 # lshw -short -C disk
 def generate_disk_model(serverName):
-    result = load(f'/configs/{serverName}' + "/hardware/disk/lshw-brief.txt")
+    result = load(f'/configs/{serverName}'+"/hardware/disk/lshw-brief.txt")
     disks= []
     for line in result:
         if "disk" in line:
@@ -143,9 +145,9 @@ def generate_model(server ,part ,spec):
             return generate_disk_model(server)
     elif part == "software":
         return "software not configed"
-
-def compare(part ,spec):
-    cmd = ["ls" , f'{configs_dir}/configs']
+    
+def compare(part, spec):
+    cmd = ["ls", f'{configs_dir}/configs/']
     result = subprocess.run(cmd, stdout=subprocess.PIPE, text=True)
     listOfServers = result.stdout.split("\n")
     listOfServers.pop()
@@ -159,6 +161,124 @@ def compare(part ,spec):
         dict[model].append(server)
     return dict
 
+#### SOFTWARE info ####
+def get_list_of_servers ():
+    cmd = ["ls", f'{configs_dir}/configs/']
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, text=True)
+    global listOfServers
+    listOfServers = result.stdout.split("\n")
+    listOfServers.pop()
+    return listOfServers
+
+def compare_confs (confsOfServers ):
+    commonConf = confsOfServers[listOfServers[0]]
+    allConfs = {}
+    for server in listOfServers:
+        commonConf = set(commonConf) & set(confsOfServers[server])
+    for server in listOfServers:
+        uncommonconfs = set(confsOfServers[server]) - commonConf
+        if len(uncommonconfs) != 0:
+            allConfs[server] = uncommonconfs
+    if len(commonConf) != 0:
+        allConfs["common"] = commonConf
+    return allConfs  ############  dict of list of strings
+
+def generate_swift_status(servername):
+    services = load(f"/configs/{servername}/software/swift/services/{servername}-swift-status.txt")
+    listOfDowns = []
+    for line in services:
+        if "No" in line:
+            listOfDowns.append(line.split("No ")[1].replace("\n" , "").split(" running")[0])
+    return listOfDowns
+
+def generate_all_swift_status(services):
+    listOfServices = []
+    if services == "main":
+        listOfServices= ["proxy-server" , "object-server" , "account-server" , "container-server"]
+    if services == "object":
+        listOfServices = ["object-auditor" , "object-reconstructor" , "object-replicator" , "object-updater" , "object-expirer"]
+    if services == "account":
+        listOfServices = ["account-replicator" , "account-auditor"  , "account-reaper"]
+    if services == "container":
+        listOfServices = ["container-updater" , "container-auditor" , "container-replicator" , "container-sharder" , "container-sync"]
+    returndict={}
+    returndict ["servers"] = listOfServices
+    for server in listOfServers:
+        returndict[server] = []
+        listOfDownServices = generate_swift_status(server)
+        for service in listOfServices:
+            if service in listOfDownServices:
+                returndict[server].append( "Down" ) ############ returndict[server].append([service , "Down"])
+            else:
+                returndict[server].append( "UP" ) ############  returndict[server].append([service , "UP"])
+    return returndict       ####### dict of list of stirng
+
+def generate_ring (servername):
+    x = {}
+    for i in ["object", "account", "container"]:
+        with open(configs_dir+"/configs/"+servername+"/software/swift/rings/"+servername+"-" +i+"-ring.txt", "r") as file:
+            x[i] = file.read()
+    ring_item_dic = {}
+    ring_item = []
+    for key, value in x.items():
+        ring_item_dic["Ring." + key + ".nodes"] = len(set([v.split()[3] for v in value.splitlines()[6:]]))
+        ring_item_dic.update({"Ring." + key + "." + item.split(" ")[1]:int(float(item.split(" ")[0])) for item in value.splitlines()[1].split(", ")[:5]})
+    for rkey , rvalue in ring_item_dic.items():
+        ring_item.append(rkey + " = " + str(rvalue))
+    return ring_item
+
+def get_conf (server , confType , serverType = None):
+    conf = []
+    if confType == "server_confs":
+        conf = [i for i in load("/configs/"+ server + "/software/swift/server-confs/" + server + "-" + serverType + "-server.conf" ) if "#" not in i]
+    if confType == "software_version":
+        conf= [i.replace("\n", "") for i in load("/configs/"+ server + "/software/system/image-versions.txt")]
+    if confType == "sysctl":
+        conf = [i.replace("\n" , "") for i in load ("/configs/"+ server + "/software/system/sysctl.txt")]
+    if confType == "systemctl":
+        conf = [" ".join(i.replace("  " , "").split(" ")[:3]) for i in load ("configs/"+ server + "/software/system/systemctl.txt")]
+    if confType == "lsof":
+        conf = [i.replace("\n" , "") for i in load ("/configs/"+ server + "/software/system/lsof.txt")]
+    if confType == "lsmod":
+        conf = [i.replace("  ", " ").replace("\n", "") for i in load("/configs/"+ server + "/software/system/lsmod.txt")]
+    if confType == "rings":
+        conf = generate_ring(server)
+    return conf
+
+def generate_confs (confType , serverType = None):
+    confOfServers = {}
+    for server in listOfServers:
+        confOfServers[server] =  get_conf(server, confType , serverType)
+    compared_dict = compare_confs(confOfServers)
+    compared_dict ["servers"] = confType
+    return compared_dict
+
+def dict_to_html_table(data):
+    html = "<table border='1' class='wikitable'>\n"
+    #generate first row
+    html += "<tr>\n"
+    html += f"<td>servers</td>\n"
+    if  isinstance(data["servers"] , list):
+        for item in data["servers"]:
+            html += f"<td>{item}</td>\n"
+    else:
+        str = data["servers"]
+        html += f"<td>{str}</td>\n"
+    html += "</tr>\n"
+    for key , value in data.items():
+        if key != "servers":
+            html += "<tr>\n"
+            html += f"<td>{key}</td>\n"
+            if isinstance(value, set):
+                str = "  ,  ".join(value)
+                html += f"<td>{str}</td>\n"
+            else:
+                for i in range(len(value)):
+                    html += f"<td>{value[i]}</td>\n"
+            html += "</tr>\n"
+    html += "</table>"
+    return html
+
 def test_page_maker(merged_file, merged_info_file, all_test_dir, page_title):
     htmls_dict={}
     mergedInfo = pd.read_csv(merged_info_file)
@@ -168,12 +288,9 @@ def test_page_maker(merged_file, merged_info_file, all_test_dir, page_title):
     removed_columns_mergedInfo = [col for col in original_columns_merged_info if col not in mergedInfo.columns]
     merged = merged.drop(columns=removed_columns_mergedInfo, errors='ignore')
     num_lines = mergedInfo.shape[0]
-
     number_of_groups = 0
     sorted_unique = classification.csv_to_sorted_yaml(mergedInfo)
     array_of_groups = classification.group_generator(sorted_unique,threshold=8)
-    
-
     html_result = "<h2> نتایج تست های کارایی </h2>"
     html_result += f"<p> بر روی این کلاستر {num_lines} تعداد تست انجام شده که در **var** دسته تست طبقه بندی شده است. </p>"
     for sharedInfo in array_of_groups:
@@ -234,7 +351,7 @@ def csv_to_html(csv_file):
     html_csv += "</table>"
     return html_csv
 
-def create_hw_htmls(template_content, html_output, page_title): #page_title = cluster_name
+def create_sw_hw_htmls(template_content, html_output, page_title): #page_title = cluster_name
     logging.info("Executing report_recorder create_html_template function")
     htmls_dict={}
     hw_info_dict = {}
@@ -256,13 +373,21 @@ def create_hw_htmls(template_content, html_output, page_title): #page_title = cl
             for content_line in content_of_file:
                 html_content += f"<p>{content_line.replace(' ','&nbsp;')}</p>"
             html_data = html_data.replace(address_placeholder, html_content)
-    for config_info in re.finditer(r'{server_config}:(.+)', template_content):
-        config_placeholder = config_info.group(0)
-        part,spec = config_info.group(1).split(',')
+    for hconfig_info in re.finditer(r'{hw_config}:(.+)', template_content):
+        hconfig_placeholder = hconfig_info.group(0)
+        part,spec = hconfig_info.group(1).split(',')
         dict = compare(part.strip(), spec.strip())
         hw_info_dict.update({spec.strip():dict})
         html_of_dict = dict_to_html(dict)
-        html_data = html_data.replace(config_placeholder, html_of_dict)
+        html_data = html_data.replace(hconfig_placeholder, html_of_dict)
+    for sconfig_info in re.finditer(r'{sw_config}:(.+)', template_content):
+        sconfig_placeholder = sconfig_info.group(0)
+        sconfigs = sconfig_info.group(1).split(',')
+        if sconfigs[0] == "swift_status":
+            software_html = dict_to_html_table(generate_all_swift_status(sconfigs[1]))
+        else:
+            software_html = dict_to_html_table(generate_confs(sconfigs[0],None if len(sconfigs)== 1 else sconfigs[1]))
+        html_data = html_data.replace(sconfig_placeholder, software_html)
     htmls_dict.update({page_title:html_data})
     htmls_dict.update(sub_pages_maker(html_data,page_title,hw_info_dict))
     for html_key,html_value in htmls_dict.items():
@@ -289,7 +414,7 @@ def convert_html_to_wiki(html_content):
     # Convert <img> tags to wiki images
     for img_tag in soup.find_all('img'):
         if 'src' in img_tag.attrs:
-            img_tag.replace_with(f"[[File:{os.path.basename(img_tag['src'])}|800px|thumb|center|{os.path.basename(img_tag['src']).split('_2024')[0]}]]") #replace(_2024) hazf shavaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad
+            img_tag.replace_with(f"[[File:{os.path.basename(img_tag['src'])}|tumbnail|upright 2.0|center|{os.path.basename(img_tag['src']).split('_2024')[0]}]]") #replace(_2024) hazf shavaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad
     return str(soup)
 
 def sub_pages_maker(template_content , page_title ,hw_info_dict):
@@ -374,11 +499,15 @@ def main(input_template, htmls_path, cluster_name, scenario_name, configs_direct
         if configs_directory is not None:
             if os.path.exists(configs_directory):
                 configs_dir = configs_directory
+                get_list_of_servers()
             else:
                 print(f"\033[91minput backup File not found\033[0m")
         if input_template:
             with open(input_template, 'r') as template_content:
-                htmls_dict = create_hw_htmls(template_content.read(), htmls_path, cluster_name+'--HW')  
+                if 'hardware' in os.path.basename(input_template):
+                    htmls_dict = create_sw_hw_htmls(template_content.read(), htmls_path, cluster_name+'--HW') 
+                if 'software' in os.path.basename(input_template):
+                    htmls_dict = create_sw_hw_htmls(template_content.read(), htmls_path, cluster_name+'--SW')
         if merged_file and merged_info_file and  all_test_dir:
             htmls_dict.update(create_test_htmls("",htmls_path,cluster_name+"--"+scenario_name, merged_file, merged_info_file, all_test_dir)) 
     elif upload_operation:
@@ -400,7 +529,7 @@ def main(input_template, htmls_path, cluster_name, scenario_name, configs_direct
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate report for kateb")
     parser.add_argument("-i", "--input_template", help="Template HTML file path")
-    parser.add_argument("-o", "--html_output_path", help="Output HTML file name")
+    parser.add_argument("-o", "--htmls_path", help="Output HTML file name")
     parser.add_argument("-cn", "--cluster_name", help="cluster_name set for title of Kateb HW page.")
     parser.add_argument("-sn", "--scenario_name", help="set for title of Kateb test page.")
     parser.add_argument("-U", "--upload_operation", action='store_true', help="upload page to kateb")
