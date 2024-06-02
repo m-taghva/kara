@@ -6,7 +6,7 @@
     # Attention ! after clone repository, please remove (.placeholder) files inside ./result/ 
     
     - Install dependencies:
-       # pip install pytz datetime matplotlib pandas tqdm alive_progress BeautifulSoup2 swiftclient
+       # pip install pytz datetime matplotlib pandas tqdm alive_progress BeautifulSoup4 swiftclient
        
        =======================Manager========================
        - manager.py can run all tools as you need with scenario file in yaml format with different options.
