@@ -467,9 +467,9 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                 get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/container-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-container-server.conf ; "
                 get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/account-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-account-server.conf ; "
                 get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/proxy-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-proxy-server.conf ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/account.ring.gz > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-account-ring.txt ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/container.ring.gz > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-container-ring.txt ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/object.ring.gz > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-object-ring.txt ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/account.builder > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-account-ring.txt ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/container.builder > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-container-ring.txt ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/object.builder > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-object-ring.txt ; "
                 get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-object-server.conf ; "
                 get_swift_conf += f"ssh -p {port} {user}@{ip} docker inspect {container_name} > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-docker-inspect.txt ; "
                 get_swift_conf += f"ssh -p {port} {user}@{ip} docker ps -a --format '{{.ID}} {{.Image}}' | awk '{{print $2}}' | sort > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/image-versions.txt 2>&1 "
@@ -641,7 +641,8 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                     logging.error(f"monstaver - lsmod failed on {container_name}")
                     print(f"\033[91mlsmod failed on {container_name}\033[0m")
                 
-                lsof_command = f"ssh -p {port} {user}@{ip} sudo lsof > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/lsof.txt 2>&1"
+                lsof_command = f"ssh -p {port} {user}@{ip} sudo lsof 2>/dev/null | wc -l > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/lsof.txt ; "
+                lsof_command += f"ssh -p {port} {user}@{ip} sudo lsof > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/lsof_full.txt"
                 lsof_process = subprocess.run(lsof_command, shell=True)
                 if lsof_process.returncode == 0:
                     logging.info(f"monstaver - lsof successful on {container_name}")
