@@ -642,7 +642,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                     print(f"\033[91mlsmod failed on {container_name}\033[0m")
                 
                 lsof_command = f"ssh -p {port} {user}@{ip} sudo lsof 2>/dev/null | wc -l > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/lsof.txt ; "
-                lsof_command += f"ssh -p {port} {user}@{ip} sudo lsof > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/lsof_full.txt"
+                lsof_command += f"ssh -p {port} {user}@{ip} sudo lsof 2>/dev/null > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/lsof_full.txt"
                 lsof_process = subprocess.run(lsof_command, shell=True)
                 if lsof_process.returncode == 0:
                     logging.info(f"monstaver - lsof successful on {container_name}")
