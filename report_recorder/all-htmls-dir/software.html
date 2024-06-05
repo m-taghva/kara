@@ -26,9 +26,7 @@
 
 <h4> وضعیت رینگ ها</h4>
 {sw_config}:rings
-<h4> فایل های کانفیگ سرورها</h4>
-<h5> پروکسی سرور ها </h5>
-{sw_config}:server_confs,proxy
+<h4>کانفیگ سرویس‌ها</h4>
 
 <h5> آبجکت سرور ها </h5>
 {sw_config}:server_confs,object
@@ -39,23 +37,24 @@
 <h5> کانتینر سرور ها </h5>
 {sw_config}:server_confs,container
 
+<h5> پروکسی سرور ها </h5>
+{sw_config}:server_confs,proxy
+
 <h3> تنظیمات مربوط به سیستم</h3>
 <p>در این قسمت تنظیمات مربوط به کرنل و سرویس های داخل داکر به ازای هر سرور قرار می گیرد.</p>
 
-<h4>وضعیت سرویس ها</h4>
-<h5>systemctl list-units</h5>
-{sw_config}:systemctl
-
-<h5>lsof | wc -l</h5>
+<h4>lsof | wc -l</h4>
 {sw_config}:lsof
 
-<h5>lsmod</h5>
+<h4>lsmod</h4>
 {sw_config}:lsmod
+
+<h4>systemctl list-units</h4>
+{sw_config}:systemctl
 
 <h4>تنظیمات sysctl</h4>
 {sw_config}:sysctl
 
-[[رده:کارا]]
 [[رده:تست]]
-[[رده:هیولا]]
 [[رده:کارایی]]
+[[رده:هیولا]]
