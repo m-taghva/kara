@@ -8,7 +8,7 @@ from collections import Counter
 import subprocess
 import sys
 import pandas as pd
-pywiki_path = os.path.abspath("./../report_recorder/pywikibot/")
+pywiki_path = os.path.abspath("./../report_recorder/pywikibot")
 if pywiki_path not in sys.path:
     sys.path.append(pywiki_path)
 import pywikibot
@@ -162,7 +162,7 @@ def compare(part, spec):
     return dict
 
 #### SOFTWARE info ####
-def get_list_of_servers ():
+def get_list_of_servers():
     cmd = ["ls", f'{configs_dir}/configs/']
     result = subprocess.run(cmd, stdout=subprocess.PIPE, text=True)
     global listOfServers
@@ -170,7 +170,7 @@ def get_list_of_servers ():
     listOfServers.pop()
     return listOfServers
 
-def compare_confs (confsOfServers ):
+def compare_confs(confsOfServers ):
     commonConf = confsOfServers[listOfServers[0]]
     allConfs = {}
     for server in listOfServers:
@@ -227,7 +227,7 @@ def generate_ring (servername):
         ring_item.append(rkey + " = " + str(rvalue))
     return ring_item
 
-def get_conf (server , confType , serverType = None):
+def get_conf(server , confType , serverType = None):
     conf = []
     if confType == "server_confs":
         conf = [i for i in load("/configs/"+ server + "/software/swift/server-confs/" + server + "-" + serverType + "-server.conf" ) if "#" not in i]
@@ -245,7 +245,7 @@ def get_conf (server , confType , serverType = None):
         conf = generate_ring(server)
     return conf
 
-def generate_confs (confType , serverType = None):
+def generate_confs(confType , serverType = None):
     confOfServers = {}
     for server in listOfServers:
         confOfServers[server] =  get_conf(server, confType , serverType)
@@ -279,7 +279,8 @@ def dict_to_html_table(data):
     html += "</table>"
     return html
 
-def test_page_maker(merged_file, merged_info_file, all_test_dir, page_title):
+def test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, scenario_name):
+    page_title = cluster_name+'--'+scenario_name
     htmls_dict={}
     mergedInfo = pd.read_csv(merged_info_file)
     merged = pd.read_csv(merged_file)
@@ -292,6 +293,8 @@ def test_page_maker(merged_file, merged_info_file, all_test_dir, page_title):
     sorted_unique = classification.csv_to_sorted_yaml(mergedInfo)
     array_of_groups = classification.group_generator(sorted_unique,threshold=8)
     html_result = "<h2> نتایج تست های کارایی </h2>"
+    html_result += f"<p> برای اطلاعات بیشتر مشخصات سخت افزاری به  <a href=https://kateb.burna.ir/wiki/{cluster_name}--HW>سند {cluster_name}--HW</a> مراجعه کنید.</p>"
+    html_result += f"<p> برای اطلاعات بیشتر مشخصات نرم افزاری به  <a href=https://kateb.burna.ir/wiki/{cluster_name}--SW>سند {cluster_name}--SW</a> مراجعه کنید.</p>"
     html_result += f"<p> بر روی این کلاستر {num_lines} تعداد تست انجام شده که در **var** دسته تست طبقه بندی شده است. </p>"
     for sharedInfo in array_of_groups:
         mergedInfo2 = mergedInfo
@@ -396,8 +399,8 @@ def create_sw_hw_htmls(template_content, html_output, page_title): #page_title =
             print(f"HTML template saved to: {html_output+'/'+html_key+'.html'}") 
     return htmls_dict
 
-def create_test_htmls(template_content, html_output, page_title, merged_file, merged_info_file, all_test_dir): #page_title = cluster_name + scenario_name
-    htmls_dict = test_page_maker(merged_file, merged_info_file, all_test_dir, page_title)
+def create_test_htmls(template_content, html_output, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir): #page_title = cluster_name + scenario_name
+    htmls_dict = test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, scenario_name)
     for html_key,html_value in htmls_dict.items():
         with open(os.path.join(html_output+"/"+html_key+".html"), 'w') as html_file:
             html_file.write(html_value)
@@ -414,7 +417,7 @@ def convert_html_to_wiki(html_content):
     # Convert <img> tags to wiki images
     for img_tag in soup.find_all('img'):
         if 'src' in img_tag.attrs:
-            img_tag.replace_with(f"[[File:{os.path.basename(img_tag['src'])}|tumbnail|upright 2.0|center|{os.path.basename(img_tag['src']).split('_2024')[0]}]]") #replace(_2024) hazf shavaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad
+            img_tag.replace_with(f"[[File:{os.path.basename(img_tag['src'])}|border|center|650px|{os.path.basename(img_tag['src']).split('_2024')[0]}]]") #replace(_2024) hazf shavaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad
     return str(soup)
 
 def sub_pages_maker(template_content , page_title ,hw_info_dict):
@@ -509,7 +512,7 @@ def main(input_template, htmls_path, cluster_name, scenario_name, configs_direct
                 if 'software' in os.path.basename(input_template):
                     htmls_dict = create_sw_hw_htmls(template_content.read(), htmls_path, cluster_name+'--SW')
         if merged_file and merged_info_file and  all_test_dir:
-            htmls_dict.update(create_test_htmls("",htmls_path,cluster_name+"--"+scenario_name, merged_file, merged_info_file, all_test_dir)) 
+            htmls_dict.update(create_test_htmls("",htmls_path, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir)) 
     elif upload_operation:
         for html_file in os.listdir(htmls_path):
             with open(os.path.join(htmls_path,html_file), 'r', encoding='utf-8') as file:
