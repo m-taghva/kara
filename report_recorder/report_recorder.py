@@ -180,7 +180,7 @@ def compare_confs(confsOfServers ):
         if len(uncommonconfs) != 0:
             allConfs[server] = uncommonconfs
     if len(commonConf) != 0:
-        allConfs["common"] = commonConf
+        allConfs["All(common confs)"] = commonConf
     return allConfs  ############  dict of list of strings
 
 def generate_swift_status(servername):
@@ -293,8 +293,8 @@ def test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, s
     sorted_unique = classification.csv_to_sorted_yaml(mergedInfo)
     array_of_groups = classification.group_generator(sorted_unique,threshold=8)
     html_result = "<h2> نتایج تست های کارایی </h2>"
-    html_result += f"<p> برای اطلاعات بیشتر مشخصات سخت افزاری به  <a href=https://kateb.burna.ir/wiki/{cluster_name}--HW>سند {cluster_name}--HW</a> مراجعه کنید.</p>"
-    html_result += f"<p> برای اطلاعات بیشتر مشخصات نرم افزاری به  <a href=https://kateb.burna.ir/wiki/{cluster_name+'--'+scenario_name}--SW>سند {cluster_name+'--'+scenario_name}--SW</a> مراجعه کنید.</p>"
+    html_result += f"<p> برای اطلاعات بیشتر مشخصات سخت افزاری به  <a href=https:/taghva/kateb.burna.ir/wiki/{cluster_name}--HW>سند {cluster_name}--HW</a> مراجعه کنید.</p>"
+    html_result += f"<p> برای اطلاعات بیشتر مشخصات نرم افزاری به  <a href=https:/taghva/kateb.burna.ir/wiki/{cluster_name+'--'+scenario_name}--SW>سند {cluster_name+'--'+scenario_name}--SW</a> مراجعه کنید.</p>"
     html_result += f"<p> بر روی این کلاستر {num_lines} تعداد تست انجام شده که در **var** دسته تست طبقه بندی شده است. </p>"
     for sharedInfo in array_of_groups:
         mergedInfo2 = mergedInfo
@@ -320,7 +320,7 @@ def test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, s
             html_result += "</tr>\n"
         html_result += "</table>"
         format_tg = testGroup.strip().replace(' ','').replace('=','-').replace(',','-')
-        html_result += f"<a href=https://kateb.burna.ir/wiki/{page_title}--{format_tg}> نمایش جزئیات </a>"
+        html_result += f"<a href=https:/taghva/kateb.burna.ir/wiki/{page_title}--{format_tg}> نمایش جزئیات </a>"
         ###### create subgroups within each original group  ######
         sorted_unique_file_1 = classification.csv_to_sorted_yaml(mergedInfo2)
         array_of_groups_1 = classification.group_generator(sorted_unique_file_1,threshold=4)
