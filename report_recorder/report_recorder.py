@@ -294,7 +294,7 @@ def test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, s
     array_of_groups = classification.group_generator(sorted_unique,threshold=8)
     html_result = "<h2> نتایج تست های کارایی </h2>"
     html_result += f"<p> برای اطلاعات بیشتر مشخصات سخت افزاری به  <a href=https://kateb.burna.ir/wiki/{cluster_name}--HW>سند {cluster_name}--HW</a> مراجعه کنید.</p>"
-    html_result += f"<p> برای اطلاعات بیشتر مشخصات نرم افزاری به  <a href=https://kateb.burna.ir/wiki/{cluster_name}--SW>سند {cluster_name}--SW</a> مراجعه کنید.</p>"
+    html_result += f"<p> برای اطلاعات بیشتر مشخصات نرم افزاری به  <a href=https://kateb.burna.ir/wiki/{cluster_name+'--'+scenario_name}--SW>سند {cluster_name+'--'+scenario_name}--SW</a> مراجعه کنید.</p>"
     html_result += f"<p> بر روی این کلاستر {num_lines} تعداد تست انجام شده که در **var** دسته تست طبقه بندی شده است. </p>"
     for sharedInfo in array_of_groups:
         mergedInfo2 = mergedInfo
@@ -510,7 +510,7 @@ def main(input_template, htmls_path, cluster_name, scenario_name, configs_direct
                 if 'hardware' in os.path.basename(input_template):
                     htmls_dict = create_sw_hw_htmls(template_content.read(), htmls_path, cluster_name+'--HW') 
                 if 'software' in os.path.basename(input_template):
-                    htmls_dict = create_sw_hw_htmls(template_content.read(), htmls_path, cluster_name+'--SW')
+                    htmls_dict = create_sw_hw_htmls(template_content.read(), htmls_path, cluster_name+'--'+scenario_name+'--SW')
         if merged_file and merged_info_file and  all_test_dir:
             htmls_dict.update(create_test_htmls("",htmls_path, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir)) 
     elif upload_operation:
