@@ -8,7 +8,7 @@ from collections import Counter
 import subprocess
 import sys
 import pandas as pd
-pywiki_path = os.path.abspath("./../report_recorder/pywikibot")
+pywiki_path = os.path.abspath("./../report_recorder/pywikibot/")
 if pywiki_path not in sys.path:
     sys.path.append(pywiki_path)
 import pywikibot
