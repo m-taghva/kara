@@ -56,7 +56,7 @@ def generate_cpu_model(serverName):
             threads = line[1]
         if "Model name" in line[0]:
             model = line[1]
-    return coresPerSocket + "xcores x " + socket + "xsockets x " + threads + "xthreads " + model + "Z"
+    return coresPerSocket + "xcores x " + socket + "xsockets x " + threads + "xthreads " + model
 
 # lshw -short -C memory
 def generate_memory_model(serverName):
