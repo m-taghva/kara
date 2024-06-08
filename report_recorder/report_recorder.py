@@ -335,7 +335,7 @@ def dict_to_html(dict):
     html_dict += "<tr><th> نام سرور </th><th> مشخصات </th></tr>\n"
     for key, value in dict.items():
         if isinstance(value, list):
-            value_str = ','.join(value)
+            value_str = '<br>'.join(value)
         else:
             value_str = str(value)
         html_dict += f"<tr><td>{value_str}</td><td>{key}</td></tr>\n"
