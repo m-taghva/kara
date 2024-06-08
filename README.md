@@ -7,12 +7,13 @@
     
     - Install dependencies:
        # pip install pytz datetime matplotlib pandas tqdm alive_progress BeautifulSoup4
+       edit sudoers file in both kara server and monster host and add new user to it after %sudo group :  user1   ALL=(ALL) NOPASSWD: ALL
        
        =======================Manager========================
        - manager.py can run all tools as you need with scenario file in yaml format with different options.
        - usage:
            # python3 manger.py -sn ./path/to/scenario_file.yaml or .conf
-
+           
        =======================Config_gen=====================
 
 
