@@ -63,7 +63,7 @@ fi
 
 #### unzip pywikibot
 zip_file="$KARA_DIR/KARA/report_recorder/report_recorder_bot.zip"
-zip_destination="$KARA_DIR/KARA/report_recorder"
+zip_destination="$KARA_DIR/KARA/report_recorder/"
 unzip "$zip_file" -d "$zip_destination"
 
 #### copy user-config.py to manager dir
