@@ -462,17 +462,17 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
             # get swift config files and monster services
             if swift_info:
                 logging.info(f"monstaver - user select switch -sw for swift info") 
-                get_swift_conf = f"ssh -p {port} {user}@{ip} 'docker exec {container_name} swift-init all status' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/services/{container_name}-swift-status.txt ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} 'docker exec {container_name} service --status-all' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/services/{container_name}-services-container.txt 2>&1 ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/container-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-container-server.conf ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/account-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-account-server.conf ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/proxy-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-proxy-server.conf ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/account.builder > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-account-ring.txt ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/container.builder > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-container-ring.txt ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /etc/swift/object.builder > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-object-ring.txt ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker exec {container_name} cat /etc/swift/object-server.conf > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-object-server.conf ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker inspect {container_name} > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-docker-inspect.txt ; "
-                get_swift_conf += f"ssh -p {port} {user}@{ip} docker container ls -a | awk '{{if(NR>1) print $2}}' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/image-versions.txt "
+                get_swift_conf = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-init all status' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/services/{container_name}-swift-status.txt ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} service --status-all' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/services/{container_name}-services-container.txt 2>&1 ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} cat /etc/swift/container-server.conf' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-container-server.conf ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} cat /etc/swift/account-server.conf' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-account-server.conf ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} cat /etc/swift/proxy-server.conf' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-proxy-server.conf ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /etc/swift/account.builder' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-account-ring.txt ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /etc/swift/container.builder' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-container-ring.txt ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /etc/swift/object.builder' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/rings/{container_name}-object-ring.txt ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} cat /etc/swift/object-server.conf' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/server-confs/{container_name}-object-server.conf ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} 'sudo docker inspect {container_name}' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-docker-inspect.txt ; "
+                get_swift_conf += f"ssh -p {port} {user}@{ip} sudo docker container ls -a | awk '{{if(NR>1) print $2}}' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/image-versions.txt "
                 get_swift_conf_process = subprocess.run(get_swift_conf, shell=True)
                 if get_swift_conf_process.returncode == 0:
                     logging.info("monstaver - all swift configs copy to swift dir")
@@ -483,7 +483,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                     print("\033[91mget swift configs and monster services failed.\033[0m")
 
             # extract docker compose file path and copy it
-            docker_compose = f"ssh -p {port} {user}@{ip} docker inspect {container_name}"
+            docker_compose = f"ssh -p {port} {user}@{ip} 'sudo docker inspect {container_name}'"
             docker_compose_process = subprocess.run(docker_compose, shell=True, capture_output=True, text=True)
             if docker_compose_process.returncode == 0:
                 inspect_result = json.loads(docker_compose_process.stdout)
