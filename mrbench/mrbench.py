@@ -108,7 +108,7 @@ def copy_swift_conf(swift_configs):
                                     each_scp_successful = True
                                     print("")
                                     print(f"\033[92mcopy config file [ {filename} ] to {container_name} successful\033[0m")
-                                    name_changer = f"ssh -p {port} {user}@{ip} mv {inspect_value}/{base_name_changer} {inspect_value}/{filename} > /dev/null 2>&1" 
+                                    name_changer = f"ssh -p {port} {user}@{ip} 'sudo mv {inspect_value}/{base_name_changer} {inspect_value}/{filename} > /dev/null 2>&1'" 
                                     name_changer_process = subprocess.run(name_changer, shell=True)
                                 else:
                                     print(f"\033[91mconfigs in {container_name} failed to sync\033[0m")
