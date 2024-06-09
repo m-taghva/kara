@@ -721,7 +721,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
             else:
                 logging.info("monstaver can't connect to monster cloud storage")
                 print("\033[91mmonstaver can't connect to monster cloud storage\033[0m") 
-    backup_to_report = f"{backup_dir}/{time_dir_name}/configs"
+    backup_to_report = f"{backup_dir}/{time_dir_name}"
     return backup_to_report
 
 def main(time_range, inputs, delete, backup_restore, hardware_info, os_info, swift_info, influx_backup):
