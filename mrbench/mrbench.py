@@ -47,7 +47,7 @@ def copy_swift_conf(swift_configs):
         key_to_extract = "com.docker.compose.project.working_dir"
         all_scp_file_successful = False
         # Run the docker inspect command and capture the output
-        inspect_command = f"ssh -p {port} {user}@{ip} docker inspect {container_name}"
+        inspect_command = f"ssh -p {port} {user}@{ip} 'sudo docker inspect {container_name}'"
         inspect_result = subprocess.run(inspect_command, shell=True, capture_output=True, text=True)
         if inspect_result.returncode == 0:
             # Parse the JSON output
@@ -81,13 +81,13 @@ def copy_swift_conf(swift_configs):
                             print(f"\033[91mWARNING: your ring file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
                             #exit(1)
                         if "account" in filename:
-                            ring_command = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/account.builder"
+                            ring_command = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /rings/account.builder'"
                             ring_dict['account'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
                         elif "container" in filename:
-                            ring_command = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/container.builder"
+                            ring_command = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /rings/container.builder'"
                             ring_dict['container'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
                         else:
-                            ring_command = f"ssh -p {port} {user}@{ip} docker exec {container_name} swift-ring-builder /rings/object.builder"
+                            ring_command = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /rings/object.builder'"
                             ring_dict['object'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
                             
                     elif filename.endswith(".conf"):
@@ -125,7 +125,7 @@ def copy_swift_conf(swift_configs):
             if inspect_result.stdout == '[]\n':
                 print(f"\033[91mWARNING: your container name \033[0m'\033[92m{container_name}\033[0m' \033[91mis wrong !\033[0m")
         if all_scp_file_successful is True:
-            restart_cont_command = f"ssh -p {port} {user}@{ip} docker restart {container_name} > /dev/null 2>&1"
+            restart_cont_command = f"ssh -p {port} {user}@{ip} 'sudo docker restart {container_name}' > /dev/null 2>&1"
             restart_cont_command_process = subprocess.run(restart_cont_command, shell=True)
             if restart_cont_command_process.returncode == 0:
                 while True:
