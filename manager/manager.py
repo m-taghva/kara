@@ -286,7 +286,7 @@ def mrbench_agent(config_params, config_file, config_output):
     first_start_time = all_start_times[0] ; last_end_time = all_end_times[-1]
     logging.debug(f"manager - mrbench_agent: first_start_time,last_end_time: {first_start_time},{last_end_time}")
     logging.debug(f"manager - mrbench_agent: backup_to_report: {backup_to_report}")
-    return first_start_time, last_end_time, backup_to_report
+    return first_start_time, last_end_time, backup_to_report, result_dir
 
 def status_reporter_agent(config_params):
     result_dir = config_params.get('output_path')
@@ -299,6 +299,7 @@ def status_reporter_agent(config_params):
                 logging.debug(f"manager - status_reporter_agent: time is {time_range}")
                 start_time, end_time = time_range.strip().split(',')
                 output_csv = status_reporter.main(path_dir=result_dir, time_range=f"{start_time},{end_time}", img=image_generate)
+    return result_dir
 
 def monstaver_agent(config_params, config_file, first_start_time, last_end_time):
     operation = config_params.get('operation')
@@ -319,7 +320,7 @@ def monstaver_agent(config_params, config_file, first_start_time, last_end_time)
                 elif operation == 'info':
                     backup_to_report = monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=False)
                 elif operation == "restore":
-                    monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True)
+                    monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True, hardware_info=False, os_info=False, swift_info=False, influx_backup=False)
     elif batch_mode:
         if operation == "backup,info":
            backup_to_report = monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=False,  backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=True)
@@ -328,10 +329,10 @@ def monstaver_agent(config_params, config_file, first_start_time, last_end_time)
         elif operation == 'info':
             backup_to_report = monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=True, os_info=True, swift_info=True, influx_backup=False)
     elif operation == "restore":
-        monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True)
+        monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True, hardware_info=False, os_info=False, swift_info=False, influx_backup=False)
     if backup_to_report is not None:
        logging.debug(f"manager - monstaver_agent: backup_to_report: {backup_to_report}")
-       return backup_to_report
+       return backup_to_report, input_path
 
 def status_analyzer_agent(config_params):
     result_dir = config_params.get('input_path')
@@ -403,7 +404,7 @@ def main(config_file):
                 elif 'Monstaver' in task:
                     config_params = task['Monstaver']
                     logging.info("**manager - main: Executing monstaver_agent function**")
-                    backup_to_report = monstaver_agent(config_params, config_file, first_start_time, last_end_time)
+                    backup_to_report, input_path = monstaver_agent(config_params, config_file, first_start_time, last_end_time)
                 elif 'Status_Analyzer' in task:
                     config_params = task['Status_Analyzer']
                     logging.info("**manager - main: Executing status_analyzer_agent function**")
