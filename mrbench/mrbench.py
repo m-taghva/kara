@@ -30,7 +30,7 @@ def load_config(config_file):
            sys.exit(1)
     return data_loaded
 
-def conf_ring_thread(port, user, ip, container_name, key_to_extract):    
+def conf_ring_thread(swift_configs, port, user, ip, container_name, key_to_extract):    
     ring_dict = {}
     all_scp_file_successful = False
     # Run the docker inspect command and capture the output
@@ -132,6 +132,7 @@ def conf_ring_thread(port, user, ip, container_name, key_to_extract):
     return ring_dict
 
 def copy_swift_conf(swift_configs):
+    ring_dict = {}
     logging.info("Executing mrbench copy_swift_conf function")
     data_loaded = load_config(config_file)
     if not 'swift' in data_loaded:
@@ -150,7 +151,7 @@ def copy_swift_conf(swift_configs):
             port = value['ssh_port']
             key_to_extract = "com.docker.compose.project.working_dir"
             # run in multithread 
-            future = executor.submit(conf_ring_thread, port, user, ip, container_name, key_to_extract)
+            future = executor.submit(conf_ring_thread, swift_configs, port, user, ip, container_name, key_to_extract)
             futures.append(future)
         for future in concurrent.futures.as_completed(futures):
             try:
