@@ -11,6 +11,7 @@ def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_paramet
     serverList = unique_values = mergedTests['Host_alias'].unique().tolist()
     for testInfo in array_of_parameters:
         testGroup = ' , '.join(f'{key} = {value}' for key, value in testInfo.items())
+        h2checker = 1
         for serverName in serverList:
             mergedTestsInfo2 = mergedTestsInfo
             mergedTests2 = mergedTests 
@@ -22,7 +23,9 @@ def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_paramet
                 mergedTests2 = mergedTests2.drop(columns=key)
             if mergedTestsInfo2.empty:
                 break
-            html_result+= f"<h2> نتایج تست های گروه: {testGroup} </h2>"
+            if h2checker:
+                html_result+= f"<h2> نتایج تست های گروه: {testGroup} </h2>"
+                h2checker = 0
             mergedTestsInfo2.reset_index()
             test_rows = [pd.DataFrame([row], columns=mergedTestsInfo2.columns) for _, row in mergedTestsInfo2.iterrows()]
             num_of_tests_within_groups = len(test_rows)
