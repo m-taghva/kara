@@ -232,7 +232,7 @@ def get_conf(server , confType , serverType = None):
     if confType == "server_confs":
         conf = [i for i in load("/configs/"+ server + "/software/swift/server-confs/" + server + "-" + serverType + "-server.conf" ) if "#" not in i]
     if confType == "software_version":
-        conf= [i.replace("\n", "") for i in load("/configs/"+ server + "/software/system/image-versions.txt")]
+        conf= [i.replace("\n", "") for i in load("/configs/"+ server + "/software/system/images-version.txt")]
     if confType == "sysctl":
         conf = [i.replace("\n" , "") for i in load ("/configs/"+ server + "/software/system/sysctl.txt")]
     if confType == "systemctl":
