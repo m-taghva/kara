@@ -151,13 +151,15 @@ if __name__ == "__main__":
     transformation_directory = args.transformation_directory.strip() if args.transformation_directory else None
     csv_original = args.csv_org.strip() if args.csv_org else None
     output_directory = args.output_directory.strip() if args.output_directory else None
-    if args.selected_csv is not None:
-        if '*' in args.selected_csv:
-            selected_csv = args.selected_csv.strip() if args.selected_csv else None
+    if merge:
+        if selected_csv:
+            if '*' in selected_csv:
+                selected_csv = args.selected_csv.strip()
+            else:
+                selected_csv = args.selected_csv.split(',')         
         else:
-            selected_csv = args.selected_csv.split(',')         
-    else:
-        print(f'\033[91mplease select correct csv file your file is wrong: {args.selected_csv}\033[0m')
-        exit(1)
-   
+            selected_csv = None
+            print(f'\033[91mplease select correct csv file your file is wrong: {args.selected_csv}\033[0m')
+            exit(1)
+            
     main(merge, analyze, graph, csv_original, transformation_directory, output_directory, selected_csv, x_column, y_column)
