@@ -342,10 +342,10 @@ def status_analyzer_agent(config_params):
     analyze_csv = config_params.get('analyze_csv')
     transform_dir = config_params.get('transform')
     if merge:
-        analyzer.main(merge=True, analyze=False, graph=False, csv_original=None, output_directory=result_dir, selected_csv=merge_csv, transformation_directory=None ,x_column=None, y_column=None)
+        analyzer.main(merge=True, analyze=False, graph=False, csv_original=None, transformation_directory=None, output_directory=result_dir, selected_csv=merge_csv, x_column=None, y_column=None)
         time.sleep(10)
     if analyze:
-        analyzer.main(merge=False, analyze=True, graph=False, csv_original=analyze_csv, output_directory=None, selected_csv=None, transformation_directory=transform_dir, x_column=None, y_column=None)
+        analyzer.main(merge=False, analyze=True, graph=False, csv_original=analyze_csv, transformation_directory=transform_dir, output_directory=None, selected_csv=None, x_column=None, y_column=None)
 
 def report_recorder_agent(config_params, backup_to_report, result_dir):
     if not os.path.exists(f"./user-config.py"):
