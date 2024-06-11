@@ -116,7 +116,7 @@ def main(merge, analyze, graph, csv_original, transformation_directory, output_d
     if merge:
         if not os.path.exists(output_directory):
             os.makedirs(output_directory) 
-        csv_process(output_directory, selected_csv)
+        merge_process(output_directory, selected_csv)
     if graph:
         plot_and_save_graph(selected_csv, x_column, y_column)
     logging.info("\033[92m****** status_analyzer main function end ******\033[0m")
