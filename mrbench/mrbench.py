@@ -10,6 +10,7 @@ import yaml
 import json
 import select
 import logging
+import concurrent.futures
 
 config_file = "/etc/KARA/mrbench.conf"
 pre_test_script = "./../mrbench/pre_test_script.sh"
@@ -29,6 +30,107 @@ def load_config(config_file):
            sys.exit(1)
     return data_loaded
 
+def conf_ring_thread(port, user, ip, container_name, key_to_extract):    
+    ring_dict = {}
+    all_scp_file_successful = False
+    # Run the docker inspect command and capture the output
+    inspect_command = f"ssh -p {port} {user}@{ip} 'sudo docker inspect {container_name}'"
+    inspect_result = subprocess.run(inspect_command, shell=True, capture_output=True, text=True)
+    if inspect_result.returncode == 0:
+        # Parse the JSON output
+        container_info = json.loads(inspect_result.stdout)
+        # Check if the key exists in the JSON structure
+        if key_to_extract in container_info[0]['Config']['Labels']:
+            inspect_value = container_info[0]['Config']['Labels'][key_to_extract]
+            for filename, filepath in swift_configs.items(): 
+                each_scp_successful = False 
+                if filename.endswith(".gz") or filename.endswith(".builder"):
+                    diff_ring_command = f"ssh -p {port} {user}@{ip} 'sudo cat {inspect_value}/rings/{filename}' | diff - {filepath}"
+                    diff_ring_result = subprocess.run(diff_ring_command, shell=True, capture_output=True, text=True)
+                    print("")
+                    print(f"please wait for checking ring file [ {filename} ] inside {container_name}")
+                    if diff_ring_result.stderr == "":
+                        if diff_ring_result.stdout != "":
+                            mkdir_tmp_rings = f"ssh -p {port} {user}@{ip} 'sudo mkdir -p /tmp/rings/ > /dev/null 2>&1 && sudo chmod -R 777 /tmp/rings/'"
+                            mkdir_tmp_rings_process = subprocess.run(mkdir_tmp_rings, shell=True)
+                            copy_ring_command = f"scp -r -P {port} {filepath} {user}@{ip}:/tmp/rings > /dev/null 2>&1"
+                            copy_ring_command_process = subprocess.run(copy_ring_command, shell=True)
+                            move_tmp_root_rings = f"ssh -p {port} {user}@{ip} 'sudo mv /tmp/rings/{filename} {inspect_value}/rings/ > /dev/null 2>&1'"
+                            move_tmp_root_rings_process = subprocess.run(move_tmp_root_rings, shell=True)
+                            if move_tmp_root_rings_process.returncode == 0 and copy_ring_command_process.stderr is None:
+                                each_scp_successful = True
+                                print("")
+                                print(f"\033[92mcopy ring file [ {filename} ] to {container_name} successful\033[0m")
+                            else: 
+                                print(f"\033[91mrings in {container_name} failed to sync\033[0m")
+                    elif diff_ring_result.stderr != "":
+                        print("")
+                        print(f"\033[91mWARNING: your ring file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
+                        #exit(1)
+                    if "account" in filename:
+                        ring_command = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /rings/account.builder'"
+                        ring_dict['account'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
+                    elif "container" in filename:
+                        ring_command = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /rings/container.builder'"
+                        ring_dict['container'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
+                    else:
+                        ring_command = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /rings/object.builder'"
+                        ring_dict['object'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
+                        
+                elif filename.endswith(".conf"):
+                    diff_conf_command = f"ssh -p {port} {user}@{ip} 'sudo cat {inspect_value}/{filename}' | diff - {filepath}"
+                    diff_conf_result = subprocess.run(diff_conf_command, shell=True, capture_output=True, text=True)
+                    print("")
+                    print(f"please wait for checking config file [ {filename} ] inside {container_name}")
+                    if diff_conf_result.stderr == "":
+                        if diff_conf_result.stdout != "":
+                            mkdir_tmp_configs = f"ssh -p {port} {user}@{ip} 'sudo mkdir -p /tmp/configs/ > /dev/null 2>&1 && sudo chmod -R 777 /tmp/configs/'"
+                            mkdir_tmp_configs_process = subprocess.run(mkdir_tmp_configs, shell=True)
+                            copy_conf_command = f"scp -r -P {port} {filepath} {user}@{ip}:/tmp/configs > /dev/null 2>&1"
+                            copy_conf_command_process = subprocess.run(copy_conf_command, shell=True)
+                            base_name_changer = os.path.basename(filepath)
+                            move_tmp_root_configs = f"ssh -p {port} {user}@{ip} 'sudo mv /tmp/configs/{base_name_changer} {inspect_value}/ > /dev/null 2>&1'"
+                            move_tmp_root_configs_process = subprocess.run(move_tmp_root_configs, shell=True)
+                            if move_tmp_root_configs_process.returncode == 0 and copy_conf_command_process.stderr is None:
+                                each_scp_successful = True
+                                print("")
+                                print(f"\033[92mcopy config file [ {filename} ] to {container_name} successful\033[0m")
+                                name_changer = f"ssh -p {port} {user}@{ip} 'sudo mv {inspect_value}/{base_name_changer} {inspect_value}/{filename} > /dev/null 2>&1'" 
+                                name_changer_process = subprocess.run(name_changer, shell=True)
+                            else:
+                                print(f"\033[91mconfigs in {container_name} failed to sync\033[0m")
+                    elif diff_conf_result.stderr != "":
+                        print("")
+                        print(f"\033[91mWARNING: your config file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
+                        #exit(1)
+                if each_scp_successful: 
+                    all_scp_file_successful = True  
+    else:
+        print("")
+        print(f"\033[91mWARNING: there is a problem in your config file for SSH info inside \033[0m'\033[92m{container_name}\033[0m' \033[91msection so mrbench can't sync config and ring files !\033[0m") 
+        print("")
+        if inspect_result.stdout == '[]\n':
+            print(f"\033[91mWARNING: your container name \033[0m'\033[92m{container_name}\033[0m' \033[91mis wrong !\033[0m")
+    if all_scp_file_successful is True:
+        restart_cont_command = f"ssh -p {port} {user}@{ip} 'sudo docker restart {container_name}' > /dev/null 2>&1"
+        restart_cont_command_process = subprocess.run(restart_cont_command, shell=True)
+        if restart_cont_command_process.returncode == 0:
+            while True:
+                check_container = f"ssh -p {port} {user}@{ip} 'sudo docker ps -f name={container_name}'"
+                check_container_result = subprocess.run(check_container, shell=True, capture_output=True, text=True, check=True)
+                if "Up" in check_container_result.stdout:
+                    check_services = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} service --status-all'"
+                    check_services_result = subprocess.run(check_services, shell=True, capture_output=True, text=True, check=True)
+                    if "[ + ]  swift-account\n" or "[ + ]  swift-container\n" or "[ + ]  swift-object\n" or "[ + ]  swift-proxy\n" in check_services_result:
+                        time.sleep(20)
+                        print("")
+                        print(f"\033[92mcontainer {container_name} successfully restart\033[0m")
+                        break
+        else:
+            print(f"\033[91mcontainer {container_name} failed to reatsrt\033[0m")
+    print(f"{YELLOW}========================================{RESET}")
+    return ring_dict
+
 def copy_swift_conf(swift_configs):
     logging.info("Executing mrbench copy_swift_conf function")
     data_loaded = load_config(config_file)
@@ -38,111 +140,24 @@ def copy_swift_conf(swift_configs):
     if not data_loaded['swift']:
         print(f"Error there isn't any item in \033[91mswift\033[0m section (mrbench.conf) so ring and conf can't set.")
         exit(1)
-    for key,value in data_loaded['swift'].items():
-        ring_dict = {}
-        container_name = key
-        user = value['ssh_user']
-        ip = value['ip_swift']
-        port = value['ssh_port']
-        key_to_extract = "com.docker.compose.project.working_dir"
-        all_scp_file_successful = False
-        # Run the docker inspect command and capture the output
-        inspect_command = f"ssh -p {port} {user}@{ip} 'sudo docker inspect {container_name}'"
-        inspect_result = subprocess.run(inspect_command, shell=True, capture_output=True, text=True)
-        if inspect_result.returncode == 0:
-            # Parse the JSON output
-            container_info = json.loads(inspect_result.stdout)
-            # Check if the key exists in the JSON structure
-            if key_to_extract in container_info[0]['Config']['Labels']:
-                inspect_value = container_info[0]['Config']['Labels'][key_to_extract]
-                for filename, filepath in swift_configs.items(): 
-                    each_scp_successful = False 
-                    if filename.endswith(".gz") or filename.endswith(".builder"):
-                        diff_ring_command = f"ssh -p {port} {user}@{ip} 'sudo cat {inspect_value}/rings/{filename}' | diff - {filepath}"
-                        diff_ring_result = subprocess.run(diff_ring_command, shell=True, capture_output=True, text=True)
-                        print("")
-                        print(f"please wait for checking ring file [ {filename} ] inside {container_name}")
-                        if diff_ring_result.stderr == "":
-                            if diff_ring_result.stdout != "":
-                                mkdir_tmp_rings = f"ssh -p {port} {user}@{ip} 'sudo mkdir -p /tmp/rings/ > /dev/null 2>&1 && sudo chmod -R 777 /tmp/rings/'"
-                                mkdir_tmp_rings_process = subprocess.run(mkdir_tmp_rings, shell=True)
-                                copy_ring_command = f"scp -r -P {port} {filepath} {user}@{ip}:/tmp/rings > /dev/null 2>&1"
-                                copy_ring_command_process = subprocess.run(copy_ring_command, shell=True)
-                                move_tmp_root_rings = f"ssh -p {port} {user}@{ip} 'sudo mv /tmp/rings/{filename} {inspect_value}/rings/ > /dev/null 2>&1'"
-                                move_tmp_root_rings_process = subprocess.run(move_tmp_root_rings, shell=True)
-                                if move_tmp_root_rings_process.returncode == 0 and copy_ring_command_process.stderr is None:
-                                    each_scp_successful = True
-                                    print("")
-                                    print(f"\033[92mcopy ring file [ {filename} ] to {container_name} successful\033[0m")
-                                else: 
-                                    print(f"\033[91mrings in {container_name} failed to sync\033[0m")
-                        elif diff_ring_result.stderr != "":
-                            print("")
-                            print(f"\033[91mWARNING: your ring file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
-                            #exit(1)
-                        if "account" in filename:
-                            ring_command = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /rings/account.builder'"
-                            ring_dict['account'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
-                        elif "container" in filename:
-                            ring_command = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /rings/container.builder'"
-                            ring_dict['container'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
-                        else:
-                            ring_command = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /rings/object.builder'"
-                            ring_dict['object'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
-                            
-                    elif filename.endswith(".conf"):
-                        diff_conf_command = f"ssh -p {port} {user}@{ip} 'sudo cat {inspect_value}/{filename}' | diff - {filepath}"
-                        diff_conf_result = subprocess.run(diff_conf_command, shell=True, capture_output=True, text=True)
-                        print("")
-                        print(f"please wait for checking config file [ {filename} ] inside {container_name}")
-                        if diff_conf_result.stderr == "":
-                            if diff_conf_result.stdout != "":
-                                mkdir_tmp_configs = f"ssh -p {port} {user}@{ip} 'sudo mkdir -p /tmp/configs/ > /dev/null 2>&1 && sudo chmod -R 777 /tmp/configs/'"
-                                mkdir_tmp_configs_process = subprocess.run(mkdir_tmp_configs, shell=True)
-                                copy_conf_command = f"scp -r -P {port} {filepath} {user}@{ip}:/tmp/configs > /dev/null 2>&1"
-                                copy_conf_command_process = subprocess.run(copy_conf_command, shell=True)
-                                base_name_changer = os.path.basename(filepath)
-                                move_tmp_root_configs = f"ssh -p {port} {user}@{ip} 'sudo mv /tmp/configs/{base_name_changer} {inspect_value}/ > /dev/null 2>&1'"
-                                move_tmp_root_configs_process = subprocess.run(move_tmp_root_configs, shell=True)
-                                if move_tmp_root_configs_process.returncode == 0 and copy_conf_command_process.stderr is None:
-                                    each_scp_successful = True
-                                    print("")
-                                    print(f"\033[92mcopy config file [ {filename} ] to {container_name} successful\033[0m")
-                                    name_changer = f"ssh -p {port} {user}@{ip} 'sudo mv {inspect_value}/{base_name_changer} {inspect_value}/{filename} > /dev/null 2>&1'" 
-                                    name_changer_process = subprocess.run(name_changer, shell=True)
-                                else:
-                                    print(f"\033[91mconfigs in {container_name} failed to sync\033[0m")
-                        elif diff_conf_result.stderr != "":
-                            print("")
-                            print(f"\033[91mWARNING: your config file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
-                            #exit(1)
-                    if each_scp_successful: 
-                        all_scp_file_successful = True  
-        else:
-            print("")
-            print(f"\033[91mWARNING: there is a problem in your config file for SSH info inside \033[0m'\033[92m{container_name}\033[0m' \033[91msection so mrbench can't sync config and ring files !\033[0m") 
-            print("")
-            if inspect_result.stdout == '[]\n':
-                print(f"\033[91mWARNING: your container name \033[0m'\033[92m{container_name}\033[0m' \033[91mis wrong !\033[0m")
-        if all_scp_file_successful is True:
-            restart_cont_command = f"ssh -p {port} {user}@{ip} 'sudo docker restart {container_name}' > /dev/null 2>&1"
-            restart_cont_command_process = subprocess.run(restart_cont_command, shell=True)
-            if restart_cont_command_process.returncode == 0:
-                while True:
-                    check_container = f"ssh -p {port} {user}@{ip} 'sudo docker ps -f name={container_name}'"
-                    check_container_result = subprocess.run(check_container, shell=True, capture_output=True, text=True, check=True)
-                    if "Up" in check_container_result.stdout:
-                        check_services = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} service --status-all'"
-                        check_services_result = subprocess.run(check_services, shell=True, capture_output=True, text=True, check=True)
-                        if "[ + ]  swift-account\n" or "[ + ]  swift-container\n" or "[ + ]  swift-object\n" or "[ + ]  swift-proxy\n" in check_services_result:
-                            time.sleep(20)
-                            print("")
-                            print(f"\033[92mcontainer {container_name} successfully restart\033[0m")
-                            break
-            else:
-                print(f"\033[91mcontainer {container_name} failed to reatsrt\033[0m")
-    print(f"{YELLOW}========================================{RESET}")
-    return ring_dict 
+    
+    futures = []
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        for key,value in data_loaded['swift'].items():
+            container_name = key
+            user = value['ssh_user']
+            ip = value['ip_swift']
+            port = value['ssh_port']
+            key_to_extract = "com.docker.compose.project.working_dir"
+            # run in multithread 
+            future = executor.submit(conf_ring_thread, port, user, ip, container_name, key_to_extract)
+            futures.append(future)
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                ring_dict = future.result()
+            except Exception as exc:
+                print(f"Task generated an exception: {exc}")
+    return ring_dict
 
 def submit(workload_config_path, output_path):
     logging.info("Executing mrbench submit function")
