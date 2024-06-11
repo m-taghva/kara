@@ -52,7 +52,7 @@ def read_txt_file(file_path):
     logging.info("Executing status_analyzer read_txt_file function")
     with open(file_path, 'r') as txt_file:
         operation, new_column_name = txt_file.readline().strip().split(':')
-        selected_columns = txt_file.read().splitlines()
+        selected_columns = [line.strip() for line in txt_file.readlines()]
     return operation, new_column_name, selected_columns
 
 def process_csv_file(csv_data, operation, new_column_name, selected_columns):
