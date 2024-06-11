@@ -641,17 +641,20 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
 
                     # run in multithread 
                     bfutures_list = []
-                    with concurrent.futures.ThreadPoolExecutor() as backup_executor:
-                        backup_future = backup_executor.submit(backup_data_collector, ssh_port, ssh_user, ip_influxdb, container_name, influx_volume, time_dir_name, bar, backup_dir)
-                        bfutures_list.append(backup_future)
-                        bresults_list = []
-                        for backup_future in concurrent.futures.as_completed(bfutures_list):
-                            try:
-                                backup_result = backup_future.result()
-                                #print(f"Task completed with result: {result}")
-                                bresults_list.append(backup_result)
-                            except Exception as exc:
-                                print(f"Task generated an exception: {exc}")
+                    backup_executor = concurrent.futures.ThreadPoolExecutor()
+                    #with concurrent.futures.ThreadPoolExecutor() as backup_executor:
+                    backup_future = backup_executor.submit(backup_data_collector, ssh_port, ssh_user, ip_influxdb, container_name, influx_volume, time_dir_name, bar, backup_dir)
+                    bfutures_list.append(backup_future)
+            bresults_list = []
+            for backup_future in concurrent.futures.as_completed(bfutures_list):
+                try:
+                    backup_result = backup_future.result()
+                    #print(f"Task completed with result: {result}")
+                    bresults_list.append(backup_result)
+                except Exception as exc:
+                    print(f"Task generated an exception: {exc}")
+            backup_executor.shutdown()
+            
         #copy other files
         for path in inputs:
             other_dir = f"sudo cp -rp {path} {backup_dir}/{time_dir_name}/other_info/"
