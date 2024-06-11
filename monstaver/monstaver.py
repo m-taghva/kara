@@ -760,7 +760,7 @@ def main(time_range, inputs, delete, backup_restore, hardware_info, os_info, swi
     log_level = load_config(config_file)['log'].get('level')
     if log_level is not None:
         log_level_upper = log_level.upper()
-        if log_level_upper == "DEBUG" or "INFO" or "WARNING" or "ERROR" or "CRITICAL":
+        if log_level_upper == "DEBUG" or log_level_upper == "INFO" or log_level_upper == "WARNING" or log_level_upper == "ERROR" or log_level_upper == "CRITICAL":
             os.makedirs('/var/log/kara/', exist_ok=True)
             logging.basicConfig(filename= '/var/log/kara/all.log', level=log_level_upper, format='%(asctime)s - %(levelname)s - %(message)s')
         else:
