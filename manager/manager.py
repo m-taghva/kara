@@ -276,11 +276,11 @@ def mrbench_agent(config_params, config_file, config_output):
                         analyzer.merge_csv(csv_file=output_csv, output_directory=f"{result_dir}/analyzed", pairs_dict=formatted_data)
                 if run_monstaver != 'none':
                     if run_monstaver == 'backup,info':
-                        backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=True, software_info=True, swift_info=True, influx_backup=True)
+                        backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=True)
                     if run_monstaver == 'backup':
-                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, software_info=False, swift_info=False, influx_backup=True)
+                        monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, software_info=False, swift_info=False, influx_backup=None)
                     if run_monstaver == 'info':
-                        backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=True, software_info=True, swift_info=True, influx_backup=False)
+                        backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[result_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=False)
                 else:
                     backup_to_report = None
     # Extract first start time and last end time
@@ -315,20 +315,20 @@ def monstaver_agent(config_params, config_file, first_start_time, last_end_time)
                 logging.debug(f"manager - monstaver_agent: time range is {time_range}")
                 start_time, end_time = time_range.strip().split(',')
                 if operation == "backup,info":
-                    backup_to_report = monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=False,  backup_restore=None, hardware_info=True, software_info=True, swift_info=True, influx_backup=True)
+                    backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=False,  backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=True)
                 elif operation == 'backup':
-                    monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, software_info=False, swift_info=False, influx_backup=True)
+                    monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, software_info=False, swift_info=False, influx_backup=True)
                 elif operation == 'info':
-                    backup_to_report = monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=True, software_info=True, swift_info=True, influx_backup=False)
+                    backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=False)
                 elif operation == "restore":
                     monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True, hardware_info=False, software_info=False, swift_info=False, influx_backup=False)
     elif batch_mode:
         if operation == "backup,info":
-           backup_to_report = monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=False,  backup_restore=None, hardware_info=True, software_info=True, swift_info=True, influx_backup=True)
+           backup_to_report = monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=False,  backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=True)
         elif operation == 'backup':
             monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, software_info=False, swift_info=False, influx_backup=True)
         elif operation == 'info':
-            backup_to_report = monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=True, software_info=True, swift_info=True, influx_backup=False)
+            backup_to_report = monstaver.main(time_range=f"{first_start_time},{last_end_time}", inputs=[input_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=False)
     elif operation == "restore":
         monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True, hardware_info=False, software_info=False, swift_info=False, influx_backup=False)
     if backup_to_report is not None:
