@@ -116,7 +116,7 @@ def backup_data_collector(ssh_port, ssh_user, ip_influxdb, container_name, influ
         logging.error(f"monstaver - Remove time dir inside container failed: {influx_volume}")
         print("\033[91mremove time dir inside container failed.\033[0m")
 
-def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, bar, swift_info, hardware_info, os_info):
+def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, bar, swift_info, hardware_info, software_info):
     # make hardware/os/swift sub directories
     mkdir_hwoss_output = f"ssh -p {port} {user}@{ip} sudo mkdir -p {backup_dir}-tmp/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/ ; "
     mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/swift/services/ ; "
@@ -274,7 +274,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             print(f"\033[91m dmidecode failed on {container_name} host\033[0m")
         
     #### Execute commands to gather OS information ####
-    if os_info:
+    if software_info:
         logging.info(f"monstaver - user select switch -os for software info") 
         sysctl_process = subprocess.run(f"ssh -p {port} {user}@{ip} sudo sysctl -a > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/sysctl.txt", shell=True)
         if sysctl_process.returncode == 0:
@@ -509,7 +509,7 @@ def restore(data_loaded):
                         print("\033[92mBackup restored successfully(First Time Backup!).\033[0m")
 
 ##### BACKUP PARTS #####
-def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swift_info, influx_backup):
+def backup(time_range, inputs, delete, data_loaded, hardware_info, software_info, swift_info, influx_backup):
     logging.info("Executing monstaver backup function")
     if time_range is None:
         time_range = data_loaded['default'].get('time')
@@ -523,7 +523,14 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
         if default_input_paths:
             inputs = default_input_paths
         else:
-            inputs = []      
+            inputs = []
+    if not hardware_info:
+        hardware_info = data_loaded['default'].get('hardware_backup', False)
+    if not software_info:
+        software_info = data_loaded['default'].get('software_backup', False)
+    if not swift_info:
+        swift_info = data_loaded['default'].get('swift_backup', False)
+    logging.info(f"monstaver - hardware / software / swift backup options: {hardware_info}/{software_info}/{swift_info}")
     backup_dir = data_loaded['default'].get('backup_output')
     start_time_str, end_time_str = time_range.split(',')
     logging.info(f"monstaver - start time & end time of backup: {start_time_str}, {end_time_str}")
@@ -649,7 +656,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                 user = value['ssh_user']
                 ip = value['ip_swift']
                 port = value['ssh_port']
-                future = info_executor.submit(info_collector, port, user, ip, backup_dir, time_dir_name, container_name, bar, swift_info, hardware_info, os_info)
+                future = info_executor.submit(info_collector, port, user, ip, backup_dir, time_dir_name, container_name, bar, swift_info, hardware_info, software_info)
                 info_futures_list.append(future)
             info_results_list = []
             for future in concurrent.futures.as_completed(info_futures_list):
@@ -707,11 +714,11 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
             else:
                 logging.info("monstaver can't connect to monster cloud storage")
                 print("\033[91mmonstaver can't connect to monster cloud storage\033[0m") 
-                
+
     backup_to_report = f"{backup_dir}/{time_dir_name}/"
     return backup_to_report
 
-def main(time_range, inputs, delete, backup_restore, hardware_info, os_info, swift_info, influx_backup):
+def main(time_range, inputs, delete, backup_restore, hardware_info, software_info, swift_info, influx_backup):
     log_level = load_config(config_file)['log'].get('level')
     if log_level is not None:
         log_level_upper = log_level.upper()
@@ -722,13 +729,14 @@ def main(time_range, inputs, delete, backup_restore, hardware_info, os_info, swi
             print(f"\033[91mInvalid log level:{log_level}\033[0m")  
     else:
         print(f"\033[91mPlease enter log_level in the configuration file.\033[0m")
+
     logging.info("****** Monstaver main function start ******")
     data_loaded = load_config(config_file)
     if backup_restore: 
         restore(data_loaded)
         return None
     else:
-        return backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swift_info, influx_backup)
+        return backup(time_range, inputs, delete, data_loaded, hardware_info, software_info, swift_info, influx_backup)
     
 if __name__ == "__main__":
     # Command-line argument parsing
@@ -738,8 +746,8 @@ if __name__ == "__main__":
     argParser.add_argument("-i", "--inputs", help="Input paths for copying to result")
     argParser.add_argument("-r", "--restore", action="store_true", help="run restore function")
     argParser.add_argument("-hw", "--hardware_info", action="store_true", help="take hardware info from monster")
-    argParser.add_argument("-os", "--os_info", action="store_true", help="take os info from monster")
-    argParser.add_argument("-sw", "--swift_info", action="store_true", help="take swift info from monster")
+    argParser.add_argument("-sw", "--software_info", action="store_true", help="take os/software info from monster")
+    argParser.add_argument("-s", "--swift_info", action="store_true", help="take swift info from monster")
     argParser.add_argument("-ib", "--influx_backup", action="store_true", help="take backup from influxdb")
     args = argParser.parse_args()
-    main(time_range=args.time_range, inputs=args.inputs.split(',') if args.inputs is not None else args.inputs, delete=args.delete, backup_restore=args.restore, hardware_info=args.hardware_info, os_info=args.os_info, swift_info=args.swift_info, influx_backup=args.influx_backup)
+    main(time_range=args.time_range, inputs=args.inputs.split(',') if args.inputs is not None else args.inputs, delete=args.delete, backup_restore=args.restore, hardware_info=args.hardware_info, software_info=args.software_info, swift_info=args.swift_info, influx_backup=args.influx_backup)
