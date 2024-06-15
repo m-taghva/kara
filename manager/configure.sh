@@ -64,9 +64,16 @@ fi
 #### unzip pywikibot
 zip_file="$KARA_DIR/KARA/report_recorder/report_recorder_bot.zip"
 zip_destination="$KARA_DIR/KARA/report_recorder/"
-unzip "$zip_file" -d "$zip_destination"
-mv "$KARA_DIR/KARA/report_recorder/report_recorder_bot"/*  "$zip_destination"
-
+if unzip "$zip_file" -d "$zip_destination"; then
+  if mv "$KARA_DIR/KARA/report_recorder/report_recorder_bot"/* "$zip_destination" > /dev/null 2>&1; then
+    echo "${YELLOW}Unzip and move report_recoder_bot to /resport_recorder dir successful${RESET}"
+  else
+    echo "{BOLD}Unzip successful but move failed for report_recoder_bot${RESET}"
+  fi
+else
+  echo "{BOLD}report_recoder_bot unzip failed${RESET}"
+fi
+ 
 #### copy user-config.py to manager dir
 if [ ! -f "$KARA_DIR/KARA/manager/user-config.py" ]; then
     sudo cp -r $KARA_DIR/KARA/report_recorder/user-config.py $KARA_DIR/KARA/manager/
