@@ -62,8 +62,7 @@ def convert_time(start_time_str, end_time_str, margin_start, margin_end):
 def backup_data_collector(ssh_port, ssh_user, ip_influxdb, container_name, influx_volume, time_dir_name, bar, backup_dir):
     # New_location_backup_in_host = value['temporary_location_backup_host']
     tmp_backup = "/tmp/influxdb-backup-tmp"
-    mkdir_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo mkdir -p {tmp_backup} && sudo chmod -R 777 {tmp_backup}'"
-    mkdir_process = subprocess.run(mkdir_command, shell=True)
+    mkdir_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo mkdir -p {tmp_backup} && sudo chmod -R 777 {tmp_backup}'", shell=True)
     if mkdir_process.returncode == 0:
         logging.info(f"monstaver - create {tmp_backup} successful")
         time.sleep(1)
@@ -72,8 +71,7 @@ def backup_data_collector(ssh_port, ssh_user, ip_influxdb, container_name, influ
         print(f"\033[91mDirectory {tmp_backup} creation and permission setting failed.\033[0m")
 
     # copy backup to temporary dir 
-    cp_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker cp {container_name}:{influx_volume}/{time_dir_name}/{container_name} {tmp_backup}'"
-    cp_process = subprocess.run(cp_command, shell=True)
+    cp_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker cp {container_name}:{influx_volume}/{time_dir_name}/{container_name} {tmp_backup}'", shell=True)
     if cp_process.returncode == 0:
         logging.info(f"monstaver - copy backup to {tmp_backup} successful")
         bar()
@@ -82,8 +80,7 @@ def backup_data_collector(ssh_port, ssh_user, ip_influxdb, container_name, influ
         print(f"\033[91mcopy backup to {tmp_backup} failed\033[0m")
 
     # tar all backup
-    tar_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo tar -cf {tmp_backup}/{container_name}.tar.gz -C {tmp_backup}/{container_name}/ .'"
-    tar_process = subprocess.run(tar_command, shell=True)
+    tar_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo tar -cf {tmp_backup}/{container_name}.tar.gz -C {tmp_backup}/{container_name}/ .'", shell=True)
     if tar_process.returncode == 0:
         logging.info(f"monstaver - create {tmp_backup}/{container_name}.tar.gz successful")
         bar()
@@ -92,8 +89,7 @@ def backup_data_collector(ssh_port, ssh_user, ip_influxdb, container_name, influ
         print(f"\033[91mcreate {tmp_backup}/{container_name}.tar.gz  failed.\033[0m")
 
     # move tar file to dbs dir inside your server
-    mv_command = f"scp -r -P {ssh_port} {ssh_user}@{ip_influxdb}:{tmp_backup}/*.tar.gz {backup_dir}/{time_dir_name}/dbs/ > /dev/null 2>&1"
-    mv_process = subprocess.run(mv_command, shell=True)
+    mv_process = subprocess.run(f"scp -r -P {ssh_port} {ssh_user}@{ip_influxdb}:{tmp_backup}/*.tar.gz {backup_dir}/{time_dir_name}/dbs/ > /dev/null 2>&1", shell=True)
     if mv_process.returncode == 0:
         logging.info(f"monstaver - all backup moved to your server: {backup_dir}/{time_dir_name}/dbs/")
         print("all backup moved to your server")
@@ -103,8 +99,7 @@ def backup_data_collector(ssh_port, ssh_user, ip_influxdb, container_name, influ
         print(f"\033[91mmoving backup files to {backup_dir}/{time_dir_name}/dbs/ failed.\033[0m")
 
     # remove temporary location of backup in host
-    del_command_tmp_loc = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo rm -rf {tmp_backup}'"
-    del_process = subprocess.run(del_command_tmp_loc, shell=True)
+    del_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo rm -rf {tmp_backup}'", shell=True)
     if del_process.returncode == 0:
         logging.info(f"monstaver - remove temporary location of backup in host: {tmp_backup}")
         bar()
@@ -113,8 +108,7 @@ def backup_data_collector(ssh_port, ssh_user, ip_influxdb, container_name, influ
         print("\033[91mremove temp dir failed.\033[0m")
 
     # delete {time_dir} inside container
-    del_time_cont = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec {container_name} rm -rf {influx_volume}'"
-    del_time_process = subprocess.run(del_time_cont, shell=True)
+    del_time_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec {container_name} rm -rf {influx_volume}'", shell=True)
     if del_time_process.returncode == 0:
         logging.info(f"monstaver - Remove time dir inside container: {influx_volume}")
         bar()
@@ -177,8 +171,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
         docker_compose_file = inspect_result[0]['Config']['Labels'].get('com.docker.compose.project.config_files')
         docker_compose_path = inspect_result[0]['Config']['Labels'].get('com.docker.compose.project.working_dir')
         docker_compose_result = os.path.join(docker_compose_path,docker_compose_file)
-    copy_compose_file = f"scp -r -P {port} {user}@{ip}:{docker_compose_result} {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/ > /dev/null 2>&1"
-    copy_compose_file_process = subprocess.run(copy_compose_file, shell=True)
+    copy_compose_file_process = subprocess.run(f"scp -r -P {port} {user}@{ip}:{docker_compose_result} {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/ > /dev/null 2>&1", shell=True)
     if copy_compose_file_process.returncode == 0:
         logging.info("monstaver - extract docker compose file path and copy to os dir successful")
         bar()
@@ -187,8 +180,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
         print("\033[91mfailure in copy compose file\033[0m")
 
     # copy etc dir from container to host
-    get_etc_command =  f"ssh -p {port} {user}@{ip} 'sudo docker cp {container_name}:/etc  {backup_dir}-tmp/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/'"
-    get_etc_process = subprocess.run(get_etc_command, shell=True)
+    get_etc_process = subprocess.run(f"ssh -p {port} {user}@{ip} 'sudo docker cp {container_name}:/etc  {backup_dir}-tmp/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/'", shell=True)
     if get_etc_process.returncode == 0:
         logging.info(f"monstaver - copy monster etc of {container_name} to hos successful")
         bar()
@@ -197,8 +189,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
         print(f"\033[91mfailure in copy monster etc of {container_name} to host\033[0m")
 
     # copy container etc dir from host to your server
-    mv_etc_cont_command = f"scp -r -P {port} {user}@{ip}:{backup_dir}-tmp/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/etc/*  {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/ > /dev/null 2>&1"
-    mv_etc_cont_process = subprocess.run(mv_etc_cont_command, shell=True)
+    mv_etc_cont_process = subprocess.run(f"scp -r -P {port} {user}@{ip}:{backup_dir}-tmp/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/etc/*  {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/ > /dev/null 2>&1", shell=True)
     if mv_etc_cont_process.stderr is None:
         logging.info(f"monstaver - copy container etc dir from host {container_name} to your server successful")
         bar()
@@ -207,8 +198,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
         print(f"\033[91mfailure in copy container etc dir from host {container_name} to your server\033[0m")
     
     # copy host etc dir from host to your server
-    mv_etc_host_command = f"scp -r -P {port} {user}@{ip}:/etc/*  {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-host/ > /dev/null 2>&1"
-    mv_etc_host_process = subprocess.run(mv_etc_host_command, shell=True)
+    mv_etc_host_process = subprocess.run(f"scp -r -P {port} {user}@{ip}:/etc/*  {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-host/ > /dev/null 2>&1", shell=True)
     if mv_etc_host_process.stderr is None:
         logging.info(f"monstaver - copy host etc from host {container_name} to your server successful")
         bar()
@@ -237,8 +227,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             logging.error(f"monstaver - lshw failed on {container_name} host")
             print(f"\033[91m lshw failed on {container_name} host\033[0m")
 
-        lscpu_command = f"ssh -p {port} {user}@{ip} sudo lscpu > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/cpu/lscpu.txt"
-        lscpu_process = subprocess.run(lscpu_command, shell=True)
+        lscpu_process = subprocess.run(f"ssh -p {port} {user}@{ip} sudo lscpu > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/cpu/lscpu.txt", shell=True)
         if lscpu_process.returncode == 0:
             logging.info(f"monstaver - lscpu successful on {container_name} host")
             time.sleep(1)
@@ -249,8 +238,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             logging.error(f"lscpu failed on {container_name} host")
             print(f"\033[91m lscpu failed on {container_name} host\033[0m")
 
-        lsmem_command = f"ssh -p {port} {user}@{ip} sudo lsmem > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/memory/lsmem.txt"
-        lsmem_process = subprocess.run(lsmem_command, shell=True)
+        lsmem_process = subprocess.run(f"ssh -p {port} {user}@{ip} sudo lsmem > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/memory/lsmem.txt", shell=True)
         if lsmem_process.returncode == 0:
             logging.info(f"monstaver - lsmem successful on {container_name} host")
             time.sleep(1)
@@ -261,8 +249,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             logging.error(f"lsmem failed on {container_name} host")
             print(f"\033[91m lamem failed on {container_name} host\033[0m")
 
-        lspci_command = f"ssh -p {port} {user}@{ip} sudo lspci > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/pci/lspci.txt"
-        lspci_process = subprocess.run(lspci_command, shell=True)
+        lspci_process = subprocess.run(f"ssh -p {port} {user}@{ip} sudo lspci > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/pci/lspci.txt", shell=True)
         if lspci_process.returncode == 0:
             logging.info(f"monstaver - lspci successful on {container_name} host")
             time.sleep(1)
@@ -289,8 +276,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
     #### Execute commands to gather OS information ####
     if os_info:
         logging.info(f"monstaver - user select switch -os for software info") 
-        sysctl_command = f"ssh -p {port} {user}@{ip} sudo sysctl -a > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/sysctl.txt"
-        sysctl_process = subprocess.run(sysctl_command, shell=True)
+        sysctl_process = subprocess.run(f"ssh -p {port} {user}@{ip} sudo sysctl -a > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/sysctl.txt", shell=True)
         if sysctl_process.returncode == 0:
             logging.info(f"monstaver - sysctl -a successful on {container_name}")
             time.sleep(1)
@@ -298,8 +284,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             logging.error(f"monstaver - sysctl failed on {container_name}")
             print(f"\033[91m sysctl failed on {container_name}\033[0m")
 
-        ps_aux_command = f"ssh -p {port} {user}@{ip} sudo ps -aux > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/ps-aux.txt"
-        ps_aux_process = subprocess.run(ps_aux_command, shell=True)
+        ps_aux_process = subprocess.run(f"ssh -p {port} {user}@{ip} sudo ps -aux > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/ps-aux.txt", shell=True)
         if ps_aux_process.returncode == 0:
             logging.info(f"monstaver - ps -aux successful on {container_name}")
             time.sleep(1)
@@ -307,8 +292,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             logging.error(f"monstaver - ps_aux failed on {container_name}")          
             print(f"\033[91m ps_aux failed on {container_name}\033[0m")
 
-        list_unit_command = f"ssh -p {port} {user}@{ip} sudo systemctl list-units > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/systemctl.txt"
-        list_unit_process = subprocess.run(list_unit_command, shell=True)
+        list_unit_process = subprocess.run(f"ssh -p {port} {user}@{ip} sudo systemctl list-units > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/systemctl.txt", shell=True)
         if list_unit_process.returncode == 0:
             logging.info(f"monstaver - systemctl list-units successful on {container_name}")
             time.sleep(1)
@@ -316,8 +300,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             logging.error(f"monstaver - systemctl list-units failed on {container_name}")           
             print(f"\033[91msystemctl list-units failed on {container_name}\033[0m")
 
-        lsmod_command = f"ssh -p {port} {user}@{ip} sudo lsmod > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/lsmod.txt"
-        lsmod_process = subprocess.run(lsmod_command, shell=True)
+        lsmod_process = subprocess.run(f"ssh -p {port} {user}@{ip} sudo lsmod > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/lsmod.txt", shell=True)
         if lsmod_process.returncode == 0:
             logging.info(f"monstaver - lsmod successful on {container_name}")
             time.sleep(1)
@@ -342,8 +325,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             print(f"\033[91mlsof failed on {container_name}\033[0m")
 
     # remove /influxdb-backup/time_dir from container and host
-    rm_cont_host_dir_command =  f"ssh -p {port} {user}@{ip} sudo rm -rf {backup_dir}-tmp/* ; ssh -p {port} {user}@{ip} sudo docker exec {container_name} rm -rf {backup_dir}-tmp/* "
-    rm_cont_host_dir_process = subprocess.run(rm_cont_host_dir_command, shell=True)
+    rm_cont_host_dir_process = subprocess.run(f"ssh -p {port} {user}@{ip} sudo rm -rf {backup_dir}-tmp/* ; ssh -p {port} {user}@{ip} sudo docker exec {container_name} rm -rf {backup_dir}-tmp/* ", shell=True)
     if rm_cont_host_dir_process.returncode == 0:
         logging.info(f"monstaver - remove /influxdb-backup/time_dir from container and host successful for {ip} and {container_name}")
         bar()
@@ -365,8 +347,7 @@ def restore(data_loaded):
             prefix = db_info.get('prefix')
             location = db_info.get('location') 
             try:
-                list_command = f"tar -tvf {location} | grep '^d'"
-                output_bytes = subprocess.check_output(list_command, shell=True)
+                output_bytes = subprocess.check_output(f"tar -tvf {location} | grep '^d'", shell=True)
                 output = output_bytes.decode('utf-8')
                 # Filter out directories that start with a dot
                 directories = [line.split()[-1] for line in output.split('\n') if line.startswith('d') and not line.endswith('./')]
@@ -389,8 +370,7 @@ def restore(data_loaded):
             print(f"*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* START OF RESTORE FOR\033[92m {mc_server} | {destination_db_name} \033[0m*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
        
             # Drop second_db
-            drop_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} \"sudo docker exec -i -u root {container_name} influx -execute 'drop database {destination_db_name}'\""
-            drop_process = subprocess.run(drop_command, shell=True)
+            drop_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} \"sudo docker exec -i -u root {container_name} influx -execute 'drop database {destination_db_name}'\"", shell=True)
             exit_code = drop_process.returncode
             if exit_code == 0:
                 print()
@@ -403,8 +383,7 @@ def restore(data_loaded):
                 print()
 
             # Create second_db
-            create_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} \"sudo docker exec -i -u root {container_name} influx -execute 'create database {destination_db_name}'\""
-            create_process = subprocess.run(create_command, shell=True)
+            create_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} \"sudo docker exec -i -u root {container_name} influx -execute 'create database {destination_db_name}'\"", shell=True)
             exit_code = create_process.returncode
             if exit_code == 0:
                 logging.info(f"monstaver - Create database {destination_db_name} successfully")
@@ -416,8 +395,7 @@ def restore(data_loaded):
                 print()
 
             # Ensure the target restore directory exists
-            create_dir_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} mkdir -p {influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_tar && sudo docker exec -i -u root {container_name} mkdir -p {influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_untar'"
-            create_dir_process = subprocess.run(create_dir_command, shell=True)
+            create_dir_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} mkdir -p {influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_tar && sudo docker exec -i -u root {container_name} mkdir -p {influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_untar'", shell=True)
             create_dir_exit_code = create_dir_process.returncode
             if create_dir_exit_code == 0:
                 logging.info(f"monstaver - Restore directory created successfully: {create_dir_process}")
@@ -430,8 +408,7 @@ def restore(data_loaded):
                 sys.exit(1)
 
             # Copy backup file to container mount point
-            copy_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker cp {location} {container_name}:{influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_tar'"
-            copy_process = subprocess.run(copy_command, shell=True)
+            copy_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker cp {location} {container_name}:{influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_tar'", shell=True)
             exit_code = copy_process.returncode
             if exit_code == 0:
                 logging.info(f"monstaver - Copy to mount point successfully: {copy_process}")
@@ -443,8 +420,7 @@ def restore(data_loaded):
                 print()
     
             # Extract the backup.tar.gz
-            extract_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} tar -xf {influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_tar/{container_name}.tar.gz -C {influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_untar/'"
-            extract_process = subprocess.run(extract_command, shell=True)
+            extract_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} tar -xf {influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_tar/{container_name}.tar.gz -C {influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_untar/'", shell=True)
             exit_code = extract_process.returncode
             if exit_code == 0:
                 logging.info(f"monstaver - Backup extracted successfully: {extract_process}")
@@ -469,8 +445,7 @@ def restore(data_loaded):
 
             # Restore backup to temporay database
             if output is not None and source_db_name in output:
-                restore_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd restore -portable -db {source_db_name} -newdb tempdb {influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_untar/{source_db_name} > /dev/null 2>&1'"
-                restore_process = subprocess.run(restore_command, shell=True)
+                restore_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd restore -portable -db {source_db_name} -newdb tempdb {influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_untar/{source_db_name} > /dev/null 2>&1'", shell=True)
                 restore_exit_code = restore_process.returncode
                 if restore_exit_code == 0:
                     logging.info(f"monstaver - Restore data to temporary database successfully: {restore_process}")
@@ -483,8 +458,7 @@ def restore(data_loaded):
                     sys.exit(1)
       
                 # Merge phase
-                merge_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} \"sudo docker exec -i -u root {container_name} influx -execute 'SELECT * INTO \"{destination_db_name}\".autogen.:MEASUREMENT FROM \"tempdb\".autogen./.*/ GROUP BY *'\" > /dev/null 2>&1 "
-                merge_process = subprocess.run(merge_command, shell=True)
+                merge_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} \"sudo docker exec -i -u root {container_name} influx -execute 'SELECT * INTO \"{destination_db_name}\".autogen.:MEASUREMENT FROM \"tempdb\".autogen./.*/ GROUP BY *'\" > /dev/null 2>&1 ", shell=True)
                 merge_exit_code = merge_process.returncode
                 if merge_exit_code == 0:
                     logging.info(f"monstaver - Merging data to second database successfully: {merge_process}")
@@ -497,10 +471,8 @@ def restore(data_loaded):
                     sys.exit(1)
 
                 # Drop tmp db
-                drop_tmp_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} \"sudo docker exec -i -u root {container_name} influx -execute 'drop database tempdb'\""
-                drop_tmp_process = subprocess.run(drop_tmp_command, shell=True)
-                drop_tmp_exit_code = drop_tmp_process.returncode
-                if drop_tmp_exit_code == 0:
+                drop_tmp_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} \"sudo docker exec -i -u root {container_name} influx -execute 'drop database tempdb'\"", shell=True)
+                if drop_tmp_process.returncode == 0:
                     logging.info("monstaver - Dropping temporary database successfully")
                     print("\033[92mDropping temporary database successfully.\033[0m")
                     print()
@@ -513,8 +485,7 @@ def restore(data_loaded):
                     print()
              
                 # remove untar and tar file in container
-                del_restore_cont = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec {container_name} rm -rf {influx_mount_point}'"
-                del_restore_process = subprocess.run(del_restore_cont, shell=True)
+                del_restore_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec {container_name} rm -rf {influx_mount_point}'", shell=True)
                 if del_restore_process.returncode == 0:
                     logging.info("monstaver - remove untar and tar file in container successfully")
                     time.sleep(1)
@@ -528,10 +499,8 @@ def restore(data_loaded):
 
             # If main database does not exist 
             elif output is not None and databases not in output:
-                    restore_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd restore -portable -db {source_db_name} {influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_untar'"
-                    restore_process = subprocess.run(restore_command, shell=True)
-                    restore_exit_code = restore_process.returncode
-                    if restore_exit_code == 1:
+                    restore_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd restore -portable -db {source_db_name} {influx_mount_point}/MPK_RESTORE/{mc_server}-{destination_db_name}/backup_untar'", shell=True)
+                    if restore_process.returncode == 1:
                         logging.critical(f"monstaver - Restore failed:{output} is not None and {databases} not in {output}")
                         print("\033[91mRestore failed.\033[0m")
                         print()
@@ -584,8 +553,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                 for db_name in database_names:
                     # Perform backup using influxd backup command
                     start_time = time.time()
-                    backup_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd backup -portable -db {db_name} -start {start_time_backup} -end {end_time_backup} {influx_volume}/{time_dir_name}/{container_name}/{db_name} > /dev/null 2>&1'"
-                    backup_process = subprocess.run(backup_command, shell=True, timeout=240)
+                    backup_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd backup -portable -db {db_name} -start {start_time_backup} -end {end_time_backup} {influx_volume}/{time_dir_name}/{container_name}/{db_name} > /dev/null 2>&1'", shell=True, check=True, timeout=240)
                     end_time = time.time() 
                     response_time = end_time - start_time
                     if response_time > 120:  # Check if the time taken exceeds 2 minutes (120 seconds)
@@ -605,14 +573,12 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                                         logging.info(f"monstaver - Container: {container_name} is up and running")
                                         print(f"Container: {container_name} is up and running.")
                                         # check influxdb service
-                                        check_influx_service = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec {container_name} service influxdb status'"
-                                        check_influx_service_result = subprocess.run(check_influx_service, shell=True, check=True, capture_output=True, text=True)
+                                        check_influx_service_result = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec {container_name} service influxdb status'", shell=True, check=True, capture_output=True, text=True)
                                         if "is running [ OK ]" in check_influx_service_result.stdout:
                                             logging.info("monstaver - influxdb service is up and running")
                                             print("influxdb service is up and running")
                                              # check database inside influx
-                                            check_db_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} \"sudo docker exec -i -u root {container_name} influx -execute 'SHOW DATABASES'\""
-                                            check_db_command_result = subprocess.run(check_db_command, shell=True, check=True, capture_output=True, text=True)
+                                            check_db_command_result = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} \"sudo docker exec -i -u root {container_name} influx -execute 'SHOW DATABASES'\"", shell=True, check=True, capture_output=True, text=True)
                                             if db_name in check_db_command_result.stdout:
                                                 logging.info(f"monstaver - database: {db_name} exists in influxdb")
                                                 print(f"database: {db_name} exists in influxdb")
@@ -640,25 +606,24 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                         print("\033[91mBackup failed.\033[0m")
 
                     # run in multithread 
-                    bfutures_list = []
+                    backup_futures_list = []
                     backup_executor = concurrent.futures.ThreadPoolExecutor()
                     #with concurrent.futures.ThreadPoolExecutor() as backup_executor:
                     backup_future = backup_executor.submit(backup_data_collector, ssh_port, ssh_user, ip_influxdb, container_name, influx_volume, time_dir_name, bar, backup_dir)
-                    bfutures_list.append(backup_future)
-            bresults_list = []
-            for backup_future in concurrent.futures.as_completed(bfutures_list):
+                    backup_futures_list.append(backup_future)
+            backup_results_list = []
+            for backup_future in concurrent.futures.as_completed(backup_futures_list):
                 try:
                     backup_result = backup_future.result()
                     #print(f"Task completed with result: {result}")
-                    bresults_list.append(backup_result)
+                    backup_results_list.append(backup_result)
                 except Exception as exc:
                     print(f"Task generated an exception: {exc}")
             backup_executor.shutdown()
             
         #copy other files
         for path in inputs:
-            other_dir = f"sudo cp -rp {path} {backup_dir}/{time_dir_name}/other_info/"
-            other_dir_process = subprocess.run(other_dir, shell=True)
+            other_dir_process = subprocess.run(f"sudo cp -rp {path} {backup_dir}/{time_dir_name}/other_info/", shell=True)
             if other_dir_process.returncode == 0:
                 logging.info(f"monstaver - all input_paths copy to other_info dir: {inputs}")
                 print("all input_paths copy to other_info dir")
@@ -667,8 +632,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                 print("\033[91mcopy input_paths failed.\033[0m")
 
         # copy monstaver config file to backup
-        monstaver_conf = f"sudo cp {config_file} {backup_dir}/{time_dir_name}/other_info/"
-        monstaver_conf_process =  subprocess.run(monstaver_conf, shell=True)
+        monstaver_conf_process =  subprocess.run(f"sudo cp {config_file} {backup_dir}/{time_dir_name}/other_info/", shell=True)
         if monstaver_conf_process.returncode == 0:
             logging.info(f"monstaver - copy monstaver config file to {backup_dir}/{time_dir_name}/other_info/")
             time.sleep(1)
@@ -677,28 +641,27 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
             print("\033[91mcopy monstaver config failed.\033[0m")
         
         # run in multithread 
-        futures = []
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        info_futures_list = []
+        with concurrent.futures.ThreadPoolExecutor() as info_executor:
             # copy ring and config to output
             for key,value in data_loaded['swift'].items():
                 container_name = key
                 user = value['ssh_user']
                 ip = value['ip_swift']
                 port = value['ssh_port']
-                future = executor.submit(info_collector, port, user, ip, backup_dir, time_dir_name, container_name, bar, swift_info, hardware_info, os_info)
-                futures.append(future)
-            results = []
-            for future in concurrent.futures.as_completed(futures):
+                future = info_executor.submit(info_collector, port, user, ip, backup_dir, time_dir_name, container_name, bar, swift_info, hardware_info, os_info)
+                info_futures_list.append(future)
+            info_results_list = []
+            for future in concurrent.futures.as_completed(info_futures_list):
                 try:
-                    result = future.result()
+                    info_result = future.result()
                     #print(f"Task completed with result: {result}")
-                    results.append(result)
+                    info_results_list.append(info_result)
                 except Exception as exc:
                     print(f"Task generated an exception: {exc}")
         
         # tar all result inside output dir
-        tar_output = f"sudo tar -C {backup_dir} -cf {backup_dir}/{time_dir_name}.tar.gz {time_dir_name}"
-        tar_output_process = subprocess.run(tar_output, shell=True)
+        tar_output_process = subprocess.run(f"sudo tar -C {backup_dir} -cf {backup_dir}/{time_dir_name}.tar.gz {time_dir_name}", shell=True)
         if tar_output_process.returncode == 0:
             logging.info(f"monstaver - all files compressed in : {backup_dir}/{time_dir_name}.tar.gz")
             print(f"all files compressed in : {backup_dir}/{time_dir_name}.tar.gz")
@@ -711,8 +674,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
         # delete orginal time dir inside output dir use -d switch        
         if delete:
             logging.info(f"monstaver - user select switch -d for delete final backup") 
-            time_del = f"sudo rm -rf {backup_dir}/{time_dir_name}"
-            time_del_process = subprocess.run(time_del, shell=True)
+            time_del_process = subprocess.run(f"sudo rm -rf {backup_dir}/{time_dir_name}", shell=True)
             if time_del_process.returncode == 0:
                 logging.info(f"monstaver - delete orginal backup dir inside {backup_dir}/{time_dir_name} successful")
                 time.sleep(1)
@@ -738,8 +700,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, os_info, swif
                 create_container = requests.put(f"{public_url}/{cont_name}", headers=headers)
                 if create_container.status_code == "200" or "201" or "202":
                     logging.info(f"contaner {cont_name} created on  monster")
-                    upload_backup = f"curl -X PUT -T {backup_dir}/{time_dir_name}.tar.gz -H 'X-Auth-Token:{token}' {public_url}/{cont_name}/{time_dir_name}.tar.gz"
-                    upload_backup_process = subprocess.run(upload_backup, shell=True)
+                    upload_backup_process = subprocess.run(f"curl -X PUT -T {backup_dir}/{time_dir_name}.tar.gz -H 'X-Auth-Token:{token}' {public_url}/{cont_name}/{time_dir_name}.tar.gz", shell=True)
                     if upload_backup_process.returncode == 0:
                         logging.info("backup tar file upload to monster cloud storage")
                         print("backup tar file upload to monster cloud storage")
