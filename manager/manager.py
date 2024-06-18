@@ -360,6 +360,8 @@ def report_recorder_agent(config_params, backup_to_report, result_dir):
     scenario_name = config_params.get('scenario_name')
     if backup_to_report is None:
         backup_to_report = config_params.get('configs_dir')
+    if result_dir is None:
+        result_dir = "./../results"
     # for HW report
     report_recorder.main(input_template=f"{html_templates_path}/hardware.html", htmls_path=output_path, cluster_name=cluster_name, scenario_name=scenario_name, configs_directory=backup_to_report, upload_operation=upload_to_kateb, create_html_operation=create_html, merged_file=None, merged_info_file=None, all_test_dir=None)
     # for SW report
