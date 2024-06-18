@@ -73,7 +73,7 @@ for entry in data["results"]:
         plt.xticks(x_ticks, x_labels)
         plt.grid(True)
         plt.tight_layout()
-        output_filename = f"{server_name}_{metric_name.replace('.', '_')}_{value_column}:{time_range_start.strftime('%Y-%m-%d_%H-%M-%S')}_{time_range_end.strftime('%Y-%m-%d_%H-%M-%S')}.png"
+        output_filename = f"{server_name}-{metric_name.replace('.', '-')}-{value_column}_{time_range_start.strftime('%Y-%m-%d-%H-%M-%S')}-{time_range_end.strftime('%Y-%m-%d-%H-%M-%S')}.png"
         output_filepath = os.path.join(server_dir, output_filename)
         # Update the progress bar description to show the image name
         pbar.set_description(f"Generating {output_filename}")
