@@ -6,7 +6,7 @@ import os
 
 ################# CSV to sorted yaml descending-based ##############################################################
 def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_parameters,tests_dir):
-    img_metrics = ['netdata_disk_sdb_writes_mean','netdata_statsd_timer_swift_object_server_put_timing_events_mean']
+    img_metrics = ['netdata-disk-sdb-writes-mean','netdata-statsd-timer-swift-object-server-put-timing-events-mean']
     html_result =  f"<p> در این سند جزئیات مربوط به تست های گروه {test_group} آمده است</p>"
     serverList = unique_values = mergedTests['Host_alias'].unique().tolist()
     for testInfo in array_of_parameters:
