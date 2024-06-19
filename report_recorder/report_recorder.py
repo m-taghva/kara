@@ -44,16 +44,16 @@ def generate_cpu_model(serverName):
     threads = ""
     model = ""
     for line in load(f'/configs/{serverName}' + "/hardware/cpu/lscpu.txt"):
-        line = line.replace("  ", "").replace("\n","").split(":")
+        line = line.replace("\n","").split(":")
         if "Core(s) per socket" in line[0]:
-            coresPerSocket=line[1]
+            coresPerSocket=line[1].strip()
             #print ("("+  coresPerSocket+ ")")
         if "Socket(s)" in line[0]:
-            socket=line[1]
+            socket=line[1].strip()
         if "Thread(s) per core" in line[0]:
-            threads = line[1]
+            threads = line[1].strip()
         if "Model name" in line[0]:
-            model = line[1]
+            model = line[1].strip()
     return coresPerSocket + "xcores x " + socket + "xsockets x " + threads + "xthreads " + model
 
 # lshw -short -C memory
