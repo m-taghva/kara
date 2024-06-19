@@ -109,14 +109,21 @@ def generate_motherboard_model(serverName):
             productName = line.split(":")[1].replace("\n", "")
     return manufacturer + productName
 
-# lshw -short -C disk
+# lshw -C disk
 def generate_disk_model(serverName):
     disks= []
-    for line in load(f'/configs/{serverName}'+"/hardware/disk/lshw-brief.txt"):
-        if "disk" in line:
-            diskname = line.split("disk")[1].replace("  ", "").replace("\n", "")
-            if diskname != "":
-                disks.append(diskname)
+    with open(f'{configs_dir}/configs/{serverName}'+"/hardware/disk/lshw.txt",'r') as f:
+        diskList = f.read().split("*-")
+    for i in range (1,len(diskList)):
+        if not("size:" in diskList[i]):
+            continue 
+        diskname=""
+        for x in diskList[i].splitlines():
+            if "description:" in x or "product:" in x:
+                diskname+=x.split(":")[1].strip() + " "
+            elif "size:" in x:
+                diskname+=x.split("(")[1].split(")")[0] + " "
+        disks.append(diskname)
     counts = Counter(disks)
     disksNames =""
     for item, count in counts.items():
