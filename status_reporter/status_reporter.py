@@ -7,12 +7,13 @@ import argparse
 import yaml
 import logging
 import pytz
+
+config_file = "/etc/KARA/status.conf"
+
 # For font style
 BOLD = "\033[1m"
 RESET = "\033[0m"
 YELLOW = "\033[1;33m"
-
-config_file = "/etc/KARA/status.conf"
 
 def load_config(config_file):
     with open(config_file, "r") as stream:
@@ -149,10 +150,9 @@ def main(metric_file, path_dir, time_range, img=False):
                                 metric_name = metric_name.replace(" ", "")
                                 output_csv_str[0] += f",{metric_operation}_{metric_name.replace('netdata.', '')}"
                             # Construct the curl command for query 1
-                            query1_curl_command = f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "db={db_name}" --data-urlencode "q=SELECT {metric_operation}(\\"value\\") FROM \\"{metric_name}\\" WHERE (\\"host\\" =~ /^{host_name}$/) AND time >= \'{start_time_utc}\' AND time <= \'{end_time_utc}\' fill(none)"'
-                            query_result = subprocess.getoutput(query1_curl_command)
-                            if query_result:
-                                values = json.loads(query_result).get('results', [{}])[0].get('series', [{}])[0].get('values', [])
+                            csv_query = subprocess.getoutput(f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "db={db_name}" --data-urlencode "q=SELECT {metric_operation}(\\"value\\") FROM \\"{metric_name}\\" WHERE (\\"host\\" =~ /^{host_name}$/) AND time >= \'{start_time_utc}\' AND time <= \'{end_time_utc}\' fill(none)"')
+                            if csv_query:
+                                values = json.loads(csv_query).get('results', [{}])[0].get('series', [{}])[0].get('values', [])
                                 values = [str(v[1]) for v in values]
                                 output_csv_str[csvi] += "," + ",".join(values)
                                 if values:
@@ -160,28 +160,24 @@ def main(metric_file, path_dir, time_range, img=False):
                                     # Construct the curl command for query 2
                                     if img:
                                         logging.info(f"status_reporter - user need image and graph")
-                                        query2_curl_command = f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "db={db_name}" --data-urlencode "q=SELECT {metric_operation}(\\"value\\") FROM /{metric_name}/ WHERE (\\"host\\" =~ /^{host_name}$/) AND time >= \'{start_time_utc}\' AND time <= \'{end_time_utc}\' GROUP BY time({TIME_GROUP}s) fill(none)"'
-                                        query2_output = subprocess.getoutput(query2_curl_command)
-                                        os.system(f"python3 ./../status_reporter/image_renderer.py '{query2_output}' '{host_name}' '{path_dir}'")
+                                        img_query = subprocess.getoutput(f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "db={db_name}" --data-urlencode "q=SELECT {metric_operation}(\\"value\\") FROM /{metric_name}/ WHERE (\\"host\\" =~ /^{host_name}$/) AND time >= \'{start_time_utc}\' AND time <= \'{end_time_utc}\' GROUP BY time({TIME_GROUP}s) fill(none)"')
+                                        os.system(f"python3 ./../status_reporter/image_renderer.py '{img_query}' '{host_name}' '{path_dir}'")
                                 else:
                                     # check database name
-                                    check_database_name = f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "q=SHOW DATABASES"'
-                                    check_database_name_result = subprocess.getoutput(check_database_name)
+                                    check_database_name_result = subprocess.getoutput(f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "q=SHOW DATABASES"')
                                     db_json_data = json.loads(check_database_name_result)
                                     databases = [db[0] for db in db_json_data["results"][0]["series"][0]["values"]]
                                     if db_name in databases:
                                         logging.info(f"status_reporter - The database {db_name} is exist in {ip}")
                                         print(f"The database {db_name} is exist in {ip}")
                                         # check metric name
-                                        check_metric_name = f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "q=SHOW MEASUREMENTS ON {db_name} WITH MEASUREMENT =~ /{metric_name}/"'
-                                        check_metric_name_result = subprocess.getoutput(check_metric_name)
+                                        check_metric_name_result = subprocess.getoutput(f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "q=SHOW MEASUREMENTS ON {db_name} WITH MEASUREMENT =~ /{metric_name}/"')
                                         metric_json_data = json.loads(check_metric_name_result)
                                         if "series" in metric_json_data["results"][0]:
                                             logging.info(f"status_reporter - metric {metric_name} is exist in {db_name}")
                                             print(f"metric {metric_name} is exist in {db_name}")
                                             # check host name
-                                            check_host_name = f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "q=SHOW TAG VALUES ON {db_name} FROM \\"{metric_name}\\" WITH KEY = \\"host\\""'
-                                            check_host_name_result = subprocess.getoutput(check_host_name)
+                                            check_host_name_result = subprocess.getoutput(f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "q=SHOW TAG VALUES ON {db_name} FROM \\"{metric_name}\\" WITH KEY = \\"host\\""')
                                             host_json_data = json.loads(check_host_name_result)
                                             if "series" in host_json_data["results"][0]:
                                                 host_names = [item[1] for item in host_json_data["results"][0]["series"][0]["values"]]
