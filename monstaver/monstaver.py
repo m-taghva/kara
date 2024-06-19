@@ -24,7 +24,7 @@ def load_config(config_file):
     return data_loaded
 
 def tehran_time_to_utc(tehran_time_str):
-    logging.info("Executing monstaver tehran_time_to_utc function")
+    logging.info("monstaver - Executing tehran_time_to_utc function")
     tehran_tz = pytz.timezone('Asia/Tehran')
     utc_tz = pytz.utc
     tehran_time = tehran_tz.localize(tehran_time_str)
@@ -32,7 +32,7 @@ def tehran_time_to_utc(tehran_time_str):
     return utc_time
 
 def convert_time(start_time_str, end_time_str, margin_start, margin_end):
-    logging.info("Executing monstaver convert_time function")
+    logging.info("monstaver - Executing convert_time function")
     start_datetime = datetime.datetime.strptime(start_time_str, "%Y-%m-%d %H:%M:%S")
     end_datetime = datetime.datetime.strptime(end_time_str, "%Y-%m-%d %H:%M:%S")
     # Convert Tehran time to UTC
@@ -57,6 +57,8 @@ def convert_time(start_time_str, end_time_str, margin_start, margin_end):
     dir_end_date = dir_end_date[2:].replace("-", "")
     dir_end_time = dir_end_time.replace(":", "")
     time_dir_name = dir_start_date + "T" + dir_start_time + "_" + dir_end_date + "T" + dir_end_time
+    logging.info(f"monstaver - UTC time range: {start_time_backup},{end_time_backup}")
+    logging.info(f"monstaver - dir name of backup files: {time_dir_name}")
     return start_time_backup,end_time_backup,time_dir_name
 
 def backup_data_collector(ssh_port, ssh_user, ip_influxdb, container_name, influx_volume, time_dir_name, bar, backup_dir):
@@ -235,7 +237,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             logging.info(f"monstaver - lscpu is not installed. Please install it on {container_name} host")
             print("\033[91mlscpu is not installed. Please install it.\033[0m")
         else:
-            logging.error(f"lscpu failed on {container_name} host")
+            logging.error(f"monstaver - lscpu failed on {container_name} host")
             print(f"\033[91m lscpu failed on {container_name} host\033[0m")
 
         lsmem_process = subprocess.run(f"ssh -p {port} {user}@{ip} sudo lsmem > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/memory/lsmem.txt", shell=True)
@@ -246,7 +248,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             logging.info(f"monstaver - lsmem is not installed. Please install it on {container_name} host")
             print("\033[91mlsmem is not installed. Please install it.\033[0m")
         else:
-            logging.error(f"lsmem failed on {container_name} host")
+            logging.error(f"monstaver - lsmem failed on {container_name} host")
             print(f"\033[91m lamem failed on {container_name} host\033[0m")
 
         lspci_process = subprocess.run(f"ssh -p {port} {user}@{ip} sudo lspci > {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/pci/lspci.txt", shell=True)
@@ -622,7 +624,6 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, software_info
             for backup_future in concurrent.futures.as_completed(backup_futures_list):
                 try:
                     backup_result = backup_future.result()
-                    #print(f"Task completed with result: {result}")
                     backup_results_list.append(backup_result)
                 except Exception as exc:
                     print(f"Task generated an exception: {exc}")
@@ -662,7 +663,6 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, software_info
             for future in concurrent.futures.as_completed(info_futures_list):
                 try:
                     info_result = future.result()
-                    #print(f"Task completed with result: {result}")
                     info_results_list.append(info_result)
                 except Exception as exc:
                     print(f"Task generated an exception: {exc}")
