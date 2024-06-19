@@ -17,9 +17,7 @@ import analyzer
 report_path = os.path.abspath("./../report_recorder/")
 if report_path not in sys.path:
     sys.path.append(report_path)
-
 import report_recorder
-
 pywiki_path = os.path.abspath("./../report_recorder/pywikibot/")
 if pywiki_path not in sys.path:
     sys.path.append(pywiki_path)
@@ -212,6 +210,7 @@ def mrbench_agent(config_params, config_file, config_output):
                 logging.info(f"manager - mrbench_agent: start time and end time of test in mrbench_agent submit function is: {start_time},{end_time}")
                 subprocess.run(f"sudo cp -r {test_config_path} {result_path}", shell=True)
                 if '#' in test_config or ':' in test_config:
+                    logging.info(f"manager - mrbench_agent: making info.yaml file")
                     data_time = {'Time': f"{start_time.replace(' ','_')}_{end_time.replace(' ','_')}"}
                     with open(os.path.join(result_path, 'info.yaml'), 'w') as yaml_file:
                         yaml.dump(data_time, yaml_file, default_flow_style=False)
@@ -273,6 +272,7 @@ def mrbench_agent(config_params, config_file, config_output):
                                     formatted_data[f"{section_name}.{name}"] = val
                             else:
                                 formatted_data[section_name] = section_data
+                        logging.debug(f"manager - mrbench_agent: formatted_data for merged csv {formatted_data}")
                         analyzer.merge_csv(csv_file=output_csv, output_directory=f"{result_dir}/analyzed", pairs_dict=formatted_data)
                 if run_monstaver != 'none':
                     if run_monstaver == 'backup,info':
@@ -300,6 +300,7 @@ def status_reporter_agent(config_params):
                 logging.debug(f"manager - status_reporter_agent: time is {time_range}")
                 start_time, end_time = time_range.strip().split(',')
                 output_csv = status_reporter.main(path_dir=result_dir, time_range=f"{start_time},{end_time}", img=image_generate)
+    logging.debug(f"manager - status_reporter_agent: result dir: {result_dir}")
     return result_dir
 
 def monstaver_agent(config_params, config_file, first_start_time, last_end_time):
