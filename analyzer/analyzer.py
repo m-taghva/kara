@@ -1,5 +1,4 @@
 import os
-import re
 import subprocess
 import logging
 import argparse
@@ -13,7 +12,7 @@ YELLOW = "\033[1;33m"
 
 ####### MERGER #######
 def merge_csv(csv_file, output_directory, pairs_dict):
-    logging.info("Executing status_analyzer merge_csv function")
+    logging.info("status_analyzer - Executing merge_csv function")
     try:
         csv_data = pd.read_csv(csv_file)
         if pairs_dict:  
@@ -27,12 +26,14 @@ def merge_csv(csv_file, output_directory, pairs_dict):
             csv_data.to_csv(f'{output_directory}/merged.csv', index=False, mode='a', header=False)
         elif not os.path.exists(f'{output_directory}/merged.csv'):
             csv_data.to_csv(f'{output_directory}/merged.csv', index=False, mode='w', header=True)
-        print(f"Data from '{csv_file}' appended successfully to {YELLOW}'{output_directory}/merged.csv'{RESET}")    
+        print(f"Data from '{csv_file}' appended successfully to {YELLOW}'{output_directory}/merged.csv'{RESET}") 
+        logging.info(f"status_analyzer - Data from '{csv_file}' appended successfully to '{output_directory}/merged.csv'") 
     except FileNotFoundError:
+        logging.info(f"status_analyzer - File '{csv_file}' not found. Skipping")
         print(f"File '{csv_file}' not found. Skipping...")
 
 def merge_process(output_directory, selected_csv):
-    logging.info("Executing status_analyzer merge_process function")
+    logging.info("status_analyzer - Executing merge_process function")
     if os.path.exists(f'{output_directory}/merged.csv'):
         remove_csv = subprocess.run(f"rm {output_directory}/merged.csv", shell=True)
     if '*' in selected_csv:    
@@ -45,11 +46,12 @@ def merge_process(output_directory, selected_csv):
                 merge_csv(file, output_directory, pairs_dict=None)
             else:
                 print(f"\033[91mThis CSV file doesn't exist:\033[0m{file}")
+                logging.info(f"status_analyzer - This CSV file doesn't exist:{file}")
                 exit(1)
                 
 ####### ANALYZER #######
 def read_txt_file(file_path):
-    logging.info("Executing status_analyzer read_txt_file function")
+    logging.info("status_analyzer - Executing read_txt_file function")
     with open(file_path, 'r') as txt_file:
         operation, new_column_name = txt_file.readline().strip().split(':')
         selected_columns = [line.strip() for line in txt_file.readlines()]
@@ -66,7 +68,7 @@ def process_csv_file(csv_data, operation, new_column_name, selected_columns):
     return csv_data
 
 def analyze_and_save_csv(csv_original, transformation_directory):
-    logging.info("Executing status_analyzer analyze_and_save_csv function")
+    logging.info("status_analyzer - Executing analyze_and_save_csv function")
     csv_intermediate = pd.read_csv(csv_original)
     selected_column_names = set()
     for txt_file in os.listdir(transformation_directory):
@@ -87,7 +89,7 @@ def analyze_and_save_csv(csv_original, transformation_directory):
 
 ###### Make graph and image ######
 def plot_and_save_graph(selected_csv, x_column, y_column):
-    logging.info("Executing status_analyzer plot_and_save_graph function")
+    logging.info("status_analyzer - Executing plot_and_save_graph function")
     # Read CSV file into a DataFrame
     data = pd.read_csv(selected_csv)
     # Extract x and y values from DataFrame
@@ -151,6 +153,7 @@ if __name__ == "__main__":
     transformation_directory = args.transformation_directory.strip() if args.transformation_directory else None
     csv_original = args.csv_org.strip() if args.csv_org else None
     output_directory = args.output_directory.strip() if args.output_directory else None
+    selected_csv = args.selected_csv if args.selected_csv else None
     if merge:
         if selected_csv:
             if '*' in selected_csv:
@@ -161,5 +164,4 @@ if __name__ == "__main__":
             selected_csv = None
             print(f'\033[91mplease select correct csv file your file is wrong: {args.selected_csv}\033[0m')
             exit(1)
-            
     main(merge, analyze, graph, csv_original, transformation_directory, output_directory, selected_csv, x_column, y_column)
