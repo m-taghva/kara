@@ -397,6 +397,7 @@ def create_sw_hw_htmls(template_content, html_output, page_title): #HW_page_titl
         with open(os.path.join(html_output+"/"+html_key+".html"), 'w') as html_file:
             html_file.write(html_value)
             print(f"HTML template saved to: {html_output+'/'+html_key+'.html'}") 
+            logging.info(f"report_recorder - HTML template saved to: {html_output+'/'+html_key+'.html'}")
     return htmls_dict
 
 def create_test_htmls(template_content, html_output, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir): #page_title = cluster_name + scenario_name
@@ -406,6 +407,7 @@ def create_test_htmls(template_content, html_output, cluster_name, scenario_name
         with open(os.path.join(html_output+"/"+html_key+".html"), 'w') as html_file:
             html_file.write(html_value)
             print(f"HTML template saved to: {html_output+'/'+html_key+'.html'}") 
+            logging.info(f"report_recorder - HTML template saved to: {html_output+'/'+html_key+'.html'}") 
     return htmls_dict
 
 #### upload data and make wiki page ####
@@ -470,9 +472,9 @@ def upload_data(site, page_title, wiki_content):
             logging.info(f"Page '{page_title}' uploaded successfully.")
         else:
             print(f"Page '\033[91m{page_title}\033[0m' already exists on the wiki.")
-            logging.warning(f"Page '{page_title}' already exists on the wiki.")
+            logging.warning(f"report_recorder - Page '{page_title}' already exists on the wiki.")
     except pywikibot.exceptions.Error as e:
-        logging.error(f"Error uploading page '{page_title}': {e}")
+        logging.error(f"report_recorder - Error uploading page '{page_title}': {e}")
 
 def upload_images(site, html_content):
     logging.info("report_recorder - Executing upload_images function")
@@ -489,11 +491,13 @@ def upload_images(site, html_content):
             success = file_page.upload(image_path, comment=f"Uploaded image '{image_filename}' using KARA")
             if success:
                 print(f"File uploaded successfully! File page: {file_page.full_url()}")
+                logging.info(f"report_recorder - Image '{image_filename}' uploaded successfully.")
             else:
-                print("Upload failed.")
-            logging.info(f"Image '{image_filename}' uploaded successfully.")
+                print(f"Upload this image '{image_filename}' failed.")
+                logging.warning(f"report_recorder - Upload this image '{image_filename}' failed.")
         else:
-            logging.warning(f"Image '{image_filename}' already exists on the wiki.")
+            print(f"Image'\033[91m{image_filename}\033[0m'already exists on the wiki.")
+            logging.warning(f"report_recorder - Image '{image_filename}' already exists on the wiki.")
 
 def main(input_template, htmls_path, cluster_name, scenario_name, configs_directory, upload_operation, create_html_operation, merged_file, merged_info_file, all_test_dir):
     global configs_dir
