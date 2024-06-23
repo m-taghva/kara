@@ -245,12 +245,13 @@ def get_conf(server, confType, serverType = None):
 def generate_confs(confType, serverType = None):
     confOfServers = {}
     for server in listOfServers:
-        confOfServers[server] =  get_conf(server, confType , serverType)
+        confOfServers[server] = get_conf(server, confType , serverType)
     compared_dict = compare_confs(confOfServers)
     compared_dict ["servers"] = confType
     return compared_dict
 
 def dict_to_html_table(data):
+    logging.info("report_recorder - Executing dict_to_html_table function")
     html = "<table border='1' class='wikitable'>\n"
     #generate first row
     html += "<tr>\n"
@@ -278,6 +279,7 @@ def dict_to_html_table(data):
 
 #### make test HTML template ####
 def test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, scenario_name):
+    logging.info("report_recorder - Executing test_page_maker function")
     htmls_dict={}
     mergedInfo = pd.read_csv(merged_info_file)
     merged = pd.read_csv(merged_file)
@@ -328,6 +330,7 @@ def test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, s
 
 #### make HTML template ####
 def dict_to_html(dict):
+    logging.info("report_recorder - Executing dict_to_html function")
     html_dict = "<table border='1' class='wikitable'>\n"
     html_dict += "<tr><th> نام سرور </th><th> مشخصات </th></tr>\n"
     for key, value in dict.items():
@@ -340,6 +343,7 @@ def dict_to_html(dict):
     return html_dict
 
 def csv_to_html(csv_file):
+    logging.info("report_recorder - Executing csv_to_html function")
     html_csv = "<table border='1' class='wikitable'>\n"
     with open(csv_file, 'r') as file:
         for i, row in enumerate(csv.reader(file)):
@@ -352,7 +356,7 @@ def csv_to_html(csv_file):
     return html_csv
 
 def create_sw_hw_htmls(template_content, html_output, page_title): #HW_page_title = cluster_name #SW_page_title = cluster_name + scenario_name
-    logging.info("Executing report_recorder create_html_template function")
+    logging.info("report_recorder - Executing create_sw_hw_htmls function")
     htmls_dict={}
     hw_info_dict = {}
     html_data = template_content.replace("{title}",f"{page_title}") # for replace placeholder with title in page url
@@ -396,6 +400,7 @@ def create_sw_hw_htmls(template_content, html_output, page_title): #HW_page_titl
     return htmls_dict
 
 def create_test_htmls(template_content, html_output, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir): #page_title = cluster_name + scenario_name
+    logging.info("report_recorder - Executing create_test_htmls function")
     htmls_dict = test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, scenario_name)
     for html_key,html_value in htmls_dict.items():
         with open(os.path.join(html_output+"/"+html_key+".html"), 'w') as html_file:
@@ -405,7 +410,7 @@ def create_test_htmls(template_content, html_output, cluster_name, scenario_name
 
 #### upload data and make wiki page ####
 def convert_html_to_wiki(html_content):
-    logging.info("Executing report_recorder convert_html_to_wiki function")
+    logging.info("report_recorder - Executing convert_html_to_wiki function")
     soup = BeautifulSoup(html_content, 'html.parser')
     # Convert <a> tags to wiki links
     for a_tag in soup.find_all('a'):
@@ -417,6 +422,7 @@ def convert_html_to_wiki(html_content):
     return str(soup)
 
 def sub_pages_maker(template_content , page_title ,hw_info_dict):
+    logging.info("report_recorder - Executing sub_pages_maker function")
     global configs_dir
     htmls_list={}
     s1 = configs_dir
@@ -435,6 +441,7 @@ def sub_pages_maker(template_content , page_title ,hw_info_dict):
     return htmls_list
 
 def one_sub_page_maker(path_to_files,spec_dict):
+    logging.info("report_recorder - Executing one_sub_page_maker function")
     html_content = ""
     for i in os.listdir(path_to_files.replace("{serverName}",next(iter(spec_dict.values()))[0])):
         html_content += f"<h2> {str(i).replace('.txt','')} </h2>"
@@ -453,7 +460,7 @@ def one_sub_page_maker(path_to_files,spec_dict):
     return html_content
 
 def upload_data(site, page_title, wiki_content):
-    logging.info("Executing report_recorder upload_data function")
+    logging.info("report_recorder - Executing upload_data function")
     try:
         page = pywikibot.Page(site, page_title)
         if not page.exists():
@@ -468,7 +475,7 @@ def upload_data(site, page_title, wiki_content):
         logging.error(f"Error uploading page '{page_title}': {e}")
 
 def upload_images(site, html_content):
-    logging.info("Executing report_recorder upload_images function")
+    logging.info("report_recorder - Executing upload_images function")
     soup = BeautifulSoup(html_content, 'html.parser')
     image_paths = [img['src'] for img in soup.find_all('img') if 'src' in img.attrs]
     # Upload each image to the wiki
