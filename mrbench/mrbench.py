@@ -30,7 +30,8 @@ def load_config(config_file):
            sys.exit(1)
     return data_loaded
 
-def conf_ring_thread(swift_configs, port, user, ip, container_name, key_to_extract):    
+def conf_ring_thread(swift_configs, port, user, ip, container_name, key_to_extract): 
+    logging.info("mrbench - Executing conf_ring_thread function")   
     ring_dict = {}
     all_scp_file_successful = False
     # Run the docker inspect command and capture the output
@@ -41,9 +42,11 @@ def conf_ring_thread(swift_configs, port, user, ip, container_name, key_to_extra
         # Check if the key exists in the JSON structure
         if key_to_extract in container_info[0]['Config']['Labels']:
             inspect_value = container_info[0]['Config']['Labels'][key_to_extract]
+            logging.info(f"mrbench - mount point path in container: {inspect_value}")
             for filename, filepath in swift_configs.items(): 
                 each_scp_successful = False 
                 if filename.endswith(".gz") or filename.endswith(".builder"):
+                    logging.info(f"mrbench - diff ring files: {filename} and {filepath}")
                     diff_ring_result = subprocess.run(f"ssh -p {port} {user}@{ip} 'sudo cat {inspect_value}/rings/{filename}' | diff - {filepath}", shell=True, capture_output=True, text=True)
                     print("")
                     print(f"please wait for checking ring file [ {filename} ] inside {container_name}")
@@ -54,24 +57,31 @@ def conf_ring_thread(swift_configs, port, user, ip, container_name, key_to_extra
                         if move_tmp_root_rings_process.returncode == 0 and copy_ring_command_process.stderr is None:
                             each_scp_successful = True
                             print("")
+                            logging.info(f"mrbench - copy ring file [ {filename} ] to {container_name} successful")
                             print(f"\033[92mcopy ring file [ {filename} ] to {container_name} successful\033[0m")
                         else: 
+                            logging.info(f"mrbench - rings in {container_name} failed to sync")
                             print(f"\033[91mrings in {container_name} failed to sync\033[0m")
                     elif diff_ring_result.stderr != "":
                         print("")
+                        logging.info(f"mrbench - WARNING: your ring file naming is wrong [ {filename} ] or not exist inside {container_name}")
                         print(f"\033[91mWARNING: your ring file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
                         #exit(1)
                     if "account" in filename:
                         ring_command = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /rings/account.builder'"
                         ring_dict['account'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
+                        logging.info(f"mrbench - /rings/account.builder of {container_name} append to ring_dict")
                     elif "container" in filename:
                         ring_command = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /rings/container.builder'"
                         ring_dict['container'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
+                        logging.info(f"mrbench - /rings/container.builder of {container_name} append to ring_dict")
                     else:
                         ring_command = f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-ring-builder /rings/object.builder'"
                         ring_dict['object'] = subprocess.run(ring_command, shell=True, capture_output=True, text=True).stdout
+                        logging.info(f"mrbench - /rings/object.builder of {container_name} append to ring_dict")
                         
                 elif filename.endswith(".conf"):
+                    logging.info(f"mrbench - conf files: {filename} and {filepath}")
                     diff_conf_result = subprocess.run(f"ssh -p {port} {user}@{ip} 'sudo cat {inspect_value}/{filename}' | diff - {filepath}", shell=True, capture_output=True, text=True)
                     print("")
                     print(f"please wait for checking config file [ {filename} ] inside {container_name}")
@@ -83,21 +93,26 @@ def conf_ring_thread(swift_configs, port, user, ip, container_name, key_to_extra
                             if move_tmp_root_configs_process.returncode == 0 and copy_conf_command_process.stderr is None:
                                 each_scp_successful = True
                                 print("")
+                                logging.info(f"mrbench - copy config file [ {filename} ] to {container_name} successful")
                                 print(f"\033[92mcopy config file [ {filename} ] to {container_name} successful\033[0m")
                                 name_changer_process = subprocess.run(f"ssh -p {port} {user}@{ip} 'sudo mv {inspect_value}/{base_name_changer} {inspect_value}/{filename} > /dev/null 2>&1'", shell=True)
                             else:
+                                logging.info(f"mrbench - configs in {container_name} failed to sync")
                                 print(f"\033[91mconfigs in {container_name} failed to sync\033[0m")
                     elif diff_conf_result.stderr != "":
                         print("")
+                        logging.info(f"mrbench - WARNING: your config file naming is wrong [ {filename} ] or not exist inside {container_name}")
                         print(f"\033[91mWARNING: your config file naming is wrong [ {filename} ] or not exist inside {container_name}\033[0m")
                         #exit(1)
                 if each_scp_successful: 
                     all_scp_file_successful = True  
     else:
         print("")
+        logging.info(f"mrbench - WARNING: there is a problem in your config file for SSH info inside {container_name} section so mrbench can't sync config and ring files!")
         print(f"\033[91mWARNING: there is a problem in your config file for SSH info inside \033[0m'\033[92m{container_name}\033[0m' \033[91msection so mrbench can't sync config and ring files !\033[0m") 
         print("")
         if inspect_result.stdout == '[]\n':
+            logging.info(f"mrbench - WARNING: your container name {container_name} is wrong !")
             print(f"\033[91mWARNING: your container name \033[0m'\033[92m{container_name}\033[0m' \033[91mis wrong !\033[0m")
     if all_scp_file_successful is True:
         restart_cont_command_process = subprocess.run(f"ssh -p {port} {user}@{ip} 'sudo docker restart {container_name}' > /dev/null 2>&1", shell=True)
@@ -109,21 +124,25 @@ def conf_ring_thread(swift_configs, port, user, ip, container_name, key_to_extra
                     if "[ + ]  swift-account\n" or "[ + ]  swift-container\n" or "[ + ]  swift-object\n" or "[ + ]  swift-proxy\n" in check_services_result:
                         time.sleep(30)
                         print("")
+                        logging.info(f"mrbench - container {container_name} successfully restart")
                         print(f"\033[92mcontainer {container_name} successfully restart\033[0m")
                         break
         else:
+            logging.info(f"mrbench - container {container_name} failed to reatsrt")
             print(f"\033[91mcontainer {container_name} failed to reatsrt\033[0m")
     print(f"{YELLOW}========================================{RESET}")
     return ring_dict
 
 def copy_swift_conf(swift_configs):
+    logging.info("mrbench - Executing copy_swift_conf function")
     ring_dict = {}
-    logging.info("Executing mrbench copy_swift_conf function")
     data_loaded = load_config(config_file)
     if not 'swift' in data_loaded:
+        logging.info("mrbench - Error there isn't swift section in mrbench.conf so ring and conf can't set.")
         print(f"Error there isn't \033[91mswift\033[0m section in mrbench.conf so ring and conf can't set.")
         exit(1)
     if not data_loaded['swift']:
+        logging.info("mrbench - Error there isn't any item in swift section (mrbench.conf) so ring and conf can't set.")
         print(f"Error there isn't any item in \033[91mswift\033[0m section (mrbench.conf) so ring and conf can't set.")
         exit(1)
     
@@ -146,12 +165,13 @@ def copy_swift_conf(swift_configs):
     return ring_dict
 
 def submit(workload_config_path, output_path):
-    logging.info("Executing mrbench submit function")
+    logging.info("mrbench - Executing submit function")
     if not os.path.exists(output_path):
        os.makedirs(output_path) 
     run_pre_test_process = subprocess.run(f"bash {pre_test_script}", shell=True)
     cosbenchBin = shutil.which("cosbench")
     if not(cosbenchBin):
+        logging.info("mrbench - Command 'cosbench' not found")
         print("Command 'cosbench' not found, but can be add with:\n\n\t ln -s {cosbench-dir}/cli.sh /usr/bin/cosbench\n")
         return None, None, -1
     archive_path = os.readlink(cosbenchBin).split("cli.sh")[0]+"archive/"
@@ -161,9 +181,11 @@ def submit(workload_config_path, output_path):
         # Start workload
         cosbench_active_workload = subprocess.run(['cosbench', 'info'], capture_output=True, text=True)
         if "Total: 0 active workloads" in cosbench_active_workload.stdout:
+            logging.info(f"mrbench - this workload send to cosbench: {workload_config_path}")
             Cos_bench_command = subprocess.run(["cosbench", "submit", workload_config_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
             if Cos_bench_command.returncode == 1:
-                print("\033[91mStarting workload failed.\033[0m")
+                logging.info(f"mrbench - Starting workload failed: {workload_config_path}")
+                print(f"Starting workload failed: \033[91m{workload_config_path}\033[0m")
                 return None, None, -1
             # Extract ID of workload
             output_lines = Cos_bench_command.stdout.splitlines()
@@ -171,9 +193,11 @@ def submit(workload_config_path, output_path):
             workload_name = workload_config_path.split('/')[-1].replace('.xml','')
             if workload_id_regex:
                 workload_id = workload_id_regex.group()
+                logging.info(f"mrbench - Workload Info - ID: {workload_id} Name: {workload_name}")
                 print(f"\033[1mWorkload Info:\033[0m ID: {workload_id} Name: {workload_name}")
             else:
-                print("\033[91mStarting workload failed.\033[0m")
+                logging.info(f"mrbench - Starting workload failed: {workload_config_path}")
+                print(f"Starting workload failed: \033[91m{workload_config_path}\033[0m")
                 return None, None, -1
             # Check every second if the workload has ended or not
             archive_file_path = f"{archive_path}{workload_id}-swift-sample"
@@ -198,9 +222,11 @@ def submit(workload_config_path, output_path):
                 copy_bench_files(archive_path, archive_workload_dir_name, result_path)
                 return  start_time, end_time, result_path
             else:
+                logging.info(f"mrbench - Test: {workload_name} can't run correctly so archive path {archive_file_path} doesn't exists.")
                 print(f"\033[91mTest: {workload_name} can't run correctly so archive path {archive_file_path} doesn't exists.\033[0m")
                 return None, None, -1
         else:
+            logging.info(f"mrbench - You have actived workload so new workload can't run")
             print(f"\033[91mYou have actived workload so new workload can't run\033[0m")
             cosbench_check_workload = subprocess.run(['cosbench', 'info'], capture_output=True, text=True)
             info_output = cosbench_check_workload.stdout
@@ -223,15 +249,17 @@ def submit(workload_config_path, output_path):
                 if response == 'yes':
                     cosbench_cancel_workload = subprocess.run(["cosbench", "cancel", w_id], capture_output=True, text=True)
                     if cosbench_cancel_workload.returncode == 0:
+                        logging.info(f"mrbench - user cancel this workload manually: {w_id}")
                         print(f"Workload {w_id} canceled and new workload starting please wait ...")
                         time.sleep(10)
                         submit(workload_config_path, output_path)
             return None, None, -1
     else:
-        print(f"\033[91mWARNING: workload file doesn't exist !\033[0m")
+        logging.info(f"mrbench - WARNING: workload file doesn't exist: {workload_config_path}")
+        print(f"\033[91mWARNING: workload file doesn't exist: {workload_config_path}\033[0m")
 
 def save_time(file):
-    logging.info("Executing mrbench save_time function")
+    logging.info("mrbench - Executing save_time function")
     start_time = None
     end_time = None
     try:
@@ -249,18 +277,20 @@ def save_time(file):
             start_time = first_main_launching_time.split('@')[1].strip()
             end_time = last_main_completed_time.split('@')[1].strip()
             print(f"Start Time: {start_time}")
-            print(f"End Time: {end_time}")     
+            print(f"End Time: {end_time}") 
+            logging.info(f"mrbench - test time range: {start_time},{end_time}")  
         return start_time, end_time        
     except Exception as e:
         print(f"\033[91mAn error occurred: {str(e)}\033[0m")
         return -1
 
 def copy_bench_files(archive_path, archive_workload_dir_name, result_path):
-    logging.info("Executing mrbench copy_bench_files function")
+    logging.info("mrbench - Executing copy_bench_files function")
     time.sleep(5)
     copylistfiles = ["/workload.log","/workload-config.xml",'/'+ archive_workload_dir_name + '.csv']
     print("Copying Cosbench source files ...")
     for fileName in copylistfiles:
+        logging.info(f"mrbench - copy cosbench result file: {fileName}")
         archive_file_path = archive_path + archive_workload_dir_name + fileName
         retry=3
         while retry>0:
