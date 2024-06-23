@@ -191,6 +191,9 @@ def submit(workload_config_path, output_path):
                 if not os.path.exists(result_path):
                     os.mkdir(result_path) 
                 print(f"Result Path: {result_path}")
+                time_file = open(f"{result_path}/time.txt", "w")
+                time_file.write(f"{start_time},{end_time}")
+                time_file.close()
                 cosbench_info_result = subprocess.run(f"cosbench info > {result_path}/cosbench.info", shell=True, capture_output=True, text=True)
                 copy_bench_files(archive_path, archive_workload_dir_name, result_path)
                 return  start_time, end_time, result_path
