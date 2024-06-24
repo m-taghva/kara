@@ -210,17 +210,18 @@ def submit(workload_config_path, output_path):
             if os.path.exists(archive_file_path):
                 archive_workload_dir_name = f"{workload_id}-swift-sample"  
                 start_time, end_time = save_time(f"{archive_path}{archive_workload_dir_name}/{archive_workload_dir_name}.csv")
-                test_time_dir = f"{start_time}_{end_time}"
-                result_path = os.path.join(output_path, test_time_dir.replace(" ","_"))
-                if not os.path.exists(result_path):
-                    os.mkdir(result_path) 
-                print(f"Result Path: {result_path}")
-                time_file = open(f"{result_path}/time.txt", "w")
-                time_file.write(f"{start_time},{end_time}")
-                time_file.close()
-                cosbench_info_result = subprocess.run(f"cosbench info > {result_path}/cosbench.info", shell=True, capture_output=True, text=True)
-                copy_bench_files(archive_path, archive_workload_dir_name, result_path)
-                return  start_time, end_time, result_path
+                if start_time and end_time:
+                    test_time_dir = f"{start_time}_{end_time}"
+                    result_path = os.path.join(output_path, test_time_dir.replace(" ","_"))
+                    if not os.path.exists(result_path):
+                        os.mkdir(result_path) 
+                    print(f"Result Path: {result_path}")
+                    time_file = open(f"{result_path}/time.txt", "w")
+                    time_file.write(f"{start_time},{end_time}")
+                    time_file.close()
+                    cosbench_info_result = subprocess.run(f"cosbench info > {result_path}/cosbench.info", shell=True, capture_output=True, text=True)
+                    copy_bench_files(archive_path, archive_workload_dir_name, result_path)
+                    return  start_time, end_time, result_path
             else:
                 logging.info(f"mrbench - Test: {workload_name} can't run correctly so archive path {archive_file_path} doesn't exists.")
                 print(f"\033[91mTest: {workload_name} can't run correctly so archive path {archive_file_path} doesn't exists.\033[0m")
@@ -271,20 +272,25 @@ def save_time(file):
             for row in reader:
                 if row and row[0].endswith('main'):
                     if first_main_launching_time is None:
-                        first_main_launching_time = row[21]
-                        last_main_completed_time = row[24]
-        if first_main_launching_time and last_main_completed_time:
-            start_time = first_main_launching_time.split('@')[1].strip()
-            end_time = last_main_completed_time.split('@')[1].strip()
-            if start_time and end_time:
-                print(f"Start Time: {start_time}")
-                print(f"End Time: {end_time}") 
-                logging.info(f"mrbench - test time range: {start_time},{end_time}")  
-                return start_time, end_time
-            else:
-                logging.info(f"mrbench - can't extrcat test time range from cosbench csv file!")
-                print("mrbench can't extrcat test time range from cosbench csv file!")
-                exit(1)    
+                        if len(row) > 24:
+                            first_main_launching_time = row[21]
+                            last_main_completed_time = row[24]
+                            if first_main_launching_time and last_main_completed_time:
+                                start_time = first_main_launching_time.split('@')[1].strip()
+                                end_time = last_main_completed_time.split('@')[1].strip()
+                                if start_time and end_time:
+                                    print(f"Start Time: {start_time}")
+                                    print(f"End Time: {end_time}") 
+                                    logging.info(f"mrbench - test time range: {start_time},{end_time}")  
+                                    return start_time, end_time
+                                else:
+                                    logging.info(f"mrbench - can't extrcat test time range from cosbench csv file!")
+                                    print("\033[91m mrbench can't extrcat test time range from cosbench csv file!\033[0m")
+                                    exit()
+                        else:
+                            logging.info(f"mrbench - your workload template is not correct so mrbench can't extrcat test time range from cosbench csv file: {file}")
+                            print("\033[91myour workload template is not correct so mrbench can't extrcat test time range from cosbench csv file!\033[0m")
+                            exit() 
     except Exception as e:
         print(f"\033[91mAn error occurred: {str(e)}\033[0m")
         return -1
