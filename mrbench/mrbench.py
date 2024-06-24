@@ -119,7 +119,7 @@ def conf_ring_thread(swift_configs, port, user, ip, container_name, key_to_extra
         if restart_cont_command_process.returncode == 0:
             while True:
                 check_container_result = subprocess.run(f"ssh -p {port} {user}@{ip} 'sudo docker ps -f name={container_name}'", shell=True, capture_output=True, text=True, check=True)
-                if "Up" and "healthy" in check_container_result.stdout:
+                if "Up" in check_container_result.stdout and "healthy" in check_container_result.stdout:
                     check_services_result = subprocess.run(f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} service --status-all'", shell=True, capture_output=True, text=True, check=True)
                     if "[ + ]  swift-account\n" or "[ + ]  swift-container\n" or "[ + ]  swift-object\n" or "[ + ]  swift-proxy\n" in check_services_result:
                         time.sleep(30)
