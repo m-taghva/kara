@@ -276,16 +276,15 @@ def save_time(file):
         if first_main_launching_time and last_main_completed_time:
             start_time = first_main_launching_time.split('@')[1].strip()
             end_time = last_main_completed_time.split('@')[1].strip()
-            if start_time !=" " and end_time !=" ":
+            if start_time and end_time:
                 print(f"Start Time: {start_time}")
                 print(f"End Time: {end_time}") 
                 logging.info(f"mrbench - test time range: {start_time},{end_time}")  
+                return start_time, end_time
             else:
                 logging.info(f"mrbench - can't extrcat test time range from cosbench csv file!")
                 print("mrbench can't extrcat test time range from cosbench csv file!")
-                exit(1)
-            if start_time and end_time:
-                return start_time, end_time        
+                exit(1)    
     except Exception as e:
         print(f"\033[91mAn error occurred: {str(e)}\033[0m")
         return -1
