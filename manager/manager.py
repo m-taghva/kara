@@ -68,7 +68,7 @@ def config_gen_agent(config_params):
                 for item in os.listdir(config_output):
                     item_path = os.path.join(config_output, item)
                     shutil.move(item_path, destination_dir)
-                response = "yes" # If no input after 20 seconds, consider it as "yes"
+                response = "yes" # If no input after 30 seconds, consider it as "yes"
             if response == 'yes':
                 logging.info("manager - config_gen_agent: answer to remove request is YES")
                 # Remove all files and directories in the output directory
@@ -132,7 +132,7 @@ def mrbench_agent(config_params, config_file, config_output):
                 for item in os.listdir(result_dir):
                     item_path = os.path.join(result_dir, item)
                     shutil.move(item_path, destination_dir_results)
-                response = "yes" # If no input after 20 seconds, consider it as "yes"
+                response = "yes" # If no input after 30 seconds, consider it as "yes"
             if response == 'yes':
                 logging.info("manager - mrbench_agent: answer to remove request is YES")
                 # Remove all files and directories in the output directory
