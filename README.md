@@ -35,7 +35,7 @@
         
                 # visudo
                     > user ALL=(ALL) NOPASSWD: ALL
-                Create an SSH key for the desired user on all Hiola and MC servers, as well as the server running KARA, so that no password is needed for SSH login:
+                Create an SSH key for the desired user on all monster and MC servers, as well as the server running KARA, so that no password is needed for SSH login:
         
                 # adduser
                 # ssh-keygen (make sure the new key is just for the new user and his .ssh directory)
@@ -47,4 +47,30 @@
                 # bash configure.sh
             2.6 - Tool Logs:
                     The path and log file for all tools are the same and equal to var/log/kara/all.log/. In more advanced tools with a configuration file, it is possible to change the log display level between debug - info - warning - error -    critical. For simpler tools without a configuration file, the log display level is debug.
+
+        3- Execution Description of Tools
+
+            **Note: All tool configuration files are in the standard YAML format, allowing sections that are not needed to be commented out.
+            
+            3.1 - config-gen Tool:
+                This tool is responsible for creating workload configurations and various tests for COSBench. The program is located in the Test_Work_Run directory, and its input is an input.txt file in that directory. Based on the content of this input file, the tool can generate multiple configuration files with different values to facilitate and speed up the process of creating different scenarios.
+                
+                # python3 config-gen.py -i input.txt -o <output dir>
+                
+            3.2 - mrbench Tool:
+                This tool is responsible for executing the test configurations created by the previous tool and sending them to COSBench. It creates a unique directory for each test based on the test's time interval within a parent directory, such as result, and stores the results and information obtained from COSBench in it. This tool also has the capability to modify Swift and Ring configuration files, and it can receive files in .gz, .builder, and .conf formats from a directory that contains all the files for this purpose. The tool has a configuration file named mrbench.conf located in the /etc/KARA/ directory, which includes the information of monster servers and containers. It uses these configurations to connect via SSH and modify Swift and Ring files, and finally, restart the monster containers. This program is located in the mrbench directory.
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
        
