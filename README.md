@@ -148,7 +148,83 @@
                     Configuration File:
                         The configuration file for Monstaver is located at etc/KARA/monstaver.conf.
 
+                3.4.1 - Configuration File Description for Monstaver
+                        The configuration file for Monstaver is structured into two main sections and a logging section, each serving specific purposes related to backup and restoration tasks.
                         
+                        Backup Section (default):
+                            This section includes fundamental information for the backup process, categorized into three parts as explained:
+                            
+                            default:
+                                time: 2024-06-15 11:00:00,2024-06-15 11:05:00 # time range : start,end
+                                time_margin: 10,10 # time margin
+                                input_paths:
+                                  - /home/KARA/results  # some dir inside local server
+                                backup_output: /tmp/influxdb-backup  # output of all parts in local server
+                                
+                                # Monster storage info for uploading backup
+                                token_url: https://api.zdrive.ir/auth/v1.0
+                                public_url: https://api.zdrive.ir/v1/AUTH_user
+                                username: "user:user"
+                                password: **********
+                                cont_name: a name
+                                
+                                # Make backup from hardware/software/swift
+                                hardware_backup: True
+                                software_backup: True
+                                swift_backup: True
+                                
+                        Swift Backup Section (swift):
+                            This section contains details about Hiola servers and their containers, used for SSH connection and fetching Swift files, including configurations (hardware/software) and Swift-specific details.
+                            
+                            swift:
+                                m-r1z1s1: # container name
+                                  ssh_user: root # SSH user
+                                  ip_swift: 192.168.143.158 # Server IP
+                                  ssh_port: 22 # SSH port
+                                
+                                m-r2z2s2: # container name
+                                  ssh_user: root # SSH user
+                                  ip_swift: 192.168.143.155 # Server IP
+                                  ssh_port: 22 # SSH port
+                                  
+                        Database Sources Section (db_sources):
+                            This section includes information about MC (Monster Container) servers hosting InfluxDB, along with the mount point of the container and the list of databases available for backup.
+                            
+                            db_sources:
+                            MC:
+                              ip: 192.168.143.150 # InfluxDB server IP
+                              ssh_port: 22 # SSH port
+                              ssh_user: root # SSH user
+                              
+                              container_name: influxdb # InfluxDB container name
+                              influx_volume: /var/lib/influxdb/KARA_BACKUP # Mount point of InfluxDB container to host
+                              databases:
+                                - opentsdb
+                                
+                        Restoration Section:
+                            This section defines information about servers hosting InfluxDB for restoration purposes. It specifies similar configurations to the backup section but includes details for restoring databases from backup files located in the compressed backup file.
+                            
+                            influxdbs_restore:
+                                MyPC:
+                                  ip: 192.168.143.150 # MC server IP or new server of InfluxDB
+                                  ssh_port: 22 # SSH port
+                                  ssh_user: root # SSH user
+                                  
+                                  container_name: influxdb # Container name
+                                  influx_volume: /var/lib/influxdb/KARA_RESTORE # Mount point with restore directory
+                                  
+                                  databases:
+                                    - prefix: "rst1_" # New database prefix name
+                                      location: /tmp/influxdb-backup/231107T000743_231107T030012/dbs/influxdb.tar.gz # Backup file in local server
+                                      
+                        Program Output:
+                            The program generates its output in the directory /tmp/influxdb-backup/, which contains three main directories:
+                            dbs: For database backups.
+                            other_info: For user-defined paths.
+                            configs: For hardware, software, and Swift configurations related to each Hiola server.
+                            This configuration file enables Monstaver to efficiently manage and perform backups and restorations of InfluxDB databases along with associated Swift configurations and other relevant data.
+                        
+                                                
 
 
 
