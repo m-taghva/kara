@@ -53,4 +53,42 @@
        
        ===================Report_recorder=====================
 
+
+        1 - Installing the COSBench Benchmarking Software
+        In the first step, the COSBench tool needs to be installed. For installation guidance, refer to the Cloud Object Storage Benchmark page.
+        
+        After installation, go to the main directory and use the following commands to make the cli.sh script executable and create a soft link in the /usr/bin path.
+        
+        bash
+        sudo chmod +x /home/user/cosbench/0.4.2.c4/cli.sh
+        sudo ln -s /home/user/cosbench/0.4.2.c4/cli.sh /usr/bin/cosbench
+        2 - Installing the KARA Toolset
+        
+        2.1 - Installing Tool Prerequisites:
+        
+        bash
+        pip install pytz datetime matplotlib pandas tqdm alive_progress BeautifulSoup4
+        2.2 - Cloning the Latest Version of the Program from GitHub:
+        
+        bash
+        git clone https://github.com/m-taghva/KARA
+        3.2 - Project Directory Description:
+        The existing and required directories in the project:
+        
+        monstaver: Backup and restore tool for the database
+        status_reporter: Reporting tools from the database
+        analyzer: Analysis and aggregation of reports taken in CSV format
+        config_gen: Test execution and test configuration tools
+        mrbench: Test execution tools
+        report_recorder: Documentation tools for test results in the Katib system
+        manager: Management tool for the set, configuration files, and tool prerequisites
+        results: Location for storing test results and reports
+        configure: Auxiliary tools
+        4.2 - Running the configure tool:
+        After installing the prerequisites and cloning the repository, the configure.sh tool in the manager directory needs to be run to execute some prerequisite processes and install KARA.
+        
+        bash
+        bash configure.sh
+        5.2 - Tool Logs:
+        The path and log file for all tools are the same and equal to var/log/kara/all.log/. In more advanced tools with a configuration file, it is possible to change the log display level between debug - info - warning - error - critical. For simpler tools without a configuration file, the log display level is debug.
        
