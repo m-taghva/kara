@@ -1,11 +1,9 @@
 # KARA
-<h3> Attention !  README page will be complete after all tools done </h3>
 ‪<h2>Monster Performance Kit</h2>
 <img src="kara_tools.png" width="862" height="565"/>
 <img src="kara.png" width="1450" height="709"/>
 
     # Attention ! after clone repository, please remove (.placeholder) files inside ./result/ 
-    
     - Install dependencies:
        # pip install pytz datetime matplotlib pandas alive_progress BeautifulSoup4
        **Attention edit sudoers file in both kara server and monster host and add new user to it after %sudo group :  user1   ALL=(ALL) NOPASSWD: ALL**
