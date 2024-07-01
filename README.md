@@ -274,25 +274,22 @@
                     This tool operates as a central control hub for system monitoring, executing all created tools in a specified pipeline and various scenarios, providing them with necessary inputs. For a smoother and faster user experience, it is recommended to use this tool to automatically execute other tools and software, thereby reducing the likelihood of human error.
                     
                     The scenario file determines the execution order of tools and is customizable. Each tool section defines its required inputs and outputs, as detailed below:
-                    
-                    config_gen:
-                      # This section receives a list of input templates. It can include multiple workload test templates with specific numbering, or config files like swift configs. Output type for the program is also specified in the next section.
-                    Mrbench:
-                      # This section defines the output directory path and the execution mode of status-reporter and monstaver concurrently with each test run. Output type options are specified as csv output, images, database backups, or just hardware and software information in backups. Swift and ring config directories are specified.
-                    
-                      # Note: If config-gen has been executed before this tool and has swift configs, there's no need to use the conf_dir section, but ring files must be listed.
-                
-                    status_reporter:
-                      # If this tool needs to work independently, use its specific section. Here, inputs can include a file containing a list of required test intervals, and specify whether graph images are needed, along with the final output path.
-                    monstaver:
-                      # If this tool needs to work independently, use its specific section. Here, you can specify a file containing a list of required time intervals for backup, and the desired directory alongside backups. Additionally, batch_mode can be enabled to perform backup operations for a batch of tests after all tests have been executed. Next section can also specify the type of operation, whether it's backup with restore.
-                    
-                    status_analyzer:
-                      # In this tool's section, aggregation and analysis operations can be specified, along with required inputs for each section.
-                    
-                    report_recorder:
-                      # In this tool's section, specify the html templates to be created and uploaded to Katib, along with the parent directory path of input templates and the storage path for output templates, and the page names in Katib are specified.
-                    This scenario file is in YAML format and can be commented out as needed.
+                        config_gen:
+                          # This section receives a list of input templates. It can include multiple workload test templates with specific numbering, or config files like swift configs. Output type for the program is also specified in the next section.
+                        Mrbench:
+                          # This section defines the output directory path and the execution mode of status-reporter and monstaver concurrently with each test run. Output type options are specified as csv output, images, database backups, or just hardware and software information in backups. Swift and ring config directories are specified.
+                        
+                         # # # Note: If config-gen has been executed before this tool and has swift configs, there's no need to use the conf_dir section, but ring files must be listed.
+    
+                        status_reporter:
+                          # If this tool needs to work independently, use its specific section. Here, inputs can include a file containing a list of required test intervals, and specify whether graph images are needed, along with the final output path.
+                        monstaver:
+                          # If this tool needs to work independently, use its specific section. Here, you can specify a file containing a list of required time intervals for backup, and the desired directory alongside backups. Additionally, batch_mode can be enabled to perform backup operations for a batch of tests after all tests have been executed. Next section can also specify the type of operation, whether it's backup with restore.
+                        status_analyzer:
+                          # In this tool's section, aggregation and analysis operations can be specified, along with required inputs for each section.
+                        report_recorder:
+                          # In this tool's section, specify the html templates to be created and uploaded to Katib, along with the parent directory path of input templates and the storage path for output templates, and the page names in Katib are specified.
+                        This scenario file is in YAML format and can be commented out as needed.
 
 
 
