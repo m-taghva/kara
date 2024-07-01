@@ -1,4 +1,3 @@
-# KARA
 ‪<h2>Monster Performance Kit</h2>
 <h3>open stack swift performance and monitoring tools (KARA)</h3>
 <img src="kara_tools.png" width="862" height="565"/>
