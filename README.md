@@ -4,6 +4,7 @@
 <img src="kara.png" width="1450" height="709"/>
 
     # Attention ! after clone repository, please remove (.placeholder) files inside ./result/ 
+    
         1 - Installing the COSBench Benchmarking Software
             In the first step, the COSBench tool needs to be installed. For installation guidance, refer to the Cloud Object Storage Benchmark page.
             After installation, go to the main directory and use the following commands to make the cli.sh script executable and create a soft link in the /usr/bin path.
@@ -55,10 +56,33 @@
             3.1 - config-gen Tool:
                 This tool is responsible for creating workload configurations and various tests for COSBench. The program is located in the Test_Work_Run directory, and its input is an input.txt file in that directory. Based on the content of this input file, the tool can generate multiple configuration files with different values to facilitate and speed up the process of creating different scenarios.
                 
-                # python3 config-gen.py -i input.txt -o <output dir>
+                run config_gen:
+                        # python3 config-gen.py -i input.txt -o <output dir>
                 
             3.2 - mrbench Tool:
                 This tool is responsible for executing the test configurations created by the previous tool and sending them to COSBench. It creates a unique directory for each test based on the test's time interval within a parent directory, such as result, and stores the results and information obtained from COSBench in it. This tool also has the capability to modify Swift and Ring configuration files, and it can receive files in .gz, .builder, and .conf formats from a directory that contains all the files for this purpose. The tool has a configuration file named mrbench.conf located in the /etc/KARA/ directory, which includes the information of monster servers and containers. It uses these configurations to connect via SSH and modify Swift and Ring files, and finally, restart the monster containers. This program is located in the mrbench directory.
+
+                config file of mrbench:
+
+                                swift:
+                                    m-r1z1s1: # container name
+                                         ssh_user: root # ssh user
+                                         ip_swift: 192.168.143.158 # ip server
+                                         ssh_port: 22 # ssh port
+                                
+                                    m-r2z2s2: # container name
+                                         ssh_user: root #ssh user
+                                         ip_swift: 192.168.143.155 # ip server
+                                         ssh_port: 22 # ssh port
+                                
+                                    log:
+                                       level: info  # values = debug - info - warning - error - critical
+
+                run mrbench:
+                    # python3 mrbench.py -i <path to test config file> -o <output dir> -cr <path to config_ring dir>
+                    
+
+            
 
 
 
