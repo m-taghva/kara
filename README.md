@@ -223,6 +223,28 @@
                             other_info: For user-defined paths.
                             configs: For hardware, software, and Swift configurations related to each Hiola server.
                             This configuration file enables Monstaver to efficiently manage and perform backups and restorations of InfluxDB databases along with associated Swift configurations and other relevant data.
+
+                        Usage of the tool:
+                            This tool can receive its main inputs both as user arguments and through a configuration file.
+                            # python3 monstaver.py -t 'start time,end time' -i /path/to/dir/ -r -hw -sw -s -ib -d
+                            The argument d is for cleaning the final output directory and only preserving its compressed state. r is for restoring, s is for obtaining Swift configurations, sw and hw for hardware and software information retrieval respectively, ib for backup creation, i for user-specified directories, and t denotes the backup time interval.
+
+            3-5- status-analyzer tool:
+                This tool consists of two main processes: first, aggregating CSV files created by other tools, and then analyzing them for comparison and troubleshooting. The tool resides in the analyzer directory.
+                Aggregation (merge): 
+                    This tool takes as input a list of CSV files or a directory containing CSV files, aggregates them, and saves the merged result in a file named merged.csv at the specified user-provided path.
+                Analysis (analyze):
+                This section is responsible for parsing and analyzing CSV files. It can perform operations such as averaging and summing across selected columns and create a new CSV with new columns containing the analysis results. The workflow of the analysis section is as follows: it takes as input one CSV file and a directory containing several files. These files include selected column names, the name of the analysis result column, and the type of mathematical operation for each analysis.
+                The output of this program is a new CSV file named by combining the name of the initial file and the input directory containing the transformation operations within it. This new file replaces the selected columns with the previous CSV columns and the newly analyzed columns. It is saved alongside the original and selected files. Depending on the desired column types within the subset files in the transformation directory, you may change the name of this directory to *-transformation.
+
+                usage:
+                    # python3 status-analyzer.py -M -o<output> -sc <csv1,csv2,csvn> -A -c <csv for analyze> -t <transformation dir>
+                    # python3 status-analyzer.py -M -o<output> -sc <csv_dir/*> -A -c <csv for analyze> -t <transformation dir>
+
+            
+
+                
+
                         
                                                 
 
