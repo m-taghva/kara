@@ -6,8 +6,8 @@
     # Attention ! after clone repository, please remove (.placeholder) files inside ./result/ 
     
     - Install dependencies:
-       # pip install pytz datetime matplotlib pandas tqdm alive_progress BeautifulSoup4
-       edit sudoers file in both kara server and monster host and add new user to it after %sudo group :  user1   ALL=(ALL) NOPASSWD: ALL
+       # pip install pytz datetime matplotlib pandas alive_progress BeautifulSoup4
+       **Attention edit sudoers file in both kara server and monster host and add new user to it after %sudo group :  user1   ALL=(ALL) NOPASSWD: ALL**
        
        =======================Manager========================
        - manager.py can run all tools as you need with scenario file in yaml format with different options.
