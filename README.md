@@ -241,6 +241,38 @@
                     # python3 status-analyzer.py -M -o<output> -sc <csv1,csv2,csvn> -A -c <csv for analyze> -t <transformation dir>
                     # python3 status-analyzer.py -M -o<output> -sc <csv_dir/*> -A -c <csv for analyze> -t <transformation dir>
 
+
+            3-6- report_recorder tool:
+                This tool is responsible for generating documentation from received reports for Hyola tests and saving them in HTML format. Subsequently, it uploads them to the Kataeb system. The workflow of this tool is as follows: it takes as input an HTML template for the hardware specifications of Hyola servers and another template for the software specifications of Hyola. Within these templates, it places server information in specified locations using predefined placeholders. It generates multiple types of templates as output.
+                For test information, it also receives a merged CSV file and an output directory of tests. It creates HTML documents for the specifications and configurations of the tests, along with graphs for each test. Subsequently, it uploads them.
+                The initial and main templates for hardware and software are located in the all-htmls-dir directory.
+                Usage of the Tool:
+                    Before running the software, you need to enter your Katib user information in the user-config.py file located in the report-recorder or manager directory. After opening this file, enter your username under the user name section. During the first upload to Katib, you will also need to enter your password.
+                    
+                    This software operates in three different modes, described below:
+                        For Software and Hardware Sections:
+                            To specify the uncompressed backup directory from which information will be extracted and placed into templates:
+                        For the Testing Section:
+                            Specify the paths to the consolidated CSV files (m, -mi) from which test information will be extracted. Provide the parent directory of all test results (-td) for uploading test graphs.
+                            
+                        Creating and Uploading Software Information:
+                        # python3 report_recorder.py -H -i <path to/software.html> -o <output path> -cn <cluster name> -sn <scenario name> -cd <path to/monstaver backup dir> -U
+                        
+                        Creating and Uploading Hardware Information:
+                        # python3 report_recorder.py -H -i <path to/hardware.html> -o <output path> -cn <cluster name> -cd <path to/monstaver backup dir> -U
+                        
+                        Creating and Uploading Test Information:
+                        # python3 report_recorder.py -H -o <output path> -cn <cluster name> -sn <scenario name> -m <path to/merged.csv> -mi <path to/merged_info.csv> -td <path to/all test result dir> -U
+                        
+                        These commands will generate HTML documents and upload them to the Katib system, incorporating the specified software, hardware, or test information as needed.
+                        
+
+
+
+
+
+
+
             
 
                 
