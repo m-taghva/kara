@@ -47,7 +47,7 @@
         
                 # bash configure.sh
             2.6 - Tool Logs:
-                    The path and log file for all tools are the same and equal to var/log/kara/all.log/. In more advanced tools with a configuration file, it is possible to change the log display level between debug - info - warning - error -    critical. For simpler tools without a configuration file, the log display level is debug.
+                The path and log file for all tools are the same and equal to var/log/kara/all.log/. In more advanced tools with a configuration file, it is possible to change the log display level between debug - info - warning - error -    critical. For simpler tools without a configuration file, the log display level is debug.
 
         3- Execution Description of Tools
 
@@ -80,7 +80,55 @@
 
                 run mrbench:
                     # python3 mrbench.py -i <path to test config file> -o <output dir> -cr <path to config_ring dir>
-                    
+
+            3.3 - status-reporter Tool:
+                This tool is responsible for sending queries to the InfluxDB database and retrieving responses based on the required measurements or metrics. It displays the results in two formats: CSV files and graphs. The tool is located in the status-reporter directory, and its configuration files are located in /etc/KARA/ in the status.conf file. The metric files are located in the metrics directory within the tool's main directory. This tool is designed to receive its required inputs in two ways: through the configuration file or by accepting arguments from the user.
+
+                3.3.1 - Configuration File Description:
+                        The configuration file consists of three main sections and a log section, each explained below:
+                        
+                        - Database Information Section:
+                                You can repeat this part of the configuration for other MC servers or lists of databases and related Hiola servers, allowing you to include multiple servers and databases for reporting in one configuration file.
+                                
+                                influxdbs:  # influxdbs section  
+                                  MC:  # mc server name 
+                                    ip: 192.168.1.1  # mc ip
+                                    databases:  # list of databases
+                                       opentsdb:  # first database name
+                                           hostls:  # monster server name and alias or config name
+                                             m-r1z1s1-controller: paco 
+                                             m-r2z2s2-controller: proxy
+                                             
+                        - Metric Files Information Section:
+                                The second part of the configuration is related to the measurement or metric files. In this section, the mathematical operations for each file and their paths are mentioned. These can be modified using the input switches or program arguments. Each file contains a list of metrics sent by netdata and stored in influxdb, with the ability to comment out unnecessary metrics. The naming format for metrics in the existing files should be as follows: netdata.n.n.n.
+                                
+                                metrics:
+                                  sum:
+                                    path: ./../status_reporter/metrics/sum_metric_list.txt
+                                  mean:
+                                    path: ./../status_reporter/metrics/mean_metric_list.txt
+                                  max:
+                                    path: ./../status_reporter/metrics/max_metric_list.txt
+                                  min:
+                                    path: ./../status_reporter/metrics/min_metric_list.txt
+                        - Time Information Section:
+                                In this section, you can define time margins from the beginning and end of the report interval to ensure more accurate output, measured in seconds.
+                                
+                                When sending queries to generate graphs, you can also group time intervals to improve the readability and accuracy of the output graph, measured in seconds.
+                                
+                                The final part includes the report time range, specifying the start and end times in Tehran timestamp format. If there is no specific time range for the report, you can set it to report from the current time to a previous interval, formatted like this: now-2h (from now to 2 hours ago). This can be modified using the program's input switches.
+                                
+                                time:
+                                  start_time_sum: 10  # increase your report start time
+                                  end_time_subtract: 10  # decrease your report end time
+                                  time_group: 10  # time group for image query 
+                                  time_range: 2024-04-23 10:55:00,2024-04-23 10:59:00  # or now-2h,now-1h
+                        - Usage Method:
+                                If you need images and graphs for each execution and report, use the --img switch at the end of the following command:
+                                
+                                # python3 status_reporter.py -m <path to metric file 1>,<path to metric file 2>,<path to metric file n> -t ‘start time,end time’ -o <output dir or result dir>
+                                The results will be saved in the given directory under query_result as graphs for each Hiola server and a CSV file for all of them, named after the report's time range.
+                            
 
             
 
