@@ -54,7 +54,7 @@
             **Note: All tool configuration files are in the standard YAML format, allowing sections that are not needed to be commented out.
             
             3.1 - config-gen Tool:
-                This tool is responsible for creating workload configurations and various tests for COSBench. The program is located in the Test_Work_Run directory, and its input is an input.txt file in that directory. Based on the content of this input file, the tool can generate multiple configuration files with different values to facilitate and speed up the process of creating different scenarios.
+                This tool is responsible for creating workload configurations and various tests for COSBench. The program is located in the config_gen directory, and its input is an input.txt file in that directory. Based on the content of this input file, the tool can generate multiple configuration files with different values to facilitate and speed up the process of creating different scenarios.
                 
                 run config_gen:
                         # python3 config-gen.py -i input.txt -o <output dir>
