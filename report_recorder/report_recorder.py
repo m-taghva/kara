@@ -69,7 +69,7 @@ def test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, s
     return htmls_dict
 
 #### make HTML template ####
-def dict_to_html_table(data):
+def dict_html_software(data):
     logging.info("report_recorder - Executing dict_to_html_table function")
     html = "<table border='1' class='wikitable'>\n"
     #generate first row
@@ -96,7 +96,7 @@ def dict_to_html_table(data):
     html += "</table>"
     return html
 
-def dict_to_html(dict):
+def dict_html_hardware(dict):
     logging.info("report_recorder - Executing dict_to_html function")
     html_dict = "<table border='1' class='wikitable'>\n"
     html_dict += "<tr><th> نام سرور </th><th> مشخصات </th></tr>\n"
@@ -148,15 +148,15 @@ def create_sw_hw_htmls(template_content, html_output, page_title): #HW_page_titl
         part,spec = hconfig_info.group(1).split(',')
         dict = analyzer.compare(part.strip(), spec.strip())
         hw_info_dict.update({spec.strip():dict})
-        html_of_dict = dict_to_html(dict)
+        html_of_dict = dict_html_hardware(dict)
         html_data = html_data.replace(hconfig_placeholder, html_of_dict)
     for sconfig_info in re.finditer(r'{sw_config}:(.+)', template_content):
         sconfig_placeholder = sconfig_info.group(0)
         sconfigs = sconfig_info.group(1).split(',')
         if sconfigs[0] == "swift_status":
-            software_html = dict_to_html_table(analyzer.generate_all_swift_status(sconfigs[1]))
+            software_html = dict_html_software(analyzer.generate_all_swift_status(sconfigs[1]))
         else:
-            software_html = dict_to_html_table(analyzer.generate_confs(sconfigs[0],None if len(sconfigs)== 1 else sconfigs[1]))
+            software_html = dict_html_software(analyzer.generate_confs(sconfigs[0],None if len(sconfigs)== 1 else sconfigs[1]))
         html_data = html_data.replace(sconfig_placeholder, software_html)
     htmls_dict.update({page_title:html_data})
     htmls_dict.update(sub_pages_maker(html_data,page_title,hw_info_dict))
