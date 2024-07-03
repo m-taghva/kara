@@ -19,7 +19,6 @@ def conf_dir(config_dir):
 # read backup dir
 listOfServers = []
 def load(directory):
-    global configs_dir
     with open(configs_dir + directory, 'r') as f:
         content = f.readlines()
     return content
