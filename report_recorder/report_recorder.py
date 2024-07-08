@@ -357,10 +357,6 @@ if __name__ == "__main__":
     merged_info_file = args.merged_info_file if args.merged_info_file else None
     all_test_dir = args.all_test_dir if args.all_test_dir else None
     configs_directory = args.configs_directory if args.configs_directory else None
-    #if args.configs_directory:
-    #   configs_directory = args.configs_directory 
-    #else:
-    #    configs_directory = None
     upload_operation = args.upload_operation
     create_html_operation = args.create_html_operation
     main(input_template, htmls_path, cluster_name, scenario_name, configs_directory, upload_operation, create_html_operation, merged_file, merged_info_file, all_test_dir)
