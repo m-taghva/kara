@@ -345,7 +345,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             logging.error(f"monstaver - lsblk failed on {container_name}")
             print(f"\033[91m lsblk failed on {container_name}\033[0m")
 
-        xfs_info = subprocess.run(f"ssh -p {port} {user}@{ip} sudo lsblk -o name,fstype | grep -oP '\\w+.*(?=\\s+xfs)' | sed 's/\\(.*\\)vg/mapper\\/\\1vg/' | xargs -I {{}} bash -c 'echo --------------------; sudo xfs_info /dev/{{}};' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/xfs_info.txt", shell=True)
+        xfs_info = subprocess.run(f"ssh -p {port} {user}@{ip} sudo lsblk -o name,fstype | grep -oP '\\w+.*(?=\\s+xfs)' | sed 's/\\(.*\\)-/mapper\\/\\1-/' | xargs -I {{}} bash -c 'echo --------------------; sudo xfs_info /dev/{{}};' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/xfs_info.txt", shell=True)
         if xfs_info.returncode == 0:                              
             logging.info(f"monstaver - lsblk_xfs_info successful on {container_name}")
             time.sleep(1)
