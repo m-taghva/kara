@@ -1,12 +1,13 @@
 import argparse
 import re
 import os
-from bs4 import BeautifulSoup
+import yaml
 import logging
 import csv
 import subprocess
 import sys
 import pandas as pd
+from bs4 import BeautifulSoup
 pywiki_path = os.path.abspath("./../report_recorder/pywikibot/")
 if pywiki_path not in sys.path:
     sys.path.append(pywiki_path)
@@ -17,8 +18,19 @@ if classification_path not in sys.path:
 import classification
 import analyzer
 
+config_file = "/etc/KARA/report_recorder.conf"
+
+def load_config(config_file):
+    with open(config_file, "r") as stream:
+        try:
+            data_loaded = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(f"Error loading the configuration: {exc}")
+            sys.exit(1)
+    return data_loaded
+
 #### make test HTML template ####
-def test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, scenario_name):
+def test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, scenario_name, data_loaded):
     logging.info("report_recorder - Executing test_page_maker function")
     htmls_dict={}
     mergedInfo = pd.read_csv(merged_info_file)
@@ -63,9 +75,9 @@ def test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, s
         ###### create subgroups within each original group  ######
         sorted_unique_file_1 = classification.csv_to_sorted_yaml(mergedInfo2)
         array_of_groups_1 = classification.group_generator(sorted_unique_file_1,threshold=4)
-        sub_html_result = classification.create_tests_details(mergedInfo2,merged2,testGroup,array_of_groups_1,all_test_dir)
-        htmls_dict.update({f"{cluster_name}--{scenario_name}--{format_tg}":sub_html_result+"[[رده:تست]]\n[[رده:کارایی]]\n[[رده:هیولا]]"})
-    htmls_dict.update({cluster_name+'--'+scenario_name:html_result.replace("**var**",str(number_of_groups))+"[[رده:تست]]\n[[رده:کارایی]]\n[[رده:هیولا]]"})
+        sub_html_result = classification.create_tests_details(mergedInfo2,merged2,testGroup,array_of_groups_1,all_test_dir,data_loaded)
+        htmls_dict.update({f"{cluster_name}--{scenario_name}--{format_tg}":sub_html_result+data_loaded['naming_tag'].get('tags')})
+    htmls_dict.update({cluster_name+'--'+scenario_name:html_result.replace("**var**",str(number_of_groups))+data_loaded['naming_tag'].get('tags')})
     return htmls_dict
 
 #### make HTML template ####
@@ -122,7 +134,7 @@ def csv_to_html(csv_file):
     html_csv += "</table>"
     return html_csv
 
-def create_sw_hw_htmls(template_content, html_output, page_title): #HW_page_title = cluster_name #SW_page_title = cluster_name + scenario_name
+def create_sw_hw_htmls(template_content, html_output, page_title, data_loaded): #HW_page_title = cluster_name #SW_page_title = cluster_name + scenario_name
     logging.info("report_recorder - Executing create_sw_hw_htmls function")
     htmls_dict={}
     hw_info_dict = {}
@@ -158,8 +170,10 @@ def create_sw_hw_htmls(template_content, html_output, page_title): #HW_page_titl
         else:
             software_html = dict_html_software(analyzer.generate_confs(sconfigs[0],None if len(sconfigs)== 1 else sconfigs[1]))
         html_data = html_data.replace(sconfig_placeholder, software_html)
+    html_data += "<p> </p>"
+    html_data += data_loaded['naming_tag'].get('tags')
     htmls_dict.update({page_title:html_data})
-    htmls_dict.update(sub_pages_maker(html_data,page_title,hw_info_dict))
+    htmls_dict.update(sub_pages_maker(html_data,page_title,hw_info_dict,data_loaded))
     for html_key,html_value in htmls_dict.items():
         with open(os.path.join(html_output+"/"+html_key+".html"), 'w') as html_file:
             html_file.write(html_value)
@@ -167,9 +181,9 @@ def create_sw_hw_htmls(template_content, html_output, page_title): #HW_page_titl
             logging.info(f"report_recorder - HTML template saved to: {html_output+'/'+html_key+'.html'}")
     return htmls_dict
 
-def create_test_htmls(template_content, html_output, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir): #page_title = cluster_name + scenario_name
+def create_test_htmls(template_content, html_output, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir, data_loaded): #page_title = cluster_name + scenario_name
     logging.info("report_recorder - Executing create_test_htmls function")
-    htmls_dict = test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, scenario_name)
+    htmls_dict = test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, scenario_name, data_loaded)
     for html_key,html_value in htmls_dict.items():
         with open(os.path.join(html_output+"/"+html_key+".html"), 'w') as html_file:
             html_file.write(html_value)
@@ -190,26 +204,26 @@ def convert_html_to_wiki(html_content):
             img_tag.replace_with(f"[[File:{os.path.basename(img_tag['src'])}|border|center|800px|{os.path.basename(img_tag['src']).split('_')[0]}]]")
     return str(soup)
 
-def sub_pages_maker(template_content , page_title ,hw_info_dict):
+def sub_pages_maker(template_content , page_title ,hw_info_dict,data_loaded):
     logging.info("report_recorder - Executing sub_pages_maker function")
     global configs_dir
     htmls_list={}
-    s1 = configs_dir
-    sub_dir_path = os.path.join(s1,'configs/{serverName}/hardware/')
+    c_dir = configs_dir
+    sub_dir_path = os.path.join(c_dir,'configs/{serverName}/hardware/')
     if page_title + "--CPU" in template_content:
-        htmls_list.update({page_title + "--CPU":one_sub_page_maker(sub_dir_path+'cpu/',hw_info_dict['cpu'])})
+        htmls_list.update({page_title + "--CPU":one_sub_page_maker(sub_dir_path+'cpu/',hw_info_dict['cpu'],data_loaded)})
     if page_title + "--Memory" in template_content:
-        htmls_list.update({page_title + "--Memory":one_sub_page_maker(sub_dir_path+'memory/',hw_info_dict['memory'])})
+        htmls_list.update({page_title + "--Memory":one_sub_page_maker(sub_dir_path+'memory/',hw_info_dict['memory'],data_loaded)})
     if page_title + "--Network" in template_content:
-        htmls_list.update({page_title + "--Network":one_sub_page_maker(sub_dir_path+'net/',hw_info_dict['net'])})
+        htmls_list.update({page_title + "--Network":one_sub_page_maker(sub_dir_path+'net/',hw_info_dict['net'],data_loaded)})
     if page_title + "--Disk" in template_content:
-        htmls_list.update({page_title + "--Disk":one_sub_page_maker(sub_dir_path+'disk/',hw_info_dict['disk'])})
+        htmls_list.update({page_title + "--Disk":one_sub_page_maker(sub_dir_path+'disk/',hw_info_dict['disk'],data_loaded)})
     if page_title + "--PCI" in template_content:
-        #htmls_list.update({page_title + "--PCI":sub_page_maker(sub_dir_path+'pci/',hw_info_dict['pci'])})
-        htmls_list.update({page_title + "--PCI":one_sub_page_maker(sub_dir_path+'pci/',hw_info_dict['cpu'])})
+        #htmls_list.update({page_title + "--PCI":sub_page_maker(sub_dir_path+'pci/',hw_info_dict['pci'],data_loaded)})
+        htmls_list.update({page_title + "--PCI":one_sub_page_maker(sub_dir_path+'pci/',hw_info_dict['cpu'],data_loaded)})
     return htmls_list
 
-def one_sub_page_maker(path_to_files,spec_dict):
+def one_sub_page_maker(path_to_files,spec_dict,data_loaded):
     logging.info("report_recorder - Executing one_sub_page_maker function")
     html_content = ""
     for i in os.listdir(path_to_files.replace("{serverName}",next(iter(spec_dict.values()))[0])):
@@ -225,7 +239,7 @@ def one_sub_page_maker(path_to_files,spec_dict):
             else:
                 html_content += "<p> فایل مربوطه یافت نشد </p>"
     html_content += "<p> </p>"
-    html_content += "[[رده:تست]]\n[[رده:کارایی]]\n[[رده:هیولا]]"
+    html_content += data_loaded['naming_tag'].get('tags')
     return html_content
 
 def upload_data(site, page_title, wiki_content):
@@ -269,10 +283,26 @@ def upload_images(site, html_content):
 def main(input_template, htmls_path, cluster_name, scenario_name, configs_directory, upload_operation, create_html_operation, merged_file, merged_info_file, all_test_dir):
     global configs_dir
     htmls_dict = {}
+
     log_maker = subprocess.run(f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && sudo chmod -R 777 /var/log/kara/", shell=True)
     logging.basicConfig(filename= '/var/log/kara/all.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-
     logging.info("\033[92m****** report_recorder main function start ******\033[0m")
+
+    data_loaded = load_config(config_file)
+    if cluster_name is None:
+        cluster_name = data_loaded['naming_tag'].get('cluster_name')
+    if scenario_name is None:
+        scenario_name = data_loaded['naming_tag'].get('scenario_name')
+    if htmls_path is None:
+        htmls_path = data_loaded['output_path']
+    if merged_file is None:
+        merged_file = data_loaded['tests_info'].get('merged')
+    if merged_info_file is None:
+        merged_info_file = data_loaded['tests_info'].get('merged_info')
+    if all_test_dir is None:
+        all_test_dir = data_loaded['tests_info'].get('tests_dir')
+    if configs_directory is None:
+        configs_directory = data_loaded['configs_dir']
     if create_html_operation:
         if configs_directory is not None:
             if os.path.exists(configs_directory):
@@ -284,11 +314,11 @@ def main(input_template, htmls_path, cluster_name, scenario_name, configs_direct
         if input_template:
             with open(input_template, 'r') as template_content:
                 if 'hardware' in os.path.basename(input_template):
-                    htmls_dict = create_sw_hw_htmls(template_content.read(), htmls_path, cluster_name+'--HW') 
+                    htmls_dict = create_sw_hw_htmls(template_content.read(), htmls_path, cluster_name+'--HW', data_loaded) 
                 if 'software' in os.path.basename(input_template):
-                    htmls_dict = create_sw_hw_htmls(template_content.read(), htmls_path, cluster_name+'--'+scenario_name+'--SW')
-        if merged_file and merged_info_file and  all_test_dir:
-            htmls_dict.update(create_test_htmls("",htmls_path, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir)) 
+                    htmls_dict = create_sw_hw_htmls(template_content.read(), htmls_path, cluster_name+'--'+scenario_name+'--SW', data_loaded)
+        if merged_file and merged_info_file and all_test_dir:
+            htmls_dict.update(create_test_htmls("",htmls_path, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir, data_loaded)) 
     elif upload_operation:
         for html_file in os.listdir(htmls_path):
             with open(os.path.join(htmls_path,html_file), 'r', encoding='utf-8') as file:
@@ -303,6 +333,7 @@ def main(input_template, htmls_path, cluster_name, scenario_name, configs_direct
             upload_data(site, title, wiki_content)
             # Upload images to the wiki
             upload_images(site, content)
+
     logging.info("\033[92m****** report_recorder main function end ******\033[0m")
 
 if __name__ == "__main__":
@@ -319,16 +350,17 @@ if __name__ == "__main__":
     parser.add_argument("-td", "--all_test_dir", help="directory of all tests")
     args = parser.parse_args()
     input_template = args.input_template 
-    htmls_path = args.htmls_path
-    cluster_name = args.cluster_name
-    scenario_name = args.scenario_name 
-    merged_file = args.merged_file
-    merged_info_file = args.merged_info_file
-    all_test_dir = args.all_test_dir
-    if args.configs_directory:
-       configs_directory = args.configs_directory 
-    else:
-        configs_directory = None
+    htmls_path = args.htmls_path if args.htmls_path else None
+    cluster_name = args.cluster_name if args.cluster_name else None
+    scenario_name = args.scenario_name if args.scenario_name else None
+    merged_file = args.merged_file if args.merged_file else None
+    merged_info_file = args.merged_info_file if args.merged_info_file else None
+    all_test_dir = args.all_test_dir if args.all_test_dir else None
+    configs_directory = args.configs_directory if args.configs_directory else None
+    #if args.configs_directory:
+    #   configs_directory = args.configs_directory 
+    #else:
+    #    configs_directory = None
     upload_operation = args.upload_operation
     create_html_operation = args.create_html_operation
     main(input_template, htmls_path, cluster_name, scenario_name, configs_directory, upload_operation, create_html_operation, merged_file, merged_info_file, all_test_dir)
