@@ -132,7 +132,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
     mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/motherboard/ ; "
     mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/server-manufacturer ; "
     mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-host/ ; " 
-    mkdir_hwoss_output += f"sudo mkdir -p  {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/ "
+    mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/ "
     mkdir_hwoss_process = subprocess.run(mkdir_hwoss_output, shell=True)
     if mkdir_hwoss_process.returncode == 0:
         logging.info("monstaver - make hardware/software sub directories successful")
