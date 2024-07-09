@@ -354,7 +354,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             print("\033[91m lsblk/sed/xargs is not installed. Please install it.\033[0m")
         else:
             logging.error(f"monstaver - lsblk_xfs_info failed on {container_name}")
-            print(f"\033[91m lsblk failed on {container_name}\033[0m")
+            print(f"\033[91m lsblk_xfs_info failed on {container_name}\033[0m")
 
     # remove /influxdb-backup/time_dir from container and host
     rm_cont_host_dir_process = subprocess.run(f"ssh -p {port} {user}@{ip} sudo rm -rf {backup_dir}-tmp/* ; ssh -p {port} {user}@{ip} sudo docker exec {container_name} rm -rf {backup_dir}-tmp/* ", shell=True)
