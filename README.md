@@ -15,6 +15,7 @@
         
             2.1 - Installing Tool Prerequisites:
                 pip install pytz datetime matplotlib pandas alive_progress BeautifulSoup4
+                apt install xfsprogs
                 
             2.2 - Cloning the Latest Version of the Program from GitHub:
                 git clone https://github.com/m-taghva/KARA
