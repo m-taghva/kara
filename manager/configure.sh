@@ -91,6 +91,7 @@ fi
 sudo apt update
 sudo apt install -y xfsprogs
 # Install Python libraries using pip
+sudo apt install -y pip
 pip install pytz datetime matplotlib pandas alive_progress BeautifulSoup4
 if [ $? -eq 0 ]; then
   echo -e "${YELLOW}All installations were successful${RESET}"
