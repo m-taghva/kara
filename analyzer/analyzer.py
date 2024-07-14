@@ -274,8 +274,6 @@ def merge_csv(csv_file, output_directory, pairs_dict):
 
 def merge_process(output_directory, selected_csv):
     logging.info("status_analyzer - Executing merge_process function")
-    if os.path.exists(f'{output_directory}/merged.csv'):
-        remove_csv = subprocess.run(f"rm {output_directory}/merged.csv", shell=True)
     if '*' in selected_csv:    
         selected_csv = glob(selected_csv)
         for file in selected_csv:
