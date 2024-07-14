@@ -252,18 +252,45 @@ def generate_confs(confType, serverType = None):
 def merge_csv(csv_file, output_directory, pairs_dict):
     logging.info("status_analyzer - Executing merge_csv function")
     try:
+        all_value = []
+        existing_headers = []
         csv_data = pd.read_csv(csv_file)
         if pairs_dict:  
-            if not os.path.exists(f'{output_directory}/merged_info.csv'):
-                pd.DataFrame(pairs_dict, index=[0]).to_csv(f'{output_directory}/merged_info.csv', index=False, mode='w', header=True)
-            else:
+            if os.path.exists(f'{output_directory}/merged_info.csv'):
                 pd.DataFrame(pairs_dict, index=[0]).to_csv(f'{output_directory}/merged_info.csv', index=False, mode='a', header=False)
+            else:
+                pd.DataFrame(pairs_dict, index=[0]).to_csv(f'{output_directory}/merged_info.csv', index=False, mode='w', header=True)
             for key, value in pairs_dict.items():
                 csv_data.insert(0, key, value) 
-        if os.path.exists(f'{output_directory}/merged.csv'):      
-            csv_data.to_csv(f'{output_directory}/merged.csv', index=False, mode='a', header=False)
-        elif not os.path.exists(f'{output_directory}/merged.csv'):
-            csv_data.to_csv(f'{output_directory}/merged.csv', index=False, mode='w', header=True)
+        # Read the new CSV file
+        new_csv_value = csv_data.values.tolist()
+        new_csv_header = csv_data.columns.tolist()
+        if os.path.exists(f'{output_directory}/merged.csv'):
+            # Read the existing merged.csv
+            existing_merge_data = pd.read_csv(f'{output_directory}/merged.csv')
+            # Combine headers and ensure they are unique
+            existing_headers = existing_merge_data.columns.tolist()
+            for header in new_csv_header:
+                if header not in existing_headers:
+                    existing_headers.append(header)
+            # Create a combined list of rows
+            all_value = existing_merge_data.values.tolist()
+            # Align new data rows with the combined headers
+            for row in new_csv_value:
+                aligned_row = []
+                for header in existing_headers:
+                    if header in new_csv_header:
+                        aligned_row.append(row[new_csv_header.index(header)])
+                    else:
+                        aligned_row.append(None)
+                all_value.append(aligned_row)
+        else:
+            # If merged.csv does not exist, use the new CSV data
+            existing_headers = new_csv_header
+            all_value = new_csv_value
+        # Save the combined data to merged.csv
+        combined_data = pd.DataFrame(all_value, columns=existing_headers)
+        combined_data.to_csv(f'{output_directory}/merged.csv', index=False, mode='w', header=True)
         print(f"Data from '{csv_file}' appended successfully to {YELLOW}'{output_directory}/merged.csv'{RESET}") 
         logging.info(f"status_analyzer - Data from '{csv_file}' appended successfully to '{output_directory}/merged.csv'") 
     except FileNotFoundError:
