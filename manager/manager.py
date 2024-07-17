@@ -7,7 +7,6 @@ import yaml
 import shutil
 import argparse
 import logging
-import json
 from datetime import datetime
 from glob import glob
 import mrbench
