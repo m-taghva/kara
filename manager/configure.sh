@@ -26,7 +26,7 @@ if [ "$KARA_DIR" == "/" ]; then
     echo "Error: kara directory not found"
     exit 1
 fi
-echo -e "${BOLD}KARA directory found at: ${RESET}${YELLOW}$KARA_DIR/kara${RESET}"
+echo -e "${BOLD}kara directory found at: ${RESET}${YELLOW}$KARA_DIR/kara${RESET}"
 # Array of script names
 SCRIPTS=("mrbench" "config_gen" "status_reporter" "monstaver" "analyzer" "report_recorder")
 # Loop through each script and create a symbolic link in the destination directory
