@@ -3,7 +3,7 @@
 <img src="kara_chart.gif" width="862" height="565"/>
 <img src="kara_tools.png" width="862" height="565"/>
 
-    # Attention ! after clone repository, please remove (.placeholder) files inside ./result/ 
+    # Attention ! after clone repository, please remove (.placeholder) files inside ./results/ 
     
         1 - Installing the COSBench Benchmarking Software
             In the first step, the COSBench tool needs to be installed. For installation guidance, refer to the Cloud Object Storage Benchmark page.
