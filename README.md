@@ -2,7 +2,6 @@
 <h3>open stack swift performance and monitoring tools (Kara)</h3>
 <img src="kara-gif.gif" width="983" height="500"/>
 <img src="kara_tools.png" width="983" height="581"/>
-<img src="kara.png" width="983" height="581"/>
 
     # Attention ! after clone repository, please remove (.placeholder) files inside ./result/ 
     
