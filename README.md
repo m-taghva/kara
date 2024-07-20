@@ -1,6 +1,6 @@
 ‪<h2>Monster Performance Kit</h2>
 <h3>open stack swift performance and monitoring tools (Kara)</h3>
-<img src="kara-gif.gif" width="983" height="450"/>
+<img src="kara-gif.gif" width="983" height="400"/>
 <img src="kara_tools.png" width="983" height="581"/>
 <img src="kara.png" width="983" height="581"/>
 
