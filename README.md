@@ -1,7 +1,7 @@
 ‪<h2>Monster Performance Kit</h2>
 <h3>open stack swift performance and monitoring tools (Kara)</h3>
 <img src="kara_chart.gif" width="862" height="565"/>
-<img src="kara_tools.gif" width="862" height="565"/>
+<img src="kara_tools.gif" width="640" height="410"/>
 
     ## Attention ! after clone repository, please remove (.placeholder) files inside ./results/ ##
     
