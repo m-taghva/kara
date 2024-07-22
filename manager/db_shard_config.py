@@ -14,6 +14,7 @@ def load_config(config_file):
     return data_loaded
 
 def print_attention_message():
+    print("")
     print("\033[93m\033[1m" + " *-*-*-*-*-*-*-*-*-*-*-*-*-* ATTENTION *-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
     print(" DO NOT USE influxDB after running this script for at least 2 HOURS ")
     print(" *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*")
