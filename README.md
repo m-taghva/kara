@@ -6,7 +6,7 @@
     ## Attention ! after clone repository, please remove (.placeholder) files inside ./results/ ##
     
         1 - Installing the COSBench Benchmarking Software
-            In the first step, the COSBench tool needs to be installed. For installation guidance, refer to the https://github.com/intel-cloud/cosbench/blob/master/COSBenchUserGuide.pdf.
+            In the first step, the COSBench tool needs to be installed. For installation guidance, refer to the https://github.com/intel-cloud/cosbench/blob/master/COSBenchUserGuide.pdf
             After installation, go to the main directory and use the following commands to make the cli.sh script executable and create a soft link in the /usr/bin path.
             sudo chmod +x /home/user/cosbench/0.4.2.c4/cli.sh
             sudo ln -s /home/user/cosbench/0.4.2.c4/cli.sh /usr/bin/cosbench
