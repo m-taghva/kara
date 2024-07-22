@@ -65,7 +65,7 @@ fi
 #### unzip pywikibot
 zip_file="$KARA_DIR/kara/report_recorder/report_recorder_bot.zip"
 zip_destination="$KARA_DIR/kara/report_recorder/"
-if unzip "$zip_file" -d "$zip_destination"; then
+if unzip "$zip_file" -d "$zip_destination"  > /dev/null 2>&1; then
   if mv "$KARA_DIR/kara/report_recorder/report_recorder_bot"/* "$zip_destination" > /dev/null 2>&1; then
     echo -e "${YELLOW}Unzip and move report_recoder_bot to /resport_recorder dir successful${RESET}"
   else
@@ -98,3 +98,6 @@ if [ $? -eq 0 ]; then
 else
   echo -e "${RED}There was an error during the installations${RESET}"
 fi
+
+#### run shard script
+python3 ./db_shard_config.py
