@@ -35,4 +35,4 @@ for mc_server, config in data_loaded.get('db_sources', {}).items():
         if policy_changer_process.returncode == 0:
             print(f"\033[92mShard group duration in {db_name} changed to 1h successfully\033[0m")
         else :
-            print("\033[91mChaing RP failed\033[0m")
+            print(f"\033[91mChaing shard of {db_name} failed, please check /etc/kara/monstaver.conf for database config\033[0m")
