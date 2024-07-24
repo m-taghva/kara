@@ -89,7 +89,7 @@ fi
 
 #### install dependency
 sudo apt update
-sudo apt install -y xfsprogs
+sudo apt install -y xfsprogs sshpass
 # Install Python libraries using pip
 sudo apt install -y pip
 pip install pytz datetime matplotlib pandas alive_progress BeautifulSoup4 wikitextparser
