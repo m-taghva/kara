@@ -77,7 +77,6 @@
                         # ssh-keygen (make sure the new key is just for the new user and his .ssh directory)
                         # ssh-copy-id -p <port> kara@ip
                 
-                
             2.6 - Tool Logs:
                 The path and log file for all tools are the same and equal to var/log/kara/all.log/. In more advanced tools with a configuration file, it is possible to change the log display level between debug - info - warning - error -    critical. For simpler tools without a configuration file, the log display level is debug.
 
