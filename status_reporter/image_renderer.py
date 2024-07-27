@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import pytz
 from alive_progress import alive_bar
+from PIL import Image
 
 # Convert UTC times to Tehran time
 def convert_to_tehran_time(utc_time):
@@ -19,6 +20,7 @@ def image_maker(query_output, server_name, parent_dir):
     server_dir = os.path.join(parent_dir, "query_results", f"{server_name}-images")
     if not os.path.exists(server_dir):
         os.makedirs(server_dir)
+    image_paths = []
     with alive_bar(title=f"Generating Image for {server_name}") as bar:
         # Extract data and create graphs for each time range
         for entry in data["results"]:
@@ -57,4 +59,31 @@ def image_maker(query_output, server_name, parent_dir):
                 plt.savefig(output_filepath, dpi=300)
                 plt.close()
                 print(f"\033[1;33m{output_filename}\033[0m")
+                image_paths.append(output_filepath)
                 bar()
+
+    combine_images_from_directory(server_dir, os.path.join(server_dir, f"{server_name}-dashboard.png"))
+
+def combine_images_from_directory(directory, output_path):
+    # Gather all image file paths from the directory
+    image_paths = [
+        os.path.join(directory, file) for file in os.listdir(directory)
+        if file.endswith(('.png')) and '-dashboard' not in file
+    ]
+    if not image_paths:
+        print("No images found to combine.")
+        return
+    # Open images and calculate the size for the combined image
+    images = [Image.open(image_path) for image_path in image_paths]
+    widths, heights = zip(*(image.size for image in images))
+    max_width = max(widths)
+    total_height = sum(heights)
+    # Create a new blank image to hold the combined output
+    combined_image = Image.new('RGB', (max_width, total_height))
+    y_offset = 0
+    for image in images:
+        combined_image.paste(image, (0, y_offset))
+        y_offset += image.height
+    # Save the combined image
+    combined_image.save(output_path)
+    print(f"Combined image saved at {output_path}")
