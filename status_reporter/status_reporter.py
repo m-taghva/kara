@@ -7,6 +7,10 @@ import argparse
 import yaml
 import logging
 import pytz
+renderer_path = os.path.abspath("./../status_reporter/")
+if renderer_path not in sys.path:
+    sys.path.append(renderer_path)
+import image_renderer
 
 config_file = "/etc/kara/status_reporter.conf"
 
@@ -165,7 +169,7 @@ def main(metric_file, path_dir, time_range, img=False):
                                         if img:
                                             logging.info(f"status_reporter - user need image and graph")
                                             img_query = subprocess.getoutput(f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "db={db_name}" --data-urlencode "q=SELECT {metric_operation}(\\"value\\") FROM /{metric_name}/ WHERE (\\"host\\" =~ /^{host_name}$/) AND time >= \'{start_time_utc}\' AND time <= \'{end_time_utc}\' GROUP BY time({TIME_GROUP}s) fill(none)"')
-                                            os.system(f"python3 ./../status_reporter/image_renderer.py '{img_query}' '{host_name}' '{path_dir}'")
+                                            image_renderer.image_maker(img_query, host_name, path_dir)
                                     else:
                                         # check database name
                                         check_database_name_result = subprocess.getoutput(f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "q=SHOW DATABASES"')
