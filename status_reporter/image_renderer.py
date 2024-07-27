@@ -61,12 +61,25 @@ def image_maker(query_output, server_name, parent_dir):
                 # Extract time and value data
                 times_utc = [convert_to_tehran_time(value[0]) for value in values]
                 values = [value[1] for value in values]
+                # Calculate min, max, and average values
+                min_value = min(values)
+                max_value = max(values)
+                avg_value = sum(values) / len(values)
+                # Get corresponding times for min, max, and average
+                min_time = times_utc[values.index(min_value)]
+                max_time = times_utc[values.index(max_value)]
+                avg_time = times_utc[len(values) // 2]  # Approximation for average value
                 plt.figure(figsize=(10, 6))
-                plt.plot(times_utc, values, marker='o', linestyle='-', linewidth=2)
+                plt.plot(times_utc, values, marker='o', linestyle='-', linewidth=1, color='black', label='Values')
+                # Highlight min, max, and avg with different colors
+                plt.plot(min_time, min_value, 'ro', label=f'Min: {min_value}')
+                plt.plot(max_time, max_value, 'go', label=f'Max: {max_value}')
+                plt.plot(avg_time, avg_value, 'bo', label=f'Avg: {avg_value:.2f}')
                 plt.xlabel("Time (Asia/Tehran)")
                 plt.ylabel("Value")
                 plt.title(f"{metric_name} ({value_column.capitalize()}) - Server: {server_name}")
                 plt.xticks(rotation=90)
+                plt.legend()
                 # Show x-axis labels every 1 minute
                 time_range_start = times_utc[0]
                 time_range_end = times_utc[-1]
