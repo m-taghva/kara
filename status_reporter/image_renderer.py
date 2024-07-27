@@ -70,7 +70,7 @@ def image_maker(query_output, server_name, parent_dir):
                 max_time = times_utc[values.index(max_value)]
                 avg_time = times_utc[len(values) // 2]  # Approximation for average value
                 plt.figure(figsize=(10, 6))
-                plt.plot(times_utc, values, marker='o', linestyle='-', linewidth=1, color='black', label='Values')
+                plt.plot(times_utc, values, marker='.', linestyle='-', linewidth=1, color='black', label='Values')
                 # Highlight min, max, and avg with different colors
                 plt.plot(min_time, min_value, 'ro', label=f'Min: {min_value}')
                 plt.plot(max_time, max_value, 'go', label=f'Max: {max_value}')
