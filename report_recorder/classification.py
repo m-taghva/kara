@@ -14,7 +14,6 @@ def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_paramet
         testGroup = ' , '.join(f'{key} = {value}' for key, value in testInfo.items())
         h2checker = 1
         for serverName in serverList:
-            image_paths = []
             mergedTestsInfo2 = mergedTestsInfo
             mergedTests2 = mergedTests 
             mergedTests2 = mergedTests2[mergedTests2['Host_alias'] == serverName ]
@@ -34,6 +33,7 @@ def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_paramet
             html_result+=f"<p> در این گروه {num_of_tests_within_groups} تست انجام شده است که نتایج آن در ادامه قرار داده شده است.  </p>"
             html_result+= f"<h3> نتایج سرور: {serverName} </h3>"
             for test in test_rows:
+                image_paths = []
                 trow = test.iloc[0]
                 row_dict = trow.to_dict()
                 selected_merged = mergedTests2.loc[mergedTests2['Time'] == row_dict['Time']]
@@ -49,6 +49,7 @@ def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_paramet
                 html_result += "</table>"
                 html_result += "<h4>تصاویر \n</h4> <p> </p>"
                 directory_path = os.path.join(tests_dir,f"{row_dict['Time']}/query_results/{serverName}-images")
+                output_path = None
                 for metric in img_metrics:
                     if os.path.exists(directory_path):
                         for filename in os.listdir(directory_path):
