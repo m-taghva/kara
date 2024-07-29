@@ -67,7 +67,7 @@ def image_maker(query_output, server_name, parent_dir):
                 plt.tight_layout()
                 output_filename = f"{server_name}-{metric_name.replace('.', '-')}-{value_column}_{time_range_start.strftime('%Y-%m-%d-%H-%M-%S')}-{time_range_end.strftime('%Y-%m-%d-%H-%M-%S')}.png"
                 output_filepath = os.path.join(server_dir, output_filename)
-                plt.savefig(output_filepath, dpi=300)
+                plt.savefig(output_filepath, dpi=80)
                 plt.close()
                 print(f"\033[1;33m{output_filename}\033[0m saved")
                 bar()
