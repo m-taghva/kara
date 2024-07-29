@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import pytz
 from alive_progress import alive_bar
-from PIL import Image
 
 # Convert UTC times to Tehran time
 def convert_to_tehran_time(utc_time):
@@ -14,43 +13,12 @@ def convert_to_tehran_time(utc_time):
     tehran_time = utc_time.astimezone(pytz.timezone('Asia/Tehran'))
     return tehran_time
 
-def dashboard_maker(directory, output_path):
-    # Gather all image file paths from the directory
-    image_paths = [
-        os.path.join(directory, file) for file in os.listdir(directory)
-        if file.endswith(('.png')) and '-dashboard' not in file
-    ]
-    if not image_paths:
-        print("No images found to combine.")
-        return
-    # Open images and calculate the size for the combined image
-    images = [Image.open(image_path) for image_path in image_paths]
-    # Determine the number of images per row and rows needed
-    images_per_row = 2
-    rows = (len(images) + images_per_row - 1) // images_per_row
-    # Calculate the width and height of the combined image
-    max_width = max(image.width for image in images)
-    max_height = max(image.height for image in images)
-    combined_width = max_width * images_per_row
-    combined_height = max_height * rows
-    # Create a new blank image to hold the combined output
-    combined_image = Image.new('RGB', (combined_width, combined_height))
-    # Paste images into the combined image
-    for index, image in enumerate(images):
-        x_offset = (index % images_per_row) * max_width
-        y_offset = (index // images_per_row) * max_height
-        combined_image.paste(image, (x_offset, y_offset))
-    # Save the combined image
-    combined_image.save(output_path)
-    print(f"image append to {os.path.basename(output_path)}")
-
 def image_maker(query_output, server_name, parent_dir):
     data = json.loads(query_output)
     # Create a directory for the server's images if it doesn't exist
     server_dir = os.path.join(parent_dir, "query_results", f"{server_name}-images")
     if not os.path.exists(server_dir):
         os.makedirs(server_dir)
-    image_paths = []
     with alive_bar(title=f"Generating Image for {server_name}") as bar:
         # Extract data and create graphs for each time range
         for entry in data["results"]:
@@ -102,6 +70,4 @@ def image_maker(query_output, server_name, parent_dir):
                 plt.savefig(output_filepath, dpi=300)
                 plt.close()
                 print(f"\033[1;33m{output_filename}\033[0m saved")
-                image_paths.append(output_filepath)
                 bar()
-    dashboard_maker(server_dir, os.path.join(server_dir, f"{server_name}-dashboard.png"))
