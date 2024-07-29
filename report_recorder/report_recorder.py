@@ -201,7 +201,7 @@ def convert_html_to_wiki(html_content):
     # Convert <img> tags to wiki images
     for img_tag in soup.find_all('img'):
         if 'src' in img_tag.attrs:
-            img_tag.replace_with(f"[[File:{os.path.basename(img_tag['src'])}|border|center|800px|{os.path.basename(img_tag['src']).split('_')[0]}]]")
+            img_tag.replace_with(f"[[File:{os.path.basename(img_tag['src'])}|border|center|800px|{os.path.basename(img_tag['src'])}]]")
     return str(soup)
 
 def sub_pages_maker(template_content , page_title ,hw_info_dict,data_loaded):
