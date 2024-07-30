@@ -269,7 +269,7 @@ def upload_images(site, html_content):
             file_page = pywikibot.FilePage(site, page.title())
             if file_page.exists():
                 raise ValueError("File already exists!")
-            success = file_page.upload(image_path, comment=f"Uploaded image '{image_filename}' using KARA")
+            success = file_page.upload(image_path, comment=f"Uploaded image '{image_filename}' by KARA")
             if success:
                 print(f"File uploaded successfully! File page: {file_page.full_url()}")
                 logging.info(f"report_recorder - Image '{image_filename}' uploaded successfully.")
@@ -312,8 +312,8 @@ def main(input_template, htmls_path, cluster_name, scenario_name, configs_direct
                 configs_dir = configs_directory
                 analyzer.conf_dir(configs_dir)
                 analyzer.get_list_of_servers()
-            else:
-                print(f"\033[91minput backup File not found\033[0m")
+            elif create_hardware_page or create_software_page:
+                print(f"\033[91minput backup File not found for make hardware or software pages\033[0m")
         if input_template:
             with open(input_template, 'r') as template_content:
                 if create_hardware_page:
