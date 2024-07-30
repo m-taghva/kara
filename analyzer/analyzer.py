@@ -249,17 +249,19 @@ def generate_confs(confType, serverType = None):
     return compared_dict
 
 ####### MERGER #######
-def merge_csv(csv_file, output_directory, pairs_dict):
+def merge_csv(csv_file, output_directory, mergedinfo_dict, merged_dict):
     logging.info("status_analyzer - Executing merge_csv function")
     try:
         csv_data = pd.read_csv(csv_file)
-        if pairs_dict:  
+        if mergedinfo_dict:  
             if os.path.exists(f'{output_directory}/merged_info.csv'):
-                merged_info = pd.concat([pd.read_csv(f'{output_directory}/merged_info.csv'), pd.DataFrame(pairs_dict, index=[0])], ignore_index=True).drop_duplicates()
+                merged_info = pd.concat([pd.read_csv(f'{output_directory}/merged_info.csv'), pd.DataFrame(mergedinfo_dict, index=[0])], ignore_index=True).drop_duplicates()
             else:
-                merged_info = pd.DataFrame(pairs_dict, index=[0])
+                merged_info = pd.DataFrame(mergedinfo_dict, index=[0])
             merged_info.to_csv(f'{output_directory}/merged_info.csv', index=False, mode='w')
-            for key, value in pairs_dict.items():
+            print(f"Data from test appended successfully to {YELLOW}'{output_directory}/merged_info.csv'{RESET}")
+        if merged_dict:
+            for key, value in merged_dict.items():
                 csv_data.insert(0, key, value) 
         if os.path.exists(f'{output_directory}/merged.csv'):
             merged = pd.concat([pd.read_csv(f'{output_directory}/merged.csv'), csv_data], ignore_index=True).drop_duplicates()
@@ -267,6 +269,7 @@ def merge_csv(csv_file, output_directory, pairs_dict):
             merged = csv_data
         merged.to_csv(f'{output_directory}/merged.csv', index=False, mode='w')
         print(f"Data from '{csv_file}' appended successfully to {YELLOW}'{output_directory}/merged.csv'{RESET}") 
+        print("")
         logging.info(f"status_analyzer - Data from '{csv_file}' appended successfully to '{output_directory}/merged.csv'") 
     except FileNotFoundError:
         logging.info(f"status_analyzer - File '{csv_file}' not found. Skipping")
@@ -277,11 +280,11 @@ def merge_process(output_directory, selected_csv):
     if '*' in selected_csv:    
         selected_csv = glob(selected_csv)
         for file in selected_csv:
-            merge_csv(file, output_directory, pairs_dict=None)
+            merge_csv(file, output_directory, mergedinfo_dict=None, merged_dict=None)
     else:
         for file in selected_csv:
             if os.path.exists(file):
-                merge_csv(file, output_directory, pairs_dict=None)
+                merge_csv(file, output_directory, mergedinfo_dict=None, merged_dict=None)
             else:
                 print(f"\033[91mThis CSV file doesn't exist:\033[0m{file}")
                 logging.info(f"status_analyzer - This CSV file doesn't exist:{file}")
