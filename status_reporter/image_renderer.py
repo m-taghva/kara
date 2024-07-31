@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import pytz
 from alive_progress import alive_bar
 
-# variable dirs
+# variables
 result_dir = "query_results"
 
 # Convert UTC times to Tehran time
