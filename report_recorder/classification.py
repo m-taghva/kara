@@ -3,7 +3,10 @@ import pandas as pd
 import os
 from PIL import Image
 
-################# CSV to sorted yaml descending-based ##############################################################
+# variable dirs
+result_dir = "query_results"
+
+################# CSV to HTML descending-based ##############################################################
 def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_parameters,tests_dir,data_loaded):
     img_metrics = []
     for img_metric in data_loaded['tests_info'].get('metrics', []):
@@ -48,7 +51,7 @@ def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_paramet
                     html_result += "</tr>\n"
                 html_result += "</table>"
                 html_result += "<h4>تصاویر \n</h4> <p> </p>"
-                directory_path = os.path.join(tests_dir,f"{row_dict['Time']}/query_results/{serverName}-images")
+                directory_path = os.path.join(tests_dir,f"{row_dict['Time']}/{result_dir}/{serverName}-images")
                 output_path = None
                 for metric in img_metrics:
                     if os.path.exists(directory_path):
