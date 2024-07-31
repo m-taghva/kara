@@ -6,6 +6,9 @@ from datetime import datetime, timedelta
 import pytz
 from alive_progress import alive_bar
 
+# variable dirs
+result_dir = "query_results"
+
 # Convert UTC times to Tehran time
 def convert_to_tehran_time(utc_time):
     utc_time = datetime.strptime(utc_time, "%Y-%m-%dT%H:%M:%SZ")
@@ -16,7 +19,7 @@ def convert_to_tehran_time(utc_time):
 def image_maker(query_output, server_name, parent_dir):
     data = json.loads(query_output)
     # Create a directory for the server's images if it doesn't exist
-    server_dir = os.path.join(parent_dir, "query_results", f"{server_name}-images")
+    server_dir = os.path.join(parent_dir, result_dir, f"{server_name}-images")
     if not os.path.exists(server_dir):
         os.makedirs(server_dir)
     with alive_bar(title=f"Generating Image for {server_name}") as bar:
