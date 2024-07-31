@@ -68,9 +68,9 @@ def image_maker(query_output, server_name, parent_dir):
                     current_time += time_interval 
                 # Set the xlabel based on the range of dates covered
                 if date_changed:
-                    plt.xlabel(f'Time ({time_range_start.strftime("%Y-%m-%d")})  to  ({time_range_end.strftime("%Y-%m-%d")})')
+                    plt.xlabel(f'Date ({time_range_start.strftime("%Y-%m-%d")})  to  ({time_range_end.strftime("%Y-%m-%d")})')
                 else:
-                    plt.xlabel(f'Time ({time_range_start.strftime("%Y-%m-%d")})')
+                    plt.xlabel(f'Date ({time_range_start.strftime("%Y-%m-%d")})')
                 # Ensure the last time is included in the x-axis
                 x_ticks.append(time_range_end)
                 x_labels.append(time_range_end.strftime("%H:%M:%S"))
