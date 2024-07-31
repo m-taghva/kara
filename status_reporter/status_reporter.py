@@ -12,9 +12,8 @@ if renderer_path not in sys.path:
     sys.path.append(renderer_path)
 import image_renderer
 
+# variables
 config_file = "/etc/kara/status_reporter.conf"
-
-# variable dir
 log_path = "/var/log/kara/"
 result_dir = "query_results"
 
@@ -79,7 +78,7 @@ def main(metric_file, path_dir, time_range, img=False):
         if log_level_upper == "DEBUG" or log_level_upper == "INFO" or log_level_upper == "WARNING" or log_level_upper == "ERROR" or log_level_upper == "CRITICAL":
             log_dir = f"sudo mkdir {log_path} > /dev/null 2>&1 && sudo chmod -R 777 {log_path}"
             log_dir_run = subprocess.run(log_dir, shell=True)
-            logging.basicConfig(filename= '/var/log/kara/all.log', level=log_level_upper, format='%(asctime)s - %(levelname)s - %(message)s')
+            logging.basicConfig(filename= {log_path}all.log , level=log_level_upper, format='%(asctime)s - %(levelname)s - %(message)s')
         else:
             print(f"\033[91mInvalid log level:{log_level}\033[0m")  
     else:
