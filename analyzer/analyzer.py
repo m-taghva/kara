@@ -7,6 +7,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from collections import Counter
 
+# variables
+log_path = "/var/log/kara/"
+
 BOLD = "\033[1m"
 RESET = "\033[0m"
 YELLOW = "\033[1;33m"
@@ -350,9 +353,8 @@ def plot_and_save_graph(selected_csv, x_column, y_column):
     plt.savefig(image_file_path)
 
 def main(merge, analyze, graph, csv_original, transformation_directory, output_directory, selected_csv, x_column, y_column):
-    log_dir = f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && sudo chmod -R 777 /var/log/kara/"
-    log_dir_run = subprocess.run(log_dir, shell=True)
-    logging.basicConfig(filename= '/var/log/kara/all.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+    log_dir_run = subprocess.run(f"sudo mkdir {log_path} > /dev/null 2>&1 && sudo chmod -R 777 {log_path}", shell=True)
+    logging.basicConfig(filename= f'{log_path}all.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
     logging.info("\033[92m****** status_analyzer main function start ******\033[0m")
     if analyze:
         analyze_and_save_csv(csv_original, transformation_directory)
@@ -405,5 +407,4 @@ if __name__ == "__main__":
             selected_csv = None
             print(f'\033[91mplease select correct csv file your file is wrong: {args.selected_csv}\033[0m')
             exit(1)
-            
     main(merge, analyze, graph, csv_original, transformation_directory, output_directory, selected_csv, x_column, y_column)
