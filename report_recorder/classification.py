@@ -3,7 +3,7 @@ import pandas as pd
 import os
 from PIL import Image
 
-# variable dirs
+# variables
 result_dir = "query_results"
 
 ################# CSV to HTML descending-based ##############################################################
