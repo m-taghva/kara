@@ -27,41 +27,53 @@ def image_maker(query_output, server_name, parent_dir):
                 value_column = series["columns"][1]  
                 values = series["values"]
                 # Extract time and value data
-                times_utc = [convert_to_tehran_time(value[0]) for value in values]
+                tehran_timestamp = [convert_to_tehran_time(value[0]) for value in values]
                 values = [value[1] for value in values]
                 # Calculate min, max, and average values
                 min_value = min(values)
                 max_value = max(values)
                 avg_value = sum(values) / len(values)
                 # Get corresponding times for min, max, and average
-                min_time = times_utc[values.index(min_value)]
-                max_time = times_utc[values.index(max_value)]
-                avg_time = times_utc[len(values) // 2]  # Approximation for average value
+                min_time = tehran_timestamp[values.index(min_value)]
+                max_time = tehran_timestamp[values.index(max_value)]
+                avg_time = tehran_timestamp[len(values) // 2]  # Approximation for average value
                 plt.figure(figsize=(10, 6))
-                plt.plot(times_utc, values, marker='.', linestyle='-', linewidth=1, color='black', label='Values')
+                plt.plot(tehran_timestamp, values, linestyle='-', linewidth=1, color='black', label='Values')
                 # Highlight min, max, and avg with different colors
                 plt.plot(min_time, min_value, 'ro', label=f'Min: {min_value}')
                 plt.plot(max_time, max_value, 'go', label=f'Max: {max_value}')
                 plt.plot(avg_time, avg_value, 'bo', label=f'Avg: {avg_value:.2f}')
-                plt.xlabel("Time (Asia/Tehran)")
                 plt.ylabel("Value")
-                plt.title(f"{metric_name} ({value_column.capitalize()}) - Server: {server_name}")
-                plt.xticks(rotation=90)
+                plt.title(f"{metric_name} ({value_column}) - Server: {server_name}")
+                plt.xticks(rotation=70)
                 plt.legend()
                 # Show x-axis labels every 1 minute
-                time_range_start = times_utc[0]
-                time_range_end = times_utc[-1]
+                time_range_start = tehran_timestamp[0]
+                time_range_end = tehran_timestamp[-1]
                 time_interval = timedelta(minutes=1)
                 x_ticks = []
                 x_labels = []
                 current_time = time_range_start
+                last_label_date = current_time.date()
+                date_changed = False  # Flag to indicate if the date changes
                 while current_time < time_range_end:
                     x_ticks.append(current_time)
-                    x_labels.append(current_time.strftime("%Y-%m-%d %H:%M:%S"))
+                    # Check if the date changes
+                    if current_time.date() != last_label_date:
+                        x_labels.append(current_time.strftime("    %m-%d %H:%M:%S"))
+                        last_label_date = current_time.date()
+                        date_changed = True
+                    else:
+                        x_labels.append(current_time.strftime("    %H:%M:%S"))
                     current_time += time_interval 
+                # Set the xlabel based on the range of dates covered
+                if date_changed:
+                    plt.xlabel(f'Time ({time_range_start.strftime("%Y-%m-%d")})  to  ({time_range_end.strftime("%Y-%m-%d")})')
+                else:
+                    plt.xlabel(f'Time ({time_range_start.strftime("%Y-%m-%d")})')
                 # Ensure the last time is included in the x-axis
                 x_ticks.append(time_range_end)
-                x_labels.append(time_range_end.strftime("%Y-%m-%d %H:%M:%S"))
+                x_labels.append(time_range_end.strftime("%H:%M:%S"))
                 plt.xticks(x_ticks, x_labels)
                 plt.grid(True)
                 plt.tight_layout()
