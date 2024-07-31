@@ -14,6 +14,11 @@ import image_renderer
 
 config_file = "/etc/kara/status_reporter.conf"
 
+# variable dir
+log_path = "/var/log/kara/"
+result_dir = "query_results"
+
+
 # For font style
 BOLD = "\033[1m"
 RESET = "\033[0m"
@@ -72,7 +77,7 @@ def main(metric_file, path_dir, time_range, img=False):
     if log_level is not None:
         log_level_upper = log_level.upper()
         if log_level_upper == "DEBUG" or log_level_upper == "INFO" or log_level_upper == "WARNING" or log_level_upper == "ERROR" or log_level_upper == "CRITICAL":
-            log_dir = f"sudo mkdir /var/log/kara/ > /dev/null 2>&1 && sudo chmod -R 777 /var/log/kara/"
+            log_dir = f"sudo mkdir {log_path} > /dev/null 2>&1 && sudo chmod -R 777 {log_path}"
             log_dir_run = subprocess.run(log_dir, shell=True)
             logging.basicConfig(filename= '/var/log/kara/all.log', level=log_level_upper, format='%(asctime)s - %(levelname)s - %(message)s')
         else:
@@ -96,7 +101,7 @@ def main(metric_file, path_dir, time_range, img=False):
     print("") 
     
     # Create the output parent directory
-    output_parent_dir= os.path.join(path_dir, "query_results")
+    output_parent_dir= os.path.join(path_dir, result_dir)
     os.makedirs(output_parent_dir, exist_ok=True)
     # Split time_range and generate output_csv
     time_range_parts = time_range.split(',')
