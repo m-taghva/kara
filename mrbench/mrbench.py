@@ -211,22 +211,16 @@ def submit(workload_config_path, output_path):
                     break
             if os.path.exists(archive_file_path):
                 archive_workload_dir_name = f"{workload_id}-swift-sample"  
-                start_time, end_time, throughput, bandwidth, avg_restime = save_cosinfo(f"{archive_path}{archive_workload_dir_name}/{archive_workload_dir_name}.csv")
-                if start_time and end_time:
-                    test_time_dir = f"{start_time}_{end_time}"
+                cosbench_data = save_cosinfo(f"{archive_path}{archive_workload_dir_name}/{archive_workload_dir_name}.csv")
+                if cosbench_data and cosbench_data['start_time'] and cosbench_data['end_time']:
+                    test_time_dir = f"{cosbench_data['start_time']}_{cosbench_data['end_time']}"
                     result_path = os.path.join(output_path, test_time_dir.replace(" ","_"))
                     if not os.path.exists(result_path):
                         os.mkdir(result_path) 
                     print(f"Result Path: {result_path}")
-                    test_brf_info = open(f"{result_path}/test_info.txt", "w")
-                    test_brf_info.write(f"time_range: {start_time},{end_time}\n")
-                    test_brf_info.write(f"throughput: {throughput}\n")
-                    test_brf_info.write(f"bandwidth: {bandwidth}\n")
-                    test_brf_info.write(f"avg_res_time: {avg_restime}\n")
-                    test_brf_info.close()
                     cosbench_info_result = subprocess.run(f"cosbench info > {result_path}/cosbench.info", shell=True, capture_output=True, text=True)
                     copy_bench_files(archive_path, archive_workload_dir_name, result_path)
-                    return  start_time, end_time, throughput, bandwidth, avg_restime, result_path
+                    return  cosbench_data, result_path
             else:
                 logging.info(f"mrbench - Test: {workload_name} can't run correctly so archive path {archive_file_path} doesn't exists.")
                 print(f"\033[91mTest: {workload_name} can't run correctly so archive path {archive_file_path} doesn't exists.\033[0m")
@@ -266,11 +260,7 @@ def submit(workload_config_path, output_path):
 
 def save_cosinfo(file):
     logging.info("mrbench - Executing save_time function")
-    start_time = None
-    end_time = None
-    throughput = None
-    bandwidth = None
-    avg_restime = None
+    cosbench_data = {'start_time': None,'end_time': None,'throughput': None,'bandwidth': None,'avg_restime': None}
     try:
         # Find start of first main and end of last main
         with open(file, 'r') as csv_file:
@@ -283,16 +273,16 @@ def save_cosinfo(file):
                         if len(row) > 24:
                             first_main_launching_time = row[21]
                             last_main_completed_time = row[24]
-                            throughput = row[13]
-                            bandwidth = row[14]
-                            avg_restime = row[5]
+                            cosbench_data['throughput'] = row[13]
+                            cosbench_data['bandwidth'] = row[14]
+                            cosbench_data['avg_restime'] = row[5]
                             if first_main_launching_time and last_main_completed_time:
-                                start_time = first_main_launching_time.split('@')[1].strip()
-                                end_time = last_main_completed_time.split('@')[1].strip()
-                                if start_time and end_time:
-                                    print(f"Start & End Time: {start_time},{end_time}")
-                                    logging.info(f"mrbench - test time range: {start_time},{end_time}")  
-                                    return start_time, end_time, throughput, bandwidth, avg_restime
+                                cosbench_data['start_time'] = first_main_launching_time.split('@')[1].strip()
+                                cosbench_data['end_time'] = last_main_completed_time.split('@')[1].strip()
+                                if cosbench_data['start_time'] and cosbench_data['end_time']:
+                                    print(f"Start & End Time: {cosbench_data['start_time']},{cosbench_data['end_time']}")
+                                    logging.info(f"mrbench - test time range: {cosbench_data['start_time']},{cosbench_data['end_time']}")
+                                    return cosbench_data
                                 else:
                                     logging.info(f"mrbench - can't extract test time range from cosbench csv file!")
                                     print("\033[91m mrbench can't extract test time range from cosbench csv file!\033[0m")
@@ -300,7 +290,7 @@ def save_cosinfo(file):
                         else:
                             logging.info(f"mrbench - your workload template is not correct so mrbench can't extract test time range from cosbench csv file: {file}")
                             print("\033[91myour workload template is not correct so mrbench can't extract test time range from cosbench csv file!\033[0m")
-                            exit() 
+                            exit()
     except Exception as e:
         print(f"\033[91mAn error occurred: {str(e)}\033[0m")
         return -1
@@ -331,20 +321,41 @@ def main(workload_config_path, output_path, swift_configs):
     if log_level is not None:
         log_level_upper = log_level.upper()
         if log_level_upper == "DEBUG" or log_level_upper == "INFO" or log_level_upper == "WARNING" or log_level_upper == "ERROR" or log_level_upper == "CRITICAL":
-            log_maker = subprocess.run(f"sudo mkdir {log_path} > /dev/null 2>&1 && sudo chmod -R 777 {log_path}", shell=True)
+            log_dir = f"sudo mkdir {log_path} > /dev/null 2>&1 && sudo chmod -R 777 {log_path}"
             logging.basicConfig(filename= f'{log_path}all.log', level=log_level_upper, format='%(asctime)s - %(levelname)s - %(message)s')
         else:
             print(f"\033[91mInvalid log level:{log_level}\033[0m")  
     else:
         print(f"\033[91mPlease enter log_level in the configuration file.\033[0m")
     logging.info("\033[92m****** mrbench main function start ******\033[0m")
+    ring_dict = {}
+    cosbench_data = {}
     if swift_configs:
-       copy_swift_conf(swift_configs)
+        ring_dict = copy_swift_conf(swift_configs)
     if workload_config_path is not None:
         if os.path.exists(workload_config_path):
             if output_path is not None:
-                start_time, end_time, throughput, bandwidth, avg_restime, result_path = submit(workload_config_path, output_path)
-                return start_time, end_time, throughput, bandwidth, avg_restime, result_path
+                cosbench_data, result_path = submit(workload_config_path, output_path)
+                if ring_dict or cosbench_data and not os.path.exists(f"{result_path}/info.yaml"):
+                    test_time = {'run_time': f"{cosbench_data['start_time'].replace(' ','_')}_{cosbench_data['end_time'].replace(' ','_')}"}
+                    with open(os.path.join(result_path, 'info.yaml'), 'w') as yaml_file:
+                        yaml.dump(test_time, yaml_file, default_flow_style=False)
+                    cosinfo = {}
+                    cosinfo['Throughput'] = f"{cosbench_data['throughput']}"
+                    cosinfo['Bandwidth'] = f"{cosbench_data['bandwidth']}"
+                    cosinfo['Avg_res_time'] = f"{cosbench_data['avg_restime']}"
+                    cosinfo_data = {'cosbench': cosinfo}
+                    logging.info(f"mrbench - main: making info.yaml file")
+                    with open(os.path.join(result_path, 'info.yaml'), 'a') as yaml_file:
+                        yaml.dump(cosinfo_data, yaml_file, default_flow_style=False)
+                    ring_item = {}
+                    for rkey,rvalue in ring_dict.items(): 
+                        ring_item[rkey+"_nodes"]=len(set([v.split()[3] for v in rvalue.splitlines()[6:]]))
+                        ring_item.update({"Ring."+rkey+"."+item.split(" ")[1]:int(float(item.split(" ")[0])) for item in rvalue.splitlines()[1].split(", ")[:5]})
+                    ring_formated = {'ring': ring_item}
+                    with open(os.path.join(result_path, 'info.yaml'), 'a') as yaml_file:
+                        yaml.dump(ring_formated, yaml_file, default_flow_style=False)
+                return cosbench_data, result_path
             else:
                 print(f"\033[91mWARNING: output dir doesn't define !\033[0m")
         else:
