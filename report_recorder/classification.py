@@ -39,7 +39,7 @@ def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_paramet
                 image_paths = []
                 trow = test.iloc[0]
                 row_dict = trow.to_dict()
-                selected_merged = mergedTests2.loc[mergedTests2['run_time'] == row_dict['run_time']]
+                selected_merged = mergedTests2.loc[mergedTests2['cosbench.run_time'] == row_dict['cosbench.run_time']]
                 html_result+= f"<h4> نتایج تست : {row_dict} </h4>"
                 html_result+= "<table border='1' class='wikitable'>\n"
                 for i, row in enumerate(selected_merged.to_csv().split("\n")):
@@ -51,7 +51,7 @@ def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_paramet
                     html_result += "</tr>\n"
                 html_result += "</table>"
                 html_result += "<h4>تصاویر \n</h4> <p> </p>"
-                directory_path = os.path.join(tests_dir,f"{row_dict['run_time']}/{result_dir}/{serverName}-images")
+                directory_path = os.path.join(tests_dir,f"{row_dict['cosbench.run_time']}/{result_dir}/{serverName}-images")
                 output_path = None
                 for metric in img_metrics:
                     if os.path.exists(directory_path):
@@ -59,7 +59,7 @@ def create_tests_details(mergedTestsInfo,mergedTests,test_group,array_of_paramet
                             img_formating = metric.replace(".", "-")
                             if img_formating in filename:
                                 image_paths.append(os.path.join(directory_path, filename))
-                                output_path = dashboard_maker(image_paths, os.path.join(directory_path, f"{serverName}-{row_dict['run_time'].replace(':','-')}-dashboard.png")) 
+                                output_path = dashboard_maker(image_paths, os.path.join(directory_path, f"{serverName}-{row_dict['cosbench.run_time'].replace(':','-')}-dashboard.png")) 
                     else:
                         print(f"Directory {directory_path} does not exist for inserting images into kateb.")
                 if output_path:
