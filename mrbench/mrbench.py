@@ -337,16 +337,14 @@ def main(workload_config_path, output_path, swift_configs):
             if output_path is not None:
                 cosbench_data, result_path = submit(workload_config_path, output_path)
                 if ring_dict or cosbench_data and not os.path.exists(f"{result_path}/info.yaml"):
-                    test_time = {'run_time': f"{cosbench_data['start_time'].replace(' ','_')}_{cosbench_data['end_time'].replace(' ','_')}"}
-                    with open(os.path.join(result_path, 'info.yaml'), 'w') as yaml_file:
-                        yaml.dump(test_time, yaml_file, default_flow_style=False)
                     cosinfo = {}
-                    cosinfo['Throughput'] = f"{cosbench_data['throughput']}"
-                    cosinfo['Bandwidth'] = f"{cosbench_data['bandwidth']}"
-                    cosinfo['Avg_res_time'] = f"{cosbench_data['avg_restime']}"
+                    cosinfo['run_time'] = f"{cosbench_data['start_time'].replace(' ','_')}_{cosbench_data['end_time'].replace(' ','_')}"
+                    cosinfo['throughput'] = f"{cosbench_data['throughput']}"
+                    cosinfo['bandwidth'] = f"{cosbench_data['bandwidth']}"
+                    cosinfo['avg_res_time'] = f"{cosbench_data['avg_restime']}"
                     cosinfo_data = {'cosbench': cosinfo}
                     logging.info(f"mrbench - main: making info.yaml file")
-                    with open(os.path.join(result_path, 'info.yaml'), 'a') as yaml_file:
+                    with open(os.path.join(result_path, 'info.yaml'), 'w') as yaml_file:
                         yaml.dump(cosinfo_data, yaml_file, default_flow_style=False)
                     ring_item = {}
                     for rkey,rvalue in ring_dict.items(): 
