@@ -212,14 +212,11 @@ def mrbench_agent(config_params, config_file, config_output):
                 logging.info(f"manager - mrbench_agent: start time and end time of test in mrbench_agent submit function is: {cosbench_data['start_time']},{cosbench_data['end_time']}")
                 subprocess.run(f"sudo cp -r {test_config_path} {result_path}", shell=True)
                 if '#' in test_config or ':' in test_config:
-                    test_time = {'run_time': f"{cosbench_data['start_time'].replace(' ','_')}_{cosbench_data['end_time'].replace(' ','_')}"}
-                    logging.info(f"manager - mrbench_agent: making info.yaml file")
-                    with open(os.path.join(result_path, 'info.yaml'), 'w') as yaml_file:
-                        yaml.dump(test_time, yaml_file, default_flow_style=False)
                     cosinfo = {}
-                    cosinfo['Throughput'] = f"{cosbench_data['throughput']}"
-                    cosinfo['Bandwidth'] = f"{cosbench_data['bandwidth']}"
-                    cosinfo['Avg_res_time'] = f"{cosbench_data['avg_restime']}"
+                    cosinfo['run_time'] = f"{cosbench_data['start_time'].replace(' ','_')}_{cosbench_data['end_time'].replace(' ','_')}"
+                    cosinfo['throughput'] = f"{cosbench_data['throughput']}"
+                    cosinfo['bandwidth'] = f"{cosbench_data['bandwidth']}"
+                    cosinfo['avg_res_time'] = f"{cosbench_data['avg_restime']}"
                     cosinfo_data = {'cosbench': cosinfo}
                     logging.info(f"mrbench - main: making info.yaml file")
                     with open(os.path.join(result_path, 'info.yaml'), 'a') as yaml_file:
@@ -253,7 +250,7 @@ def mrbench_agent(config_params, config_file, config_output):
                     with open(os.path.join(result_path, 'info.yaml'), 'a') as yaml_file:
                         yaml.dump(data_workload, yaml_file, default_flow_style=False)
                     logging.debug(f"manager - mrbench_agent: data_workload {data_workload}")
-                    data = {**test_time, **cosinfo_data, **data_swift, **data_workload}
+                    data = {**cosinfo_data, **data_swift, **data_workload}
                 if ring_exist:
                     data_ring = {'ring': ring_dict}
                     subprocess.run(f"sudo cp -r {swift_rings[filename]} {result_path}", shell=True)
@@ -267,7 +264,7 @@ def mrbench_agent(config_params, config_file, config_output):
                     with open(os.path.join(result_path, 'info.yaml'), 'a') as yaml_file:
                         yaml.dump(ring_formated, yaml_file, default_flow_style=False)
                     logging.debug(f"manager - mrbench_agent: ring_item {ring_item}")
-                    data = {**test_time, **cosinfo_data, **data_swift, **data_workload, **ring_item}
+                    data = {**cosinfo_data, **data_swift, **data_workload, **ring_item}
                 all_start_times.append(cosbench_data['start_time']) ; all_end_times.append(cosbench_data['end_time'])
                 if run_status_reporter != 'none':
                     if run_status_reporter == 'csv':
@@ -277,18 +274,22 @@ def mrbench_agent(config_params, config_file, config_output):
                     if os.path.exists(output_csv): 
                         mergedinfo_data = {}
                         merged_data = {}
+                        run_time = {}
                         for section_name, section_data in data.items():
                             if isinstance(section_data, dict):
                                 for name, val in section_data.items():
                                     if section_name != 'cosbench':
                                         mergedinfo_data[f"{section_name}.{name}"] = val
-                                    else:
-                                        merged_data[f"{section_name}.{name}"] = val
+                                    elif section_name == 'cosbench':
+                                        if name == 'run_time':
+                                            run_time[f"{section_name}.{name}"] = val  
+                                        else:
+                                            merged_data[f"{section_name}.{name}"] = val                    
                             else:
                                 mergedinfo_data[section_name] = section_data
                                 merged_data[section_name] = section_data
                         logging.debug(f"manager - mrbench_agent: formatted_data for merged csv {mergedinfo_data}")
-                        analyzer.merge_csv(csv_file=output_csv, output_directory=f"{result_dir}/analyzed", mergedinfo_dict=mergedinfo_data, merged_dict={**merged_data,**mergedinfo_data})
+                        analyzer.merge_csv(csv_file=output_csv, output_directory=f"{result_dir}/analyzed", mergedinfo_dict={**mergedinfo_data,**run_time}, merged_dict={**run_time,**merged_data,**mergedinfo_data})
                 if run_monstaver != 'none':
                     if run_monstaver == 'backup,info':
                         backup_to_report = monstaver.main(time_range=f"{cosbench_data['start_time']},{cosbench_data['end_time']}", inputs=[result_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=True)
