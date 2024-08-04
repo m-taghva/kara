@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import pytz
 from alive_progress import alive_bar
 
-# variables
+# variable dirs
 result_dir = "query_results"
 
 # Convert UTC times to Tehran time
@@ -48,12 +48,25 @@ def image_maker(query_output, server_name, parent_dir):
                 plt.plot(avg_time, avg_value, 'bo', label=f'Avg: {avg_value:.2f}')
                 plt.ylabel("Value")
                 plt.title(f"{metric_name} ({value_column}) - Server: {server_name}")
-                plt.xticks(rotation=70)
+                plt.xticks(rotation=0)
                 plt.legend()
-                # Show x-axis labels every 1 minute
                 time_range_start = tehran_timestamp[0]
                 time_range_end = tehran_timestamp[-1]
-                time_interval = timedelta(minutes=1)
+                total_duration = time_range_end - time_range_start
+                # Determine an appropriate time interval based on the total duration
+                if total_duration <= timedelta(minutes=15):
+                    time_interval = timedelta(minutes=1)
+                elif total_duration <= timedelta(minutes=30):
+                    time_interval = timedelta(minutes=5)
+                elif total_duration <= timedelta(hours=1):
+                    time_interval = timedelta(minutes=10)
+                elif total_duration <= timedelta(hours=2):
+                    time_interval = timedelta(minutes=20)
+                elif total_duration <= timedelta(hours=3):
+                    time_interval = timedelta(minutes=30)
+                else:
+                    time_interval = timedelta(hours=1)
+
                 x_ticks = []
                 x_labels = []
                 current_time = time_range_start
@@ -63,20 +76,18 @@ def image_maker(query_output, server_name, parent_dir):
                     x_ticks.append(current_time)
                     # Check if the date changes
                     if current_time.date() != last_label_date:
-                        x_labels.append(current_time.strftime("    %m-%d %H:%M:%S"))
+                        x_labels.append(current_time.strftime("%H:%M:%S\n%m-%d\n"))
                         last_label_date = current_time.date()
                         date_changed = True
                     else:
-                        x_labels.append(current_time.strftime("    %H:%M:%S"))
+                        x_labels.append(current_time.strftime("%H:%M:%S\n"))
                     current_time += time_interval 
+
                 # Set the xlabel based on the range of dates covered
                 if date_changed:
-                    plt.xlabel(f'Date ({time_range_start.strftime("%Y-%m-%d")})  to  ({time_range_end.strftime("%Y-%m-%d")})')
+                    plt.xlabel(f'Time_range ({time_range_start.strftime("%Y-%m-%d_%H:%M:%S")})  to  ({time_range_end.strftime("%Y-%m-%d_%H:%M:%S")})')
                 else:
-                    plt.xlabel(f'Date ({time_range_start.strftime("%Y-%m-%d")})')
-                # Ensure the last time is included in the x-axis
-                x_ticks.append(time_range_end)
-                x_labels.append(time_range_end.strftime("%H:%M:%S"))
+                    plt.xlabel(f'Time_range ({time_range_start.strftime("%Y-%m-%d_%H:%M:%S")}  to  {time_range_end.strftime("%Y-%m-%d_%H:%M:%S")})')
                 plt.xticks(x_ticks, x_labels)
                 plt.grid(True)
                 plt.tight_layout()
