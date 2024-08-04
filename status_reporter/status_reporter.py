@@ -2,6 +2,7 @@ import os
 import json
 import subprocess
 import sys
+import time
 from datetime import datetime , timedelta
 import argparse
 import yaml
@@ -16,7 +17,6 @@ import image_renderer
 config_file = "/etc/kara/status_reporter.conf"
 log_path = "/var/log/kara/"
 result_dir = "query_results"
-
 
 # For font style
 BOLD = "\033[1m"
@@ -72,7 +72,8 @@ def get_metrics_from_file(metric_file_path):
     return metrics
                             
 def main(metric_file, path_dir, time_range, img=False):
-    log_level = load_config(config_file)['log'].get('level')
+    data_loaded = load_config(config_file)
+    log_level = data_loaded['log'].get('level')
     if log_level is not None:
         log_level_upper = log_level.upper()
         valid_log_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
@@ -86,10 +87,9 @@ def main(metric_file, path_dir, time_range, img=False):
 
     logging.info("\033[92m****** status reporter main function start ******\033[0m")   
     metric_file= metric_file.split(',') if metric_file else []
-    path_dir= path_dir if path_dir else "." 
-    time_range = time_range if time_range else load_config(config_file).get('time', [])['time_range']
+    path_dir = path_dir or data_loaded.get('output_path') or "." 
+    time_range = time_range if time_range else data_loaded.get('time', [])['time_range']
     # Load configuration from config file
-    data_loaded = load_config(config_file)
     time_section = data_loaded.get('time', {})
     START_TIME_SUM = time_section.get('start_time_sum')
     END_TIME_SUBTRACT = time_section.get('end_time_subtract')
@@ -141,13 +141,12 @@ def main(metric_file, path_dir, time_range, img=False):
         ip = config.get('ip')
         influx_port = config.get('influx_port')
         for db_name, db_data in config.get('databases', {}).items():
-            hostls = db_data.get('hostls', {})
-            for host_name, alias in hostls.items():
-                alias = alias if alias and len(alias) > 1 else host_name
+            hostls = db_data.get('hostls', {}).replace(' ',',')
+            for host_name in hostls.split(','):
                 start_time_utc = convert_tehran_to_utc(start_time, START_TIME_SUM)
                 end_time_utc = convert_tehran_to_utc(end_time, -END_TIME_SUBTRACT)
                 logging.info(f"status_reporter - start time of query in utc format: {start_time_utc}") ; logging.info(f"status_reporter - end time of query in utc format: {end_time_utc}")
-                output_csv_str.append(alias)  # value inside the first column of csv
+                output_csv_str.append(host_name)  # value inside the first column of csv
                 csvi += 1
                 retry = 2
                 null_result = 1
@@ -222,6 +221,7 @@ def main(metric_file, path_dir, time_range, img=False):
                                     exit()
                     if null_result:
                         retry -=1
+                        time.sleep(10)
                         if retry == 0:
                             print(f"\033[91mMaximum retries reached. database name: {db_name} in host name: {host_name} have not any value for all metrics\033[0m")
                     else:
