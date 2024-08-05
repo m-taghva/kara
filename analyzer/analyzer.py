@@ -322,8 +322,7 @@ def analyze_and_save_csv(csv_original, transformation_directory, keep_column):
             source_csv = process_csv_file(source_csv, operation, new_column_name, selected_columns)
             selected_column_names.update(selected_columns)
     if keep_column:
-        keep_columns = [col for col in source_csv.columns]
-        csv_final = source_csv[keep_columns]
+        csv_final = source_csv
     else:
         keep_columns = [col for col in source_csv.columns if col not in selected_column_names]
         csv_final = source_csv[keep_columns]
