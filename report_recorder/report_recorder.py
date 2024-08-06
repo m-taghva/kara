@@ -146,6 +146,7 @@ def create_sw_hw_htmls(template_content, html_output, page_title, data_loaded): 
         # Iterate over the placeholders and replace them with content
         address_placeholder = match.group(0)
         file_path = match.group(1).strip()
+        logging.info(f"report_recorder - path of input file inside input html:{file_path}")
         if '{backup_dir}' in file_path:
             file_path = file_path.replace('{backup_dir}', configs_dir)
         if '.csv' in os.path.basename(file_path):
@@ -161,6 +162,7 @@ def create_sw_hw_htmls(template_content, html_output, page_title, data_loaded): 
     for hconfig_info in re.finditer(r'{hw_config}:(.+)', template_content):
         hconfig_placeholder = hconfig_info.group(0)
         part,spec = hconfig_info.group(1).split(',')
+        logging.info(f"report_recorder - name of hardware part inside input html:{part,spec}")
         dict = analyzer.compare(part.strip(), spec.strip())
         hw_info_dict.update({spec.strip():dict})
         html_of_dict = dict_html_hardware(dict)
@@ -168,6 +170,7 @@ def create_sw_hw_htmls(template_content, html_output, page_title, data_loaded): 
     for sconfig_info in re.finditer(r'{sw_config}:(.+)', template_content):
         sconfig_placeholder = sconfig_info.group(0)
         sconfigs = sconfig_info.group(1).split(',')
+        logging.info(f"report_recorder - name of software part inside input html:{sconfigs}")
         if sconfigs[0] == "swift_status":
             software_html = dict_html_software(analyzer.generate_all_swift_status(sconfigs[1]))
         else:
@@ -175,6 +178,7 @@ def create_sw_hw_htmls(template_content, html_output, page_title, data_loaded): 
         html_data = html_data.replace(sconfig_placeholder, software_html)
     html_data += "<p> </p>"
     html_data += data_loaded['naming_tag'].get('tags')
+    logging.info(f"report_recorder - wiki tag for all htmls:{data_loaded['naming_tag'].get('tags')}")
     htmls_dict.update({page_title:html_data})
     htmls_dict.update(sub_pages_maker(html_data,page_title,hw_info_dict,data_loaded))
     for html_key,html_value in htmls_dict.items():
@@ -287,14 +291,23 @@ def main(input_template, htmls_path, cluster_name, scenario_name, configs_direct
     global configs_dir
     htmls_dict = {}
 
-    log_maker = subprocess.run(f"sudo mkdir {log_path} > /dev/null 2>&1 && sudo chmod -R 777 {log_path}", shell=True)
-    logging.basicConfig(filename= f'{log_path}all.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-    logging.info("\033[92m****** report_recorder main function start ******\033[0m")
+    data_loaded = load_config(config_file)
+    log_level = data_loaded['log'].get('level')
+    if log_level is not None:
+        log_level_upper = log_level.upper()
+        valid_log_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
+        if log_level_upper in valid_log_levels:
+            log_dir_run = subprocess.run(f"sudo mkdir {log_path} > /dev/null 2>&1 && sudo chmod -R 777 {log_path}", shell=True)
+            logging.basicConfig(filename= f'{log_path}all.log', level=log_level_upper, format='%(asctime)s - %(levelname)s - %(message)s')
+        else:
+            print(f"\033[91mInvalid log level:{log_level}\033[0m")  
+    else:
+        print(f"\033[91mPlease enter log_level in the configuration file.\033[0m")
 
+    logging.info("\033[92m****** report_recorder main function start ******\033[0m")
     if create_hardware_page is None and create_software_page is None and create_mtest_page is None:
         print(f"\033[91m report_recorder need hardware(-HW),software(-SW),monster_test(-MT) operation to work please select one of them ! \033[0m")
         exit()
-    data_loaded = load_config(config_file)
     if cluster_name is None:
         cluster_name = data_loaded['naming_tag'].get('cluster_name')
     if scenario_name is None:
@@ -317,6 +330,7 @@ def main(input_template, htmls_path, cluster_name, scenario_name, configs_direct
                 analyzer.get_list_of_servers()
             elif create_hardware_page or create_software_page:
                 print(f"\033[91minput backup File not found for make hardware or software pages\033[0m")
+                logging.warning(f"report_recorder - input backup File not found for make hardware or software pages")
         if input_template:
             with open(input_template, 'r') as template_content:
                 if create_hardware_page:
@@ -339,7 +353,6 @@ def main(input_template, htmls_path, cluster_name, scenario_name, configs_direct
             upload_data(site, title, wiki_content)
             # Upload images to the wiki
             upload_images(site, content)
-
     logging.info("\033[92m****** report_recorder main function end ******\033[0m")
 
 if __name__ == "__main__":
