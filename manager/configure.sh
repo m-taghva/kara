@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # for bold font
 BOLD="\e[1m"
 RESET="\e[0m"
@@ -100,5 +99,5 @@ else
 fi
 
 #### run shard & ssh script
-python3 ./ssh_gen.py
-python3 ./db_shard_config.py
+python3 ./configure_scripts/ssh_gen.py
+python3 ./configure_scripts/db_shard_config.py
