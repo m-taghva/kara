@@ -200,8 +200,8 @@ def main(metric_file, path_dir, time_range, img=False):
                                                         logging.error(f"status_reporter - The host {host_name} name is wrong")
                                                         print(f"\033[91mThe host {host_name} name is wrong\033[0m")
                                                 else:
-                                                        logging.error(f"status_reporter - metric: {metric_name} doesn't have host: {host_name} so value is null !")
-                                                        print(f"\033[91mmetric: {metric_name} doesn't have host: {host_name} so value is null !\033[0m")
+                                                    logging.error(f"status_reporter - metric: {metric_name} doesn't have host: {host_name} so value is null !")
+                                                    print(f"\033[91mmetric: {metric_name} doesn't have host: {host_name} so value is null !\033[0m")
                                             else:
                                                 logging.error(f"status_reporter - metric {metric_name} doesn't exist in {db_name}")
                                                 print(f"\033[91mmetric {metric_name} doesn't exist in {db_name}\033[0m")
