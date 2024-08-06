@@ -4,6 +4,7 @@ import sys
 
 # Define Pathes
 config_file = "./../configure.conf"
+
 def load_config(config_file):
     with open(config_file, "r") as stream:
         try:
