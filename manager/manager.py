@@ -101,7 +101,8 @@ def config_gen_agent(config_params):
     return config_output
 
 def mrbench_agent(config_params, config_file, config_output):
-    all_start_times = [] ; all_end_times = []
+    all_start_times = [] ; all_end_times = [] ; current_state = None ; last_test_state = None
+    default_state_val = {'R': 0, 'S': 0, 'W': 0}
     result_dir = config_params.get('output_path')
     run_status_reporter = config_params.get('Status_Reporter', None)
     run_monstaver = config_params.get('monstaver', None)
@@ -109,9 +110,9 @@ def mrbench_agent(config_params, config_file, config_output):
     logging.info(f"manager - mrbench_agent: ring directories: {ring_dirs}")
     if os.path.exists(state_file):
         with open(state_file, 'r') as f:
-            state = yaml.safe_load(f)
+            last_test_state = yaml.safe_load(f)
 
-    if state != {'R': 0, 'S': 0, 'W': 0}:
+    if last_test_state != default_state_val:
         print("Do you want to continue last mrbench's test in scenario? (yes/no): ", end='', flush=True)
         # Set up a timer for 30 seconds
         rlist, _, _ = select.select([sys.stdin], [], [], 30)
@@ -122,11 +123,11 @@ def mrbench_agent(config_params, config_file, config_output):
             elif response in ('n', 'no'):
                 response = 'no'
         if response == 'yes':
-                state = state
+                current_state = last_test_state
         elif response == 'no':
-            state = {'R': 0, 'S': 0, 'W': 0}
+            current_state = default_state_val
 
-    if state == {'R': 0, 'S': 0, 'W': 0}:
+    if last_test_state == default_state_val or current_state == default_state_val:
         while True:
             if not os.path.exists(result_dir):
                 os.makedirs(result_dir)
@@ -167,7 +168,6 @@ def mrbench_agent(config_params, config_file, config_output):
                     print("\033[91mInvalid input. Please enter 'yes' or 'no'\033[0m")
             else:
                 break
-            
     print(f"{YELLOW}========================================{RESET}")
     # make empty dir for merging csv
     if not os.path.exists(f"{result_dir}/analyzed/"):
@@ -181,7 +181,7 @@ def mrbench_agent(config_params, config_file, config_output):
             print(f"\033[91mThere isn't any conf_dir in scenario file !\033[0m")
             exit()
     # Load previous state
-    R, S, W = state['R'], state['S'], state['W']
+    R, S, W = current_state['R'], current_state['S'], current_state['W']
     conf_dict = {}
     for dir_name in os.listdir(config_output):
         dir_path = os.path.join(config_output, dir_name)
@@ -226,9 +226,9 @@ def mrbench_agent(config_params, config_file, config_output):
                 merged_conf_ring = {**swift_rings, **swift_configs}
                 logging.info(f"manager - mrbench_agent: rings and configs dictionary is : {merged_conf_ring}")
                 ring_dict = mrbench.copy_swift_conf(merged_conf_ring)
-                state = {'R': ri, 'S': i, 'W': W}
+                current_state = {'R': ri, 'S': i, 'W': W}
                 with open(state_file, 'w') as f:
-                    yaml.safe_dump(state, f) 
+                    yaml.safe_dump(current_state, f) 
                 time.sleep(20)
             for wi, test_config in enumerate(sorted(os.listdir(conf_dict["workloads.xml"]))[W:], start=W):
                 test_config_path = os.path.join(conf_dict["workloads.xml"], test_config)
@@ -236,9 +236,9 @@ def mrbench_agent(config_params, config_file, config_output):
                 cosbench_data, result_path = mrbench.submit(test_config_path, result_dir)
                 logging.info(f"manager - mrbench_agent: result_path of mrbench_agent submit function is: {result_path}")
                 logging.info(f"manager - mrbench_agent: start time and end time of test in mrbench_agent submit function is: {cosbench_data['start_time']},{cosbench_data['end_time']}")
-                state = {'R': ri, 'S': i, 'W': wi + 1}
+                current_state = {'R': ri, 'S': i, 'W': wi + 1}
                 with open(state_file, 'w') as f:
-                    yaml.safe_dump(state, f) 
+                    yaml.safe_dump(current_state, f) 
                 subprocess.run(f"sudo cp -r {test_config_path} {result_path}", shell=True)
                 if '#' in test_config or ':' in test_config:
                     cosinfo = {}
@@ -336,7 +336,7 @@ def mrbench_agent(config_params, config_file, config_output):
     logging.debug(f"manager - mrbench_agent: first_start_time,last_end_time: {first_start_time},{last_end_time}")
     logging.debug(f"manager - mrbench_agent: backup_to_report: {backup_to_report}")
     return first_start_time, last_end_time, backup_to_report
-
+    
 def status_reporter_agent(config_params):
     result_dir = config_params.get('output_path')
     times_file = config_params.get('times')
