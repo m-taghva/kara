@@ -25,6 +25,7 @@ if pywiki_path not in sys.path:
 # variables
 kara_config_files = "/etc/kara/"
 log_path = "/var/log/kara/"
+state_file = "./process_state.yaml"
 
 # For font style
 BOLD = "\033[1m"
