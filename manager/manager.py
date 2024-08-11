@@ -107,46 +107,67 @@ def mrbench_agent(config_params, config_file, config_output):
     run_monstaver = config_params.get('monstaver', None)
     ring_dirs = config_params.get('ring_dirs', [])
     logging.info(f"manager - mrbench_agent: ring directories: {ring_dirs}")
-    while True:
-        if not os.path.exists(result_dir):
-            os.makedirs(result_dir)
-        if os.listdir(result_dir):
-            print(f"Results directory {result_dir} is not empty and includes these files and directories:")
-            for item in os.listdir(result_dir):
-                logging.info(f"manager - mrbench_agent: dir and file in {result_dir}: {item}")
-                print(f"\033[91m{item}\033[0m")
-            # Ask user if they want to remove the contents
-            print("Do you want to remove these files and directories? (yes/no): ", end='', flush=True)
-            # Set up a timer for 30 seconds
-            rlist, _, _ = select.select([sys.stdin], [], [], 30)
-            if rlist:
-                response = input().lower()
-                if response in ('y', 'yes'):
-                    response = 'yes'
-                elif response in ('n', 'no'):
-                    response = 'no'
-            else:
-                current_time_results = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                destination_dir_results = os.path.join(os.path.dirname(os.path.dirname(result_dir)), os.path.dirname(result_dir)+"_"+current_time_results)
-                logging.info(f"manager - mrbench_agent: user do not enter any answer so current files inside {result_dir} moved to : {destination_dir_results}")
-                os.makedirs(destination_dir_results)
+    if os.path.exists(state_file):
+        with open(state_file, 'r') as f:
+            state = yaml.safe_load(f)
+
+    if state != {'R': 0, 'S': 0, 'W': 0}:
+        print("Do you want to continue last mrbench's test in scenario? (yes/no): ", end='', flush=True)
+        # Set up a timer for 30 seconds
+        rlist, _, _ = select.select([sys.stdin], [], [], 30)
+        if rlist:
+            response = input().lower()
+            if response in ('y', 'yes'):
+                response = 'yes'
+            elif response in ('n', 'no'):
+                response = 'no'
+        if response == 'yes':
+                state = state
+        elif response == 'no':
+            state = {'R': 0, 'S': 0, 'W': 0}
+
+    if state == {'R': 0, 'S': 0, 'W': 0}:
+        while True:
+            if not os.path.exists(result_dir):
+                os.makedirs(result_dir)
+            if os.listdir(result_dir):
+                print(f"Results directory {result_dir} is not empty and includes these files and directories:")
                 for item in os.listdir(result_dir):
-                    item_path = os.path.join(result_dir, item)
-                    shutil.move(item_path, destination_dir_results)
-                response = "yes" # If no input after 30 seconds, consider it as "yes"
-            if response == 'yes':
-                logging.info("manager - mrbench_agent: answer to remove request is YES")
-                # Remove all files and directories in the output directory
-                rm_result_dir = subprocess.run(f"sudo rm -rf {result_dir}/*", shell=True)
-                print("\033[92mContents removed successfully.\033[0m")
-                break
-            elif response == 'no':
-                print("\033[1;33mLeaving existing contents untouched.\033[0m")
-                break
+                    logging.info(f"manager - mrbench_agent: dir and file in {result_dir}: {item}")
+                    print(f"\033[91m{item}\033[0m")
+                # Ask user if they want to remove the contents
+                print("Do you want to remove these files and directories? (yes/no): ", end='', flush=True)
+                # Set up a timer for 30 seconds
+                rlist, _, _ = select.select([sys.stdin], [], [], 30)
+                if rlist:
+                    response = input().lower()
+                    if response in ('y', 'yes'):
+                        response = 'yes'
+                    elif response in ('n', 'no'):
+                        response = 'no'
+                else:
+                    current_time_results = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                    destination_dir_results = os.path.join(os.path.dirname(os.path.dirname(result_dir)), os.path.dirname(result_dir)+"_"+current_time_results)
+                    logging.info(f"manager - mrbench_agent: user do not enter any answer so current files inside {result_dir} moved to : {destination_dir_results}")
+                    os.makedirs(destination_dir_results)
+                    for item in os.listdir(result_dir):
+                        item_path = os.path.join(result_dir, item)
+                        shutil.move(item_path, destination_dir_results)
+                    response = "yes" # If no input after 30 seconds, consider it as "yes"
+                if response == 'yes':
+                    logging.info("manager - mrbench_agent: answer to remove request is YES")
+                    # Remove all files and directories in the output directory
+                    rm_result_dir = subprocess.run(f"sudo rm -rf {result_dir}/*", shell=True)
+                    print("\033[92mContents removed successfully.\033[0m")
+                    break
+                elif response == 'no':
+                    print("\033[1;33mLeaving existing contents untouched.\033[0m")
+                    break
+                else:
+                    print("\033[91mInvalid input. Please enter 'yes' or 'no'\033[0m")
             else:
-                print("\033[91mInvalid input. Please enter 'yes' or 'no'\033[0m")
-        else:
-            break
+                break
+            
     print(f"{YELLOW}========================================{RESET}")
     # make empty dir for merging csv
     if not os.path.exists(f"{result_dir}/analyzed/"):
@@ -159,6 +180,8 @@ def mrbench_agent(config_params, config_file, config_output):
             logging.critical("manager - mrbench_agent: There isn't any conf_dir in scenario file")
             print(f"\033[91mThere isn't any conf_dir in scenario file !\033[0m")
             exit()
+    # Load previous state
+    R, S, W = state['R'], state['S'], state['W']
     conf_dict = {}
     for dir_name in os.listdir(config_output):
         dir_path = os.path.join(config_output, dir_name)
@@ -178,7 +201,7 @@ def mrbench_agent(config_params, config_file, config_output):
         total_ring_index = len(ring_dirs)
         logging.debug(f"manager - mrbench_agent: total_ring_index {total_ring_index}")
         ring_exist = 1
-    for ri in range(total_ring_index):
+    for ri in range(R, total_ring_index):
         swift_rings = {}
         if ring_exist:
             for filename in os.listdir(ring_dirs[ri]):
@@ -191,7 +214,7 @@ def mrbench_agent(config_params, config_file, config_output):
                 Total_index *=len(os.listdir(conf_dict[key]))
                 logging.debug(f"manager - mrbench_agent: Total_index {Total_index}")
                 swift_configs[key]=""
-        for i in range(Total_index):
+        for i in range(S ,Total_index):
             if conf_exist:
                 m=1
                 for key in swift_configs:
@@ -202,14 +225,20 @@ def mrbench_agent(config_params, config_file, config_output):
             if conf_exist or ring_exist:
                 merged_conf_ring = {**swift_rings, **swift_configs}
                 logging.info(f"manager - mrbench_agent: rings and configs dictionary is : {merged_conf_ring}")
-                ring_dict = mrbench.copy_swift_conf(merged_conf_ring) 
+                ring_dict = mrbench.copy_swift_conf(merged_conf_ring)
+                state = {'R': ri, 'S': i, 'W': W}
+                with open(state_file, 'w') as f:
+                    yaml.safe_dump(state, f) 
                 time.sleep(20)
-            for test_config in sorted(os.listdir(conf_dict["workloads.xml"])):
+            for wi, test_config in enumerate(sorted(os.listdir(conf_dict["workloads.xml"]))[W:], start=W):
                 test_config_path = os.path.join(conf_dict["workloads.xml"], test_config)
                 logging.info(f"manager - mrbench_agent: test config path in mrbench_agent submit function is : {test_config_path}")
                 cosbench_data, result_path = mrbench.submit(test_config_path, result_dir)
                 logging.info(f"manager - mrbench_agent: result_path of mrbench_agent submit function is: {result_path}")
                 logging.info(f"manager - mrbench_agent: start time and end time of test in mrbench_agent submit function is: {cosbench_data['start_time']},{cosbench_data['end_time']}")
+                state = {'R': ri, 'S': i, 'W': wi + 1}
+                with open(state_file, 'w') as f:
+                    yaml.safe_dump(state, f) 
                 subprocess.run(f"sudo cp -r {test_config_path} {result_path}", shell=True)
                 if '#' in test_config or ':' in test_config:
                     cosinfo = {}
@@ -299,6 +328,9 @@ def mrbench_agent(config_params, config_file, config_output):
                         backup_to_report = monstaver.main(time_range=f"{cosbench_data['start_time']},{cosbench_data['end_time']}", inputs=[result_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=False)
                 else:
                     backup_to_report = None
+            W = 0 
+        S = 0 
+    R = 0
     # Extract first start time and last end time
     first_start_time = all_start_times[0] ; last_end_time = all_end_times[-1]
     logging.debug(f"manager - mrbench_agent: first_start_time,last_end_time: {first_start_time},{last_end_time}")
