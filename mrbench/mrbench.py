@@ -132,7 +132,6 @@ def conf_ring_thread(swift_configs, port, user, ip, container_name, key_to_extra
         else:
             logging.info(f"mrbench - container {container_name} failed to reatsrt")
             print(f"\033[91mcontainer {container_name} failed to reatsrt\033[0m")
-    print(f"{YELLOW}========================================{RESET}")
     return ring_dict
 
 def copy_swift_conf(swift_configs):
@@ -170,7 +169,7 @@ def submit(workload_config_path, output_path):
     logging.info("mrbench - Executing submit function")
     if not os.path.exists(output_path):
        os.makedirs(output_path) 
-    print("")
+    print(f"{YELLOW}========================================{RESET}")
     run_pre_test_process = subprocess.run(f"bash {pre_test_script}", shell=True)
     cosbenchBin = shutil.which("cosbench")
     if not(cosbenchBin):
