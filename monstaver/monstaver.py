@@ -280,6 +280,15 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
     #### Execute commands to gather OS information ####
     if software_info:
         logging.info(f"monstaver - user select switch -os for software info") 
+        
+        ip_a = subprocess.run(f"ssh -p {port} {user}@{ip} sudo ip a > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/ip_a.txt", shell=True)
+        if ip_a.returncode == 0:
+            logging.info(f"monstaver - ip a successful on {container_name}")
+            time.sleep(1)
+        else:
+            logging.error(f"monstaver - ip a failed on {container_name}")
+            print(f"\033[91m ip a failed on {container_name}\033[0m")
+            
         sysctl_process = subprocess.run(f"ssh -p {port} {user}@{ip} sudo sysctl -a > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/sysctl.txt", shell=True)
         if sysctl_process.returncode == 0:
             logging.info(f"monstaver - sysctl -a successful on {container_name}")
