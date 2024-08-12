@@ -84,7 +84,7 @@ def config_gen_agent(config_params):
                 print("\033[91mInvalid input. Please enter 'yes' or 'no'\033[0m")
         else:
             break
-    print(f"{YELLOW}========================================{RESET}")
+    print(f"\033[1;33m========================================\033[0m")
     for input_file in input_files:
         if os.path.exists(input_file):
             logging.info(f"manager - config_gen_agent: input_files : {input_file}")
@@ -169,7 +169,7 @@ def mrbench_agent(config_params, config_file, config_output):
                     print("\033[91mInvalid input. Please enter 'yes' or 'no'\033[0m")
             else:
                 break
-    print(f"{YELLOW}========================================{RESET}")
+    print(f"\033[1;33m========================================\033[0m")
     # make empty dir for merging csv
     if not os.path.exists(f"{result_dir}/analyzed/"):
         make_analyzed_dir = subprocess.run(f"sudo mkdir {result_dir}/analyzed/ > /dev/null 2>&1", shell=True)
