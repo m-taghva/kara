@@ -200,7 +200,7 @@ def submit(workload_config_path, output_path):
                     elif response in ('n', 'no'):
                         response = 'no'
                 else:
-                    response = "yes"
+                    continue
                 if response == 'yes':
                     cosbench_cancel_workload = subprocess.run(["cosbench", "cancel", w_id], capture_output=True, text=True)
                     if cosbench_cancel_workload.returncode == 0:
@@ -208,7 +208,10 @@ def submit(workload_config_path, output_path):
                         print(f"Workload {w_id} canceled and new workload starting please wait ...")
                         time.sleep(10)
                         submit(workload_config_path, output_path)
-                return None, None, -1
+                    else:
+                        response = None
+                if response == 'yes' or response == 'no':
+                    return None, None, -1
             else:
                 active_workload = 0
         # Start workload
