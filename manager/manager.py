@@ -27,11 +27,6 @@ kara_config_files = "/etc/kara/"
 log_path = "/var/log/kara/"
 state_file = "./process_state.yaml"
 
-# For font style
-BOLD = "\033[1m"
-RESET = "\033[0m"
-YELLOW = "\033[1;33m"
-
 def load_config(config_file):
     with open(config_file, "r") as stream:
         try:
