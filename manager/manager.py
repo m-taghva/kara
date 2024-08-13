@@ -107,7 +107,6 @@ def mrbench_agent(config_params, config_file, config_output):
     run_monstaver = config_params.get('monstaver', None)
     ring_dirs = config_params.get('ring_dirs', [])
     logging.info(f"manager - mrbench_agent: ring directories: {ring_dirs}")
-        
     if os.path.exists(state_file):
         with open(state_file, 'r') as f:
             last_test_state = yaml.safe_load(f)
@@ -147,7 +146,6 @@ def mrbench_agent(config_params, config_file, config_output):
                                     else:
                                         continue_response = 'no'
                                         break
-                        
                         if continue_response == 'yes':
                             # Load previous state
                             R, S, W = last_test_state['R'], last_test_state['S'], last_test_state['W']  
@@ -155,7 +153,6 @@ def mrbench_agent(config_params, config_file, config_output):
                         stateERR = "there isn't any scenario_hash section in state file"    
                 else:
                     stateERR = "something is wrong in state file"
-
     if stateERR != None:
         while True:
             print(stateERR+" and the scenario run from the beginning. Do you want to exit and fix the state file? (yes/no): ", end='', flush=True)
@@ -169,7 +166,6 @@ def mrbench_agent(config_params, config_file, config_output):
                     break
             else:
                 exit()
-            
     if continue_response == 'no':
         while True:
             if not os.path.exists(result_dir):
@@ -211,7 +207,6 @@ def mrbench_agent(config_params, config_file, config_output):
                     print("\033[91mInvalid input. Please enter 'yes' or 'no'\033[0m")
             else:
                 break
-
     print(f"\033[1;33m========================================\033[0m")
     # make empty dir for merging csv
     if not os.path.exists(f"{result_dir}/analyzed/"):
@@ -224,7 +219,6 @@ def mrbench_agent(config_params, config_file, config_output):
             logging.critical("manager - mrbench_agent: There isn't any conf_dir in scenario file")
             print(f"\033[91mThere isn't any conf_dir in scenario file !\033[0m")
             exit()
-
     conf_dict = {}
     for dir_name in os.listdir(config_output):
         dir_path = os.path.join(config_output, dir_name)
