@@ -39,7 +39,7 @@
                 Edit the sudoers file and give permission to the user running kara to execute sudo commands without a password:
                 # visudo
                     > %sudo ALL=(ALL:ALL) ALL
-                    > user ALL=(ALL) NOPASSWD: ALL
+                    > kara ALL=(ALL) NOPASSWD: ALL
                 
             2.5 - Running the configure tool:
                 after creating the desired user and changing the sudoers file on all the monster and mc servers, change the configure tool configuration file in the manager directory and the information of all servers for ssh and create ssh_key for each and database information Enter the prerequisites to make changes on them:
@@ -122,9 +122,9 @@
                                     ip: 192.168.1.1  # mc ip
                                     databases:  # list of databases
                                        opentsdb:  # first database name
-                                           hostls:  # monster server name and alias or config name
-                                             m-r1z1s1-controller: paco 
-                                             m-r2z2s2-controller: proxy
+                                           hostls:  # monster server name
+                                             m-r1z1s1-controller 
+                                             m-r2z2s2-controller
                                              
                         - Metric Files Information Section:
                                 The second part of the configuration is related to the measurement or metric files. In this section, the mathematical operations for each file and their paths are mentioned. These can be modified using the input switches or program arguments. Each file contains a list of metrics sent by netdata and stored in influxdb, with the ability to comment out unnecessary metrics. The naming format for metrics in the existing files should be as follows: netdata.n.n.n.
@@ -186,15 +186,17 @@
                                   - /home/KARA/results  # some dir inside local server
                                 backup_output: /tmp/influxdb-backup  # output of all parts in local server
                                 # Monster storage info for uploading backup
-                                token_url: https://api.drive.ir/****
-                                public_url: https://api.drive.ir/****
-                                username: "user:user"
-                                password: **********
-                                cont_name: a name
+                                upload_to_monster:
+                                    token_url: https://api.drive.ir/****
+                                    public_url: https://api.drive.ir/****
+                                    username: "user:user"
+                                    password: **********
+                                    cont_name: a name
                                 # Make backup from hardware/software/swift
-                                hardware_backup: True
-                                software_backup: True
-                                swift_backup: True
+                                backup-options:
+                                    hardware_backup: True
+                                    software_backup: True
+                                    swift_backup: True
                                 
                         Swift Backup Section (swift):
                             This section contains details about Hiola servers and their containers, used for SSH connection and fetching Swift files, including configurations (hardware/software) and Swift-specific details.
