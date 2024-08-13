@@ -84,24 +84,23 @@ def test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, s
     return htmls_dict
 
 #### make HTML template ####
-def dict_html_software(data):
+def dict_html_software(data, confType):
     logging.info("report_recorder - Executing dict_to_html_table function")
     html = "<table border='1' class='wikitable'>\n"
-    #generate first row
     html += "<tr>\n"
     html += f"<td>servers</td>\n"
-    if isinstance(data["servers"] , list):
+    if isinstance(data["servers"], list):
         for item in data["servers"]:
             html += f"<td>{item}</td>\n"
     else:
         str = data["servers"]
         html += f"<td>{str}</td>\n"
     html += "</tr>\n"
-    for key, value in data.items():
+    for key , value in data.items():
         if key != "servers":
             html += "<tr>\n"
             html += f"<td>{key}</td>\n"
-            if isinstance(value, set):
+            if confType != "swift_status":
                 str = "<br>".join(value)
                 html += f"<td>{str}</td>\n"
             else:
@@ -172,9 +171,9 @@ def create_sw_hw_htmls(template_content, html_output, page_title, data_loaded): 
         sconfigs = sconfig_info.group(1).split(',')
         logging.info(f"report_recorder - name of software part inside input html:{sconfigs}")
         if sconfigs[0] == "swift_status":
-            software_html = dict_html_software(analyzer.generate_all_swift_status(sconfigs[1]))
+            software_html = dict_html_software(analyzer.generate_all_swift_status(sconfigs[1]),sconfigs[0])
         else:
-            software_html = dict_html_software(analyzer.generate_confs(sconfigs[0],None if len(sconfigs)== 1 else sconfigs[1]))
+            software_html = dict_html_software(analyzer.generate_confs(sconfigs[0],None if len(sconfigs)== 1 else sconfigs[1]),sconfigs[0])
         html_data = html_data.replace(sconfig_placeholder, software_html)
     html_data += "<p> </p>"
     html_data += data_loaded['naming_tag'].get('tags')
