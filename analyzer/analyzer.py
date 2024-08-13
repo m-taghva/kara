@@ -169,24 +169,62 @@ def get_list_of_servers():
     listOfServers.pop()
     return listOfServers
 
-def compare_confs(confsOfServers):
+def compare_confs (confsOfServers, confType):
     commonConf = confsOfServers[listOfServers[0]]
     allConfs = {}
     for server in listOfServers:
-        commonConf = set(commonConf) & set(confsOfServers[server])
+        commonConf = get_commonConf(commonConf , confsOfServers[server], confType)
     for server in listOfServers:
-        uncommonconfs = set(confsOfServers[server]) - commonConf
+        uncommonconfs = get_uncommonConf(confsOfServers[server], commonConf, confType)
         if len(uncommonconfs) != 0:
             allConfs[server] = uncommonconfs
     if len(commonConf) != 0:
-        allConfs["All(common confs)"] = commonConf
-    return allConfs  #### dict of list of strings
+        allConfs["common"] = commonConf
+    if confType == "server_confs":
+        allConfs = convert_dict_to_list(allConfs)
+    return allConfs  #####  dict of list of strings
+
+def convert_dict_to_list (allconfs):
+    newdict = {}
+    for server in allconfs:
+        nlist = []
+        for confs in allconfs[server]:
+            nlist.append(confs)
+            nlist = nlist + list(allconfs[server][confs])
+        newdict[server] = nlist
+    return newdict
+
+def get_commonConf (conf1, conf2, confType):
+    if confType != "server_confs":
+        return set(conf1) & set(conf2)
+    else:
+        commonConf = {}
+        for section in conf2:
+            if section in conf1:
+                common = set(conf1[section]) & set(conf2[section])
+                if len(common)!= 0:
+                    commonConf[section] = common
+        return commonConf
+
+def get_uncommonConf (conf1, conf2, confType):
+    if confType != "server_confs":
+        return set(conf1) - conf2
+    else:
+        uncommonConf = {}
+        for section in conf1:
+            if section in conf2:
+                uncommon = set (conf1[section]) - conf2[section]
+                if len(uncommon)!= 0:
+                    uncommonConf[section] = uncommon
+            else:
+                uncommonConf[section] = conf1[section]
+        return uncommonConf
 
 def generate_swift_status(servername):
     listOfDowns = []
     for line in load(f"/configs/{servername}/software/swift/services/{servername}-swift-status.txt"):
         if "No" in line:
-            listOfDowns.append(line.split("No ")[1].replace("\n" , "").split(" running")[0])
+            listOfDowns.append(line.split("No ")[1].replace("\n", "").split(" running")[0])
     return listOfDowns
 
 def generate_all_swift_status(services):
@@ -206,49 +244,67 @@ def generate_all_swift_status(services):
         listOfDownServices = generate_swift_status(server)
         for service in listOfServices:
             if service in listOfDownServices:
-                returndict[server].append( "Down" ) ##### returndict[server].append([service , "Down"])
+                returndict[server].append( "Down" ) #### returndict[server].append([service , "Down"])
             else:
-                returndict[server].append( "UP" ) #### returndict[server].append([service , "UP"])
-    return returndict  #### dict of list of stirng
+                returndict[server].append( "UP" ) ####  returndict[server].append([service , "UP"])
+    return returndict   ####### dict of list of stirng
 
-def generate_ring(servername):
-    x = {}
-    for i in ["object", "account", "container"]:
-        with open(configs_dir+"/configs/"+servername+"/software/swift/rings/"+servername+"-" +i+"-ring.txt", "r") as file:
-            x[i] = file.read()
+def generate_ring (servername, serverType):
+    with open (configs_dir + "/configs/" + servername + "/software/swift/rings/" + servername + "-" + serverType + "-ring.txt", "r") as file:
+        x = file.read()
     ring_item_dic = {}
     ring_item = []
-    for key, value in x.items():
-        ring_item_dic["Ring." + key + ".nodes"] = len(set([v.split()[3] for v in value.splitlines()[6:]]))
-        ring_item_dic.update({"Ring." + key + "." + item.split(" ")[1]:int(float(item.split(" ")[0])) for item in value.splitlines()[1].split(", ")[:5]})
-    for rkey , rvalue in ring_item_dic.items():
-        ring_item.append(rkey + " = " + str(rvalue))
+    ring_item_dic["Ring." + serverType + ".nodes"] = len(set([v.split()[3] for v in x.splitlines()[6:]]))
+    ring_item_dic.update({"Ring." + serverType + "." + item.split(" ")[1]: item.split(" ")[0] for item in x.splitlines()[1].split(", ")[:5]})
+    for key , value in ring_item_dic.items():
+        ring_item.append(key + " = " + str(value))
     return ring_item
 
-def get_conf(server, confType, serverType = None):
+def extract_ini_file (server, serverType):
+    config = configparser.ConfigParser()
+    config.read(configs_dir + "/configs/" + server + "/software/swift/server-confs/" + server + "-" + serverType + "-server.conf")
+    confs = {}
+    for section in config.sections():
+        confs[section] = []
+        for key , value in config.items(section):
+            confs[section].append( key + " = " + value)
+    return confs
+
+def get_conf (server, confType, serverType = None):
     conf = []
     if confType == "server_confs":
-        conf = [i for i in load("/configs/"+ server + "/software/swift/server-confs/" + server + "-" + serverType + "-server.conf" ) if "#" not in i]
+        conf = extract_ini_file (server , serverType)
     if confType == "software_version":
-        conf= [i.replace("\n", "") for i in load("/configs/"+ server + "/software/system/images-version.txt")]
+        conf= [i.replace("\n", "") for i in load( "/configs/" + server + "/software/system/images-version.txt") if i != "\n"]
     if confType == "sysctl":
-        conf = [i.replace("\n" , "") for i in load ("/configs/"+ server + "/software/system/sysctl.txt")]
+        conf = [i.replace("\n" , "") for i in load ("/configs/" + server + "/software/system/sysctl.txt") if i != "\n"]
+        for i in range(len(conf)):
+            pattern = r'br-.*?\.'
+            pattern2 = r'veth.*?\.'
+            pattern3 = r'enp.*?\.'
+            conf[i] = re.sub(pattern, 'br-.', conf[i])
+            conf[i] = re.sub(pattern2, 'veth.', conf[i])
+            conf[i] = re.sub(pattern3, 'enp.', conf[i])
     if confType == "systemctl":
-        conf = [" ".join(i.replace("  " , "").split(" ")[:3]) for i in load ("configs/"+ server + "/software/system/systemctl.txt")]
+        conf = [" ".join(i.replace("  " , "").split(" ")[:3]) for i in load ("configs/" + server + "/software/system/systemctl.txt") if i != "\n"]
     if confType == "lsof":
-        conf = [i.replace("\n" , "") for i in load ("/configs/"+ server + "/software/system/lsof.txt")]
+        conf = [i.replace("\n" , "") for i in load ("/configs/" + server + "/software/system/lsof.txt") if i != "\n"]
     if confType == "lsmod":
-        conf = [i.replace("  ", " ").replace("\n", "") for i in load("/configs/"+ server + "/software/system/lsmod.txt")]
+        conf = [i.replace("  ", " ").replace("\n", "") for i in load("/configs/" + server + "/software/system/lsmod.txt") if i != "\n"]
+        for i in range(len(conf)):
+            last_space_index = conf[i].rfind(' ')
+            if not conf[i][last_space_index+1:].isdigit():
+                conf[i] = conf[i][:last_space_index] + "(" + conf[i][last_space_index+1:] + ")"
     if confType == "rings":
-        conf = generate_ring(server)
+        conf = generate_ring(server, serverType)
     return conf
 
-def generate_confs(confType, serverType = None):
+def generate_confs (confType, serverType = None):
     confOfServers = {}
     for server in listOfServers:
-        confOfServers[server] = get_conf(server, confType , serverType)
-    compared_dict = compare_confs(confOfServers)
-    compared_dict ["servers"] = confType
+        confOfServers[server] =  get_conf(server, confType , serverType)
+    compared_dict = compare_confs(confOfServers , confType)
+    compared_dict ["servers"] = confType + "  " + (serverType if serverType != None else "")
     return compared_dict
 
 ####### MERGER #######
