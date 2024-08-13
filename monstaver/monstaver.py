@@ -568,11 +568,11 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, software_info
         else:
             inputs = []
     if not hardware_info:
-        hardware_info = data_loaded['default'].get('hardware_backup', False)
+        hardware_info = data_loaded['default']['backup-options'].get('hardware_backup', False)
     if not software_info:
-        software_info = data_loaded['default'].get('software_backup', False)
+        software_info = data_loaded['default']['backup-options'].get('software_backup', False)
     if not swift_info:
-        swift_info = data_loaded['default'].get('swift_backup', False)
+        swift_info = data_loaded['default']['backup-options'].get('swift_backup', False)
     logging.info(f"monstaver - hardware / software / swift backup options: {hardware_info}/{software_info}/{swift_info}")
     backup_dir = data_loaded['default'].get('backup_output')
     start_time_str, end_time_str = time_range.split(',')
