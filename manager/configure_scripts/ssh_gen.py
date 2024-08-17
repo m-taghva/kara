@@ -3,7 +3,7 @@ from pathlib import Path
 import getpass
 import yaml
 
-config_file = './../configure.conf'  # Path to your YAML configuration file
+config_file = './configure.conf'  # Path to your YAML configuration file
 
 def generate_ssh_key_for_user(username):
     home_dir = Path(f'/home/{username}')
