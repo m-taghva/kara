@@ -1,5 +1,6 @@
 import json
 import os
+import argparse
 os.environ['MPLBACKEND'] = 'Agg'
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
@@ -97,3 +98,15 @@ def image_maker(query_output, server_name, parent_dir):
                 plt.close()
                 print(f"\033[1;33m{output_filename}\033[0m saved")
                 bar()
+
+def main(query_output, server_name, parent_dir):
+    image_maker(query_output, server_name, parent_dir)
+
+if __name__ == "__main__":
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description="Generate images from query output JSON.")
+    parser.add_argument("query_output", help="Path to the JSON containing query output.")
+    parser.add_argument("server_name", help="Name of the server for which images are being generated.")
+    parser.add_argument("parent_dir", help="Parent directory to store the result images.")
+    args = parser.parse_args()
+    main(query_output=args.query_output, server_name=args.server_name, parent_dir=args.parent_dir)
