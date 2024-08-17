@@ -1,6 +1,7 @@
 import os
 import json
 import subprocess
+import argparse
 import sys
 import time
 from datetime import datetime , timedelta
@@ -71,24 +72,7 @@ def get_metrics_from_file(metric_file_path):
         metrics = [metric.strip() for metric in f if metric.strip() and not metric.strip().startswith('#')]
     return metrics
                             
-def main(metric_file, path_dir, time_range, img=False):
-    data_loaded = load_config(config_file)
-    log_level = data_loaded['log'].get('level')
-    if log_level is not None:
-        log_level_upper = log_level.upper()
-        valid_log_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
-        if log_level_upper in valid_log_levels:
-            log_dir_run = subprocess.run(f"sudo mkdir {log_path} > /dev/null 2>&1 && sudo chmod -R 777 {log_path}", shell=True)
-            logging.basicConfig(filename= f'{log_path}all.log', level=log_level_upper, format='%(asctime)s - %(levelname)s - %(message)s')
-        else:
-            print(f"\033[91mInvalid log level:{log_level}\033[0m")  
-    else:
-        print(f"\033[91mPlease enter log_level in the configuration file.\033[0m")
-
-    logging.info("\033[92m****** status reporter main function start ******\033[0m")   
-    metric_file= metric_file.split(',') if metric_file else []
-    path_dir = path_dir or data_loaded.get('output_path') or "." 
-    time_range = time_range if time_range else data_loaded.get('time', [])['time_range']
+def get_report(data_loaded, metric_file, path_dir, time_range, img=False):
     # Load configuration from config file
     time_section = data_loaded.get('time', {})
     START_TIME_SUM = time_section.get('start_time_sum')
@@ -98,7 +82,6 @@ def main(metric_file, path_dir, time_range, img=False):
     print("")
     print(f"{YELLOW}========================================{RESET}")
     print("") 
-    
     # Create the output parent directory
     output_parent_dir= os.path.join(path_dir, result_dir)
     os.makedirs(output_parent_dir, exist_ok=True)
@@ -172,7 +155,7 @@ def main(metric_file, path_dir, time_range, img=False):
                                         if img:
                                             logging.info(f"status_reporter - user need image and graph")
                                             img_query = subprocess.getoutput(f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "db={db_name}" --data-urlencode "q=SELECT {metric_operation}(\\"value\\") FROM /{metric_name}/ WHERE (\\"host\\" =~ /^{host_name}$/) AND time >= \'{start_time_utc}\' AND time <= \'{end_time_utc}\' GROUP BY time({TIME_GROUP}s) fill(none)"')
-                                            image_renderer.image_maker(img_query, host_name, path_dir)
+                                            image_renderer.main(img_query, host_name, path_dir)
                                     else:
                                         # check database name
                                         check_database_name_result = subprocess.getoutput(f'curl -sG "http://{ip}:{influx_port}/query" --data-urlencode "q=SHOW DATABASES"')
@@ -238,8 +221,28 @@ def main(metric_file, path_dir, time_range, img=False):
     print("")
     print(f"{YELLOW}========================================{RESET}")
     print("")
-    logging.info("\033[92m****** status reporter main function end ******\033[0m")   
     return  output_csv
+  
+def main(metric_file, path_dir, time_range, img):
+    data_loaded = load_config(config_file)
+    log_level = data_loaded['log'].get('level')
+    if log_level is not None:
+        log_level_upper = log_level.upper()
+        valid_log_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
+        if log_level_upper in valid_log_levels:
+            log_dir_run = subprocess.run(f"sudo mkdir {log_path} > /dev/null 2>&1 && sudo chmod -R 777 {log_path}", shell=True)
+            logging.basicConfig(filename= f'{log_path}all.log', level=log_level_upper, format='%(asctime)s - %(levelname)s - %(message)s')
+        else:
+            print(f"\033[91mInvalid log level:{log_level}\033[0m")  
+    else:
+        print(f"\033[91mPlease enter log_level in the configuration file.\033[0m")
+    
+    logging.info("\033[92m****** status reporter main function start ******\033[0m")   
+    metric_file= metric_file.split(',') if metric_file else []
+    path_dir = path_dir or data_loaded.get('output_path') or "." 
+    time_range = time_range if time_range else data_loaded.get('time', [])['time_range']
+    get_report(data_loaded, metric_file, path_dir, time_range, img)
+    logging.info("\033[92m****** status reporter main function end ******\033[0m") 
 
 if __name__ == "__main__":
     # Parse command-line arguments for your new script
@@ -250,4 +253,4 @@ if __name__ == "__main__":
     parser.add_argument("--img", action="store_true", help="Create images and graphs")
     args = parser.parse_args()
     # Call your main function with the provided arguments
-    main(metric_file=args.metric_file, path_dir=args.path_dir, time_range=args.time_range, img=args.img)   
+    main(metric_file=args.metric_file, path_dir=args.path_dir, time_range=args.time_range, img=args.img)
