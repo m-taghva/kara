@@ -732,29 +732,33 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, software_info
                 sys.exit(1)
 
         # upload backup to monster
+        upload_operation = data_loaded['default']['upload_to_monster'].get('upload')
         token_url = data_loaded['default']['upload_to_monster'].get('token_url')
         username = data_loaded['default']['upload_to_monster'].get('username')
         password = data_loaded['default']['upload_to_monster'].get('password')
         cont_name = data_loaded['default']['upload_to_monster'].get('cont_name')
         public_url = data_loaded['default']['upload_to_monster'].get('public_url')
-        if token_url and username and password and cont_name and public_url:
-            logging.info("upload backup to monster run")
-            heads = {f"X-Storage-User":username,"X-Storage-Pass":password}
-            response = requests.get(token_url,headers=heads)
-            if response.status_code in [200, 201, 202]:
-                token = response.headers["X-Auth-Token"]
-                headers = {"X-Auth-Token": token}
-                logging.debug(f"token get from monster: {token}")
-                create_container = requests.put(f"{public_url}/{cont_name}", headers=headers)
-                if create_container.status_code in [200, 201, 202]:
-                    logging.info(f"contaner {cont_name} created on  monster")
-                    upload_backup_process = subprocess.Popen(f"curl -X PUT -T {backup_dir}/{time_dir_name}.tar.gz -H 'X-Auth-Token:{token}' {public_url}/{cont_name}/{time_dir_name}.tar.gz", shell=True)                  
+        if upload_operation:
+            if token_url and username and password and cont_name and public_url:
+                logging.info("upload backup to monster run")
+                heads = {f"X-Storage-User":username,"X-Storage-Pass":password}
+                response = requests.get(token_url,headers=heads)
+                if response.status_code in [200, 201, 202]:
+                    token = response.headers["X-Auth-Token"]
+                    headers = {"X-Auth-Token": token}
+                    logging.debug(f"token get from monster: {token}")
+                    create_container = requests.put(f"{public_url}/{cont_name}", headers=headers)
+                    if create_container.status_code in [200, 201, 202]:
+                        logging.info(f"contaner {cont_name} created on  monster")
+                        upload_backup_process = subprocess.Popen(f"curl -X PUT -T {backup_dir}/{time_dir_name}.tar.gz -H 'X-Auth-Token:{token}' {public_url}/{cont_name}/{time_dir_name}.tar.gz", shell=True)                  
+                    else:
+                        logging.info("create container in monster cloud storage fail before upload backup")
+                        print("\033[91mcreate container in monster cloud storage fail before upload backup\033[0m") 
                 else:
-                    logging.info("create container in monster cloud storage fail before upload backup")
-                    print("\033[91mcreate container in monster cloud storage fail before upload backup\033[0m") 
+                    logging.info("monstaver can't connect to monster cloud storage")
+                    print("\033[91mmonstaver can't connect to monster cloud storage\033[0m") 
             else:
-                logging.info("monstaver can't connect to monster cloud storage")
-                print("\033[91mmonstaver can't connect to monster cloud storage\033[0m") 
+                print("\033[91mfix monstaver config file, if you need upload backup to monster!\033[0m")
 
     backup_to_report = f"{backup_dir}/{time_dir_name}/"
     return backup_to_report
