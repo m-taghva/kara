@@ -179,7 +179,7 @@ def compare_confs (confsOfServers, confType):
         if len(uncommonconfs) != 0:
             allConfs[server] = uncommonconfs
     if len(commonConf) != 0:
-        allConfs["all_servers(common)"] = commonConf
+        allConfs["All(common confs)"] = commonConf
     if confType == "server_confs":
         allConfs = convert_dict_to_list(allConfs)
     return allConfs  #####  dict of list of strings
