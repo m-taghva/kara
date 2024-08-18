@@ -263,13 +263,21 @@ def generate_ring (servername, serverType):
     return ring_item
 
 def extract_ini_file (server, serverType):
+    # Read the file into a variable
+    file_path = configs_dir + "/configs/" + server + "/software/swift/server-confs/" + server + "-" + serverType + "-server.conf"
+    with open(file_path, 'r') as file:
+        file_content = file.read()
+    # Replace [DEFAULT] with [default] for fix repeating 
+    modified_content = file_content.replace("[DEFAULT]", "[default]")
     config = configparser.ConfigParser()
-    config.read(configs_dir + "/configs/" + server + "/software/swift/server-confs/" + server + "-" + serverType + "-server.conf")
+    config.read_string(modified_content)
     confs = {}
     for section in config.sections():
-        confs[section] = []
+        confs["["+section+"]"] = []
         for key , value in config.items(section):
-            confs[section].append( key + " = " + value)
+            confs["["+section+"]"].append(key + " = " + value)
+        if confs["["+section+"]"] == []:
+            confs["["+section+"]"] = ["empty"]
     return confs
 
 def get_conf (server, confType, serverType = None):
