@@ -85,7 +85,7 @@ def test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, s
 
 #### make HTML template ####
 def dict_html_software(data, confType):
-    logging.info("report_recorder - Executing dict_to_html_table function")
+    logging.info("report_recorder - Executing dict_html_software function")
     html = "<table border='1' class='wikitable'>\n"
     html += "<tr>\n"
     html += f"<td>servers</td>\n"
