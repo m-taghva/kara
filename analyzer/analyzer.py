@@ -292,9 +292,11 @@ def get_conf (server, confType, serverType = None):
             pattern = r'br-.*?\.'
             pattern2 = r'veth.*?\.'
             pattern3 = r'enp.*?\.'
+            pattern4 = r'tap.*?\.'
             conf[i] = re.sub(pattern, 'br-.', conf[i])
             conf[i] = re.sub(pattern2, 'veth.', conf[i])
             conf[i] = re.sub(pattern3, 'enp.', conf[i])
+            conf[i] = re.sub(pattern4, 'tap.', conf[i])
     if confType == "systemctl":
         conf = [" ".join(i.replace("  " , "").split(" ")[:3]) for i in load ("configs/" + server + "/software/system/systemctl.txt") if i != "\n"]
     if confType == "lsof":
