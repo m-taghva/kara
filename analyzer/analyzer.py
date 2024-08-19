@@ -285,18 +285,14 @@ def get_conf (server, confType, serverType = None):
     if confType == "server_confs":
         conf = extract_ini_file (server , serverType)
     if confType == "software_version":
-        conf= [i.replace("\n", "") for i in load( "/configs/" + server + "/software/system/images-version.txt") if i != "\n"]
+        conf= [i.replace("\n", "") for i in load("/configs/" + server + "/software/system/images-version.txt") if i != "\n"]
     if confType == "sysctl":
         conf = [i.replace("\n" , "") for i in load ("/configs/" + server + "/software/system/sysctl.txt") if i != "\n"]
+        pattern_replacements = [(r'br-.*?\.', 'br-.'),(r'veth.*?\.', 'veth.'),(r'enp.*?\.', 'enp.'),(r'tap.*?\.', 'tap.')]
+        # Loop through the conf list and apply each regex pattern with its corresponding replacement
         for i in range(len(conf)):
-            pattern = r'br-.*?\.'
-            pattern2 = r'veth.*?\.'
-            pattern3 = r'enp.*?\.'
-            pattern4 = r'tap.*?\.'
-            conf[i] = re.sub(pattern, 'br-.', conf[i])
-            conf[i] = re.sub(pattern2, 'veth.', conf[i])
-            conf[i] = re.sub(pattern3, 'enp.', conf[i])
-            conf[i] = re.sub(pattern4, 'tap.', conf[i])
+            for pattern, replacement in pattern_replacements:
+                conf[i] = re.sub(pattern, replacement, conf[i])
     if confType == "systemctl":
         conf = [" ".join(i.replace("  " , "").split(" ")[:3]) for i in load ("configs/" + server + "/software/system/systemctl.txt") if i != "\n"]
     if confType == "lsof":
