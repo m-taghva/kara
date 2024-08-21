@@ -241,8 +241,9 @@ def main(metric_file, path_dir, time_range, img):
     metric_file= metric_file.split(',') if metric_file else []
     path_dir = path_dir or data_loaded.get('output_path') or "." 
     time_range = time_range if time_range else data_loaded.get('time', [])['time_range']
-    get_report(data_loaded, metric_file, path_dir, time_range, img)
+    output_csv = get_report(data_loaded, metric_file, path_dir, time_range, img)
     logging.info("\033[92m****** status reporter main function end ******\033[0m") 
+    return output_csv
 
 if __name__ == "__main__":
     # Parse command-line arguments for your new script
