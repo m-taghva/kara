@@ -41,10 +41,10 @@ scenario:
       #      create_html: True
       #      hardware:
       #            report: True
-      #            template: /root/monster/kara/report_recorder/report_template/input_templates/hardware.html
+      #            template: /root/monster/kara/report_recorder/input_templates/hardware.html
       #      software:
       #            report: True
-      #            template: /root/monster/kara/report_recorder/report_template/input_templates/software.html   
+      #            template: /root/monster/kara/report_recorder/input_templates/software.html   
       #      monster_test:
       #            report: True
       #            merged: /home/kara/results/analyzed/merged.csv 
