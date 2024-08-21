@@ -733,12 +733,12 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, software_info
 
         # upload backup to monster
         upload_operation = data_loaded['default']['upload_to_monster'].get('upload')
-        token_url = data_loaded['default']['upload_to_monster'].get('token_url')
-        username = data_loaded['default']['upload_to_monster'].get('username')
-        password = data_loaded['default']['upload_to_monster'].get('password')
-        cont_name = data_loaded['default']['upload_to_monster'].get('cont_name')
-        public_url = data_loaded['default']['upload_to_monster'].get('public_url')
         if upload_operation:
+            token_url = data_loaded['default']['upload_to_monster'].get('token_url')
+            username = data_loaded['default']['upload_to_monster'].get('username')
+            password = data_loaded['default']['upload_to_monster'].get('password')
+            cont_name = data_loaded['default']['upload_to_monster'].get('cont_name')
+            public_url = data_loaded['default']['upload_to_monster'].get('public_url')
             if token_url and username and password and cont_name and public_url:
                 logging.info("upload backup to monster run")
                 heads = {f"X-Storage-User":username,"X-Storage-Pass":password}
