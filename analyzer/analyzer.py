@@ -299,10 +299,6 @@ def get_conf (server, confType, serverType = None):
     if confType == "lsmod":
         conf = [i.replace("  ", " ").replace("\n", "") for i in load("/configs/" + server + "/software/system/lsmod.txt") if i != "\n"]
         for i in range(len(conf)):
-            parts = conf[i].split()
-            if len(parts) > 2 and parts[1].isdigit():
-                # Exclude the size (second column) and rejoin the rest of the line
-                conf[i] = " ".join(parts[:1] + parts[2:])
             last_space_index = conf[i].rfind(' ')
             if not conf[i][last_space_index+1:].isdigit():
                 conf[i] = conf[i][:last_space_index] + " (" + conf[i][last_space_index+1:] + ")"
