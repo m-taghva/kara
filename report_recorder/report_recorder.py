@@ -23,6 +23,12 @@ config_file = "/etc/kara/report_recorder.conf"
 kateb_url = "https://kateb.burna.ir/wiki/"
 log_path = "/var/log/kara/"
 
+#salimi
+
+pageNameDelimiter = "; "
+valueDelimiter = ","
+timeColumn = "cosbench.run_time"
+
 def load_config(config_file):
     with open(config_file, "r") as stream:
         try:
