@@ -2,7 +2,7 @@
 <h3>open stack swift performance and monitoring tools (Kara)</h3>
 <img src="kara_chart.gif" width="800" height="500"/>
     <img src="kara_tools.gif" width="800" height="500"/>
-
+  
     ## Attention ! after clone repository, please remove (.placeholder) files inside ./results/ ##
     
         1 - Installing the COSBench Benchmarking Software
