@@ -248,20 +248,65 @@ def one_sub_page_maker(path_to_files,spec_dict,data_loaded):
     html_content += data_loaded['naming_tag'].get('tags')
     return html_content
 
-def upload_data(site, page_title, wiki_content):
+def check_data(site, title_content_dict):
+    logging.info("report_recorder - Executing check_data function")
+    delete_all = False
+    skip_all = False
+    titles_to_skip = []
+    for title in list(title_content_dict.keys()):
+        page = pywikibot.Page(site, title)
+        if skip_all:
+            logging.info(f"Skipping page '{title}' due to 'no all' choice.")
+            titles_to_skip.append(title)
+            continue
+        if page.exists() and not delete_all:
+            valid_input_received = False
+            while not valid_input_received:
+                user_choice = input(f"Page '{title}' already exists. Delete it? (yes/yes all/no/no all): ").strip().lower()
+                if user_choice == "yes":
+                    page.delete(reason="Removing old page before re-upload", prompt=False)
+                    logging.info(f"Page '{title}' existed and was deleted.")
+                    valid_input_received = True
+                elif user_choice == "yes all":
+                    delete_all = True
+                    logging.info(f"Deleting all existing pages due to 'yes all' choice.")
+                    valid_input_received = True
+                elif user_choice == "no":
+                    logging.info(f"Page '{title}' exists and was not deleted.")
+                    titles_to_skip.append(title)
+                    valid_input_received = True
+                elif user_choice == "no all":
+                    skip_all = True
+                    logging.info(f"Skipping all remaining pages due to 'no all' choice.")
+                    titles_to_skip.append(title)
+                    valid_input_received = True
+                else:
+                    print(f"\033[91mInvalid input '{user_choice}' received.")
+                    logging.error(f"Invalid input '{user_choice}' received.")
+    # Remove skipped titles from the dictionary
+    for title in titles_to_skip:
+        title_content_dict.pop(title, None)
+    # If "yes all" was chosen, delete remaining pages
+    if delete_all:
+        for title in list(title_content_dict.keys()):
+            page = pywikibot.Page(site, title)
+            if page.exists():
+                page.delete(reason="Removing old page before re-upload", prompt=False)
+                logging.info(f"Page '{title}' existed and was deleted due to 'yes all' choice.")
+    # Upload the remaining pages
+    upload_data(site, title_content_dict)
+
+def upload_data(site, title_content_dict):
     logging.info("report_recorder - Executing upload_data function")
     try:
-        page = pywikibot.Page(site, page_title)
-        if not page.exists():
-            page.text = wiki_content + '\n powered by KARA'
+        for title, content in title_content_dict.items():
+            page = pywikibot.Page(site, title)
+            page.text = content + '\n powered by KARA'
             page.save(summary="Uploaded by KARA", force=True, quiet=False, botflag=False)
             #page.save(" برچسب: [[مدیاویکی:Visualeditor-descriptionpagelink|ویرایش‌گر دیداری]]")
-            logging.info(f"Page '{page_title}' uploaded successfully.")
-        else:
-            print(f"Page '\033[91m{page_title}\033[0m' already exists on the wiki.")
-            logging.warning(f"report_recorder - Page '{page_title}' already exists on the wiki.")
+            logging.info(f"Page '{title}' uploaded successfully.")
     except pywikibot.exceptions.Error as e:
-        logging.error(f"report_recorder - Error uploading page '{page_title}': {e}")
+        logging.error(f"report_recorder - Error uploading page '{title}': {e}")
 
 def upload_images(site, html_content):
     logging.info("report_recorder - Executing upload_images function")
@@ -346,12 +391,14 @@ def main(input_template, htmls_path, cluster_name, scenario_name, configs_direct
         # Set up the wiki site
         site = pywikibot.Site()
         site.login()
+        title_content_dict = {}
         for title,content in htmls_dict.items():
             wiki_content = convert_html_to_wiki(content)
-            # Upload converted data to the wiki
-            upload_data(site, title, wiki_content)
+            title_content_dict[title] = wiki_content
             # Upload images to the wiki
             upload_images(site, content)
+        # Upload converted data to the wiki
+        check_data(site, title_content_dict)
     logging.info("\033[92m****** report_recorder main function end ******\033[0m")
 
 if __name__ == "__main__":
