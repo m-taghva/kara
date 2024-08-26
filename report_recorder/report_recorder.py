@@ -17,7 +17,7 @@ if classification_path not in sys.path:
     sys.path.append(classification_path)
 import classification
 import analyzer
-
+  
 # variables
 config_file = "/etc/kara/report_recorder.conf"
 kateb_url = "https://kateb.burna.ir/wiki/"
