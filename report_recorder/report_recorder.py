@@ -281,9 +281,9 @@ def pageDataToHTML(clusterName,scenarioName,mainPageData) -> []: #return list of
     mainPageHTML = dominate.document(title=f'{clusterName}--{scenarioName}')
     total_rows = sum(df.shape[0] for df in mainPageData.values())
     with mainPageHTML:
-        p("برای مشاهده مشخصات سخت‌افزاری کلاستر به سند ",a(f'مشخصات سخت‌افزاری {clusterName}', href=f'./{clusterName}--HW.html', target='_blank'),"مراجعه کنید.")
-        p("برای مشاهده تنظیمات و مشخصات نرم‌افزاری کلاستر به سند ",a(f'مشخصات نرم‌افزاری سناریو {scenarioName} در کلاستر {clusterName}', href=f'./{clusterName}--{scenarioName}--SW.html', target='_blank'),"مراجعه کنید.")
-        h2("نتایج تست های کارایی")
+        p("برای مشاهده مشخصات سخت‌افزاری کلاستر به سند ",a(f'مشخصات سخت‌افزاری {clusterName}', href=f'./{clusterName}--HW.html', target='_blank'),"مراجعه کنید.", dir="rtl")
+        p("برای مشاهده تنظیمات و مشخصات نرم‌افزاری کلاستر به سند ",a(f'مشخصات نرم‌افزاری سناریو {scenarioName} در کلاستر {clusterName}', href=f'./{clusterName}--{scenarioName}--SW.html', target='_blank'),"مراجعه کنید.", dir="rtl")
+        h2("نتایج تست های کارایی", dir="rtl")
         p(raw(f"در این سناریو مجموعا <b>{total_rows}</b> تست وجود دارد که در <b>{len(mainPageData)}</b> دسته طبقه‌بندی شده‌اند. در ادامه هر دسته در یک بخش جداگانه آورده شده است."), dir="rtl")
     for pageName, pageData in mainPageData.items():
         subPageData = subPage(text="", columnName=None, subcsv={}, summarycsv=pageData)
