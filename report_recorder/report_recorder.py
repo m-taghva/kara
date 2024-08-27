@@ -8,6 +8,11 @@ import subprocess
 import sys
 import pandas as pd
 from bs4 import BeautifulSoup
+from dataclasses import dataclass
+import dominate
+from dominate.tags import *
+from dominate.util import raw
+
 pywiki_path = os.path.abspath("./../report_recorder/pywikibot/")
 if pywiki_path not in sys.path:
     sys.path.append(pywiki_path)
@@ -23,8 +28,6 @@ config_file = "/etc/kara/report_recorder.conf"
 kateb_url = "https://kateb.burna.ir/wiki/"
 log_path = "/var/log/kara/"
 
-#salimi
-
 pageNameDelimiter = "; "
 valueDelimiter = ","
 timeColumn = "cosbench.run_time"
@@ -38,56 +41,6 @@ def load_config(config_file):
             sys.exit(1)
     return data_loaded
 
-#### make test HTML template ####
-def test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, scenario_name, data_loaded):
-    logging.info("report_recorder - Executing test_page_maker function")
-    htmls_dict={}
-    mergedInfo = pd.read_csv(merged_info_file)
-    merged = pd.read_csv(merged_file)
-    original_columns_merged_info = mergedInfo.columns.tolist()
-    mergedInfo = mergedInfo.loc[:, mergedInfo.nunique() != 1]
-    removed_columns_mergedInfo = [col for col in original_columns_merged_info if col not in mergedInfo.columns]
-    merged = merged.drop(columns=removed_columns_mergedInfo, errors='ignore')
-    num_lines = mergedInfo.shape[0]
-    number_of_groups = 0
-    sorted_unique = classification.csv_to_sorted_yaml(mergedInfo)
-    array_of_groups = classification.group_generator(sorted_unique,threshold=8)
-    html_result = f"<p> برای اطلاعات بیشتر مشخصات سخت افزاری به سند  <a href={kateb_url}{cluster_name}--HW>{cluster_name}--HW</a> مراجعه کنید.</p>"
-    html_result += f"<p> برای اطلاعات بیشتر مشخصات نرم افزاری به سند <a href={kateb_url}{cluster_name}--{scenario_name}--SW>{cluster_name}--{scenario_name}--SW</a> مراجعه کنید.</p>"
-    html_result += "<h2> نتایج تست های کارایی </h2>"
-    html_result += f"<p> بر روی این کلاستر {num_lines} تعداد تست انجام شده که در **var** دسته تست طبقه بندی شده است. </p>"
-    for sharedInfo in array_of_groups:
-        mergedInfo2 = mergedInfo
-        merged2 = merged
-        testGroup = ' , '.join(f'{key} = {value}' for key, value in sharedInfo.items())
-        for key, value in sharedInfo.items():
-            mergedInfo2 = mergedInfo2[mergedInfo2[key] == int(value)]
-            merged2 = merged2[merged2[key] == int(value)]
-            mergedInfo2 = mergedInfo2.drop(key,axis=1)
-            merged2 = merged2.drop(key,axis=1)
-        if merged2.empty:
-            continue    
-        else:
-            number_of_groups+=1
-            html_result+= f"<h3> نتایج تست های گروه: {testGroup} </h3>"
-        html_result+= "<table border='1' class='wikitable'>\n"
-        for i, row in enumerate(merged2.to_csv().split("\n")):
-            html_result += "<tr>\n"
-            tag = "th" if i == 0 else "td"
-            for j , column in enumerate(row.split(",")):
-                if j:
-                    html_result += f"<{tag}>{column}</{tag}>\n"
-            html_result += "</tr>\n"
-        html_result += "</table>"
-        format_tg = testGroup.strip().replace(' ','').replace('=','-').replace(',','-')
-        html_result += f"<a href={kateb_url}{cluster_name}--{scenario_name}--{format_tg}> نمایش جزئیات </a>"
-        ###### create subgroups within each original group  ######
-        sorted_unique_file_1 = classification.csv_to_sorted_yaml(mergedInfo2)
-        array_of_groups_1 = classification.group_generator(sorted_unique_file_1,threshold=4)
-        sub_html_result = classification.create_tests_details(mergedInfo2,merged2,testGroup,array_of_groups_1,all_test_dir,data_loaded)
-        htmls_dict.update({f"{cluster_name}--{scenario_name}--{format_tg}":sub_html_result+data_loaded['naming_tag'].get('tags')})
-    htmls_dict.update({cluster_name+'--'+scenario_name:html_result.replace("**var**",str(number_of_groups))+data_loaded['naming_tag'].get('tags')})
-    return htmls_dict
 
 #### make HTML template ####
 def dict_html_software(data, confType):
@@ -193,15 +146,197 @@ def create_sw_hw_htmls(template_content, html_output, page_title, data_loaded): 
             logging.info(f"report_recorder - HTML template saved to: {html_output+'/'+html_key+'.html'}")
     return htmls_dict
 
+
+#############################################################################################################
+
+
+@dataclass
+class subdf:
+    subcsv: pd.core.frame.DataFrame
+    csvinfo: dict
+    bestColumnforDivider: str
+    dividerNumber: int
+    l: int
+    value: str
+
+@dataclass
+class subPage:
+    text: str
+    columnName: str
+    subcsv: dict
+    summarycsv: pd.core.frame.DataFrame
+
+# Function to create subdf for each unique value in a column
+def createcsvinfo(subdfinstance):
+    for column_name in subdfinstance.subcsv.columns:
+        unique_values = subdfinstance.subcsv[column_name].unique()
+        subdfs = []
+        maxl = 0
+        for value in unique_values:
+            subcsv = subdfinstance.subcsv[subdfinstance.subcsv[column_name] == value].drop(columns=[column_name])
+            notMerged = 1
+            for i in range(len(subdfs)):
+                if subdfs[i].l+len(subcsv) <=testPerPageLimit:
+                    concatcsv = pd.concat([subdfs[i].subcsv,subcsv])
+                    new_subdf = subdf(subcsv = concatcsv, csvinfo={}, bestColumnforDivider = None, dividerNumber=len(concatcsv)+1, l=len(concatcsv), value=f"{subdfs[i].value}{valueDelimiter}{value}")
+                    new_subdf.subcsv[column_name]= subdfinstance.subcsv[column_name]
+                    subdfs[i] = new_subdf
+                    notMerged = 0
+                    break
+            if notMerged:
+                new_subdf = subdf(subcsv=subcsv, csvinfo={}, bestColumnforDivider = None, dividerNumber=len(subcsv)+1, l=len(subcsv), value=value)
+                subdfs.append(new_subdf)
+            if new_subdf.l>maxl:
+                maxl = new_subdf.l
+        subdfinstance.csvinfo[column_name] = subdfs
+        if maxl <= testPerPageLimit and len(unique_values) < subdfinstance.dividerNumber:
+            subdfinstance.dividerNumber = len(unique_values)
+            subdfinstance.bestColumnforDivider = column_name
+
+def divider(maindata):
+    if not maindata.bestColumnforDivider:
+        for key, subdf_list in maindata.csvinfo.items():
+            currentDividerNumber = 0
+            for index, item in enumerate(subdf_list):
+                if item.l > testPerPageLimit:
+                    createcsvinfo(maindata.csvinfo[key][index])
+                    currentDividerNumber += divider(maindata.csvinfo[key][index])
+                else:
+                    currentDividerNumber += 1
+            if currentDividerNumber < maindata.dividerNumber:
+                maindata.dividerNumber = currentDividerNumber
+                maindata.bestColumnforDivider = key
+        return maindata.dividerNumber
+    else:
+        return maindata.dividerNumber
+
+def createMainPageData(maindata,prefixstr=""):
+    doclist = {}
+    for item in maindata.csvinfo[maindata.bestColumnforDivider]:
+        currentstr = f'{maindata.bestColumnforDivider}:{item.value}'
+        if(item.bestColumnforDivider):
+            doclist.update(createMainPageData(item,prefixstr+currentstr+pageNameDelimiter))
+        else:
+            doclist[prefixstr+currentstr] = item.subcsv
+    return doclist
+
+def createSubPageData(subPageData: subPage):
+    # Convert each row to a tuple and count occurrences
+    if not subPageData.summarycsv.empty:
+        most_duplicated_count = subPageData.summarycsv.apply(tuple, axis=1).value_counts().max() # Count of the most duplicated row 
+        if len(subPageData.summarycsv)-most_duplicated_count:
+            subPageData.columnName = subPageData.summarycsv.nunique().idxmax()
+            uniqueList = subPageData.summarycsv[subPageData.columnName].unique()
+            subPageData.text = f"در این سند {len(uniqueList)} دسته تست شامل {subPageData.columnName} برابر با {uniqueList.tolist()} آورده شده است."
+            for value in subPageData.summarycsv[subPageData.columnName].unique():
+                subcsv = subPageData.summarycsv[subPageData.summarycsv[subPageData.columnName] == value].drop(columns=[subPageData.columnName])
+                subPageData.subcsv[value] = subPage(text="", columnName=None, subcsv={}, summarycsv=subcsv)
+                createSubPageData(subPageData.subcsv[value])
+        else:
+            subPageData.text = f"در این تست {subPageData.summarycsv.iloc[0].to_dict()} است."
+            subPageData.summarycsv = subPageData.summarycsv.drop(columns=subPageData.summarycsv.columns)
+            if most_duplicated_count > 1:
+                subPageData.text += f"<br><b>توجه:</b> این تست {len(subPageData.summarycsv)} بار تکرار شده است."
+
+    else:
+        if len(subPageData.summarycsv) > 1:
+            subPageData.text = f"<b>توجه:</b> این تست {len(subPageData.summarycsv)} بار تکرار شده است."
+    subPageData.summarycsv[timeColumn]= infocsv[timeColumn]
+    subPageData.summarycsv = pd.merge(subPageData.summarycsv, detailcsv, on=timeColumn)
+    subPageData.summarycsv.columns = subPageData.summarycsv.columns.str.replace('.', '. ', regex=False)
+
+def createSubPageHTML(subPageHTML: dominate.document, subPageData :subPage, heading_level=2):
+    with subPageHTML:
+        p(raw(subPageData.text), dir="rtl")
+    if subPageData.columnName:
+        for key,value in subPageData.subcsv.items():
+            with subPageHTML:
+                if heading_level<7:
+                    heading_tag = getattr(dominate.tags, f'h{heading_level}')
+                    heading_tag(f'{subPageData.columnName}:{key}', dir="rtl")
+                else:
+                    starLevel = "*"*(heading_level-6)
+                    p(raw(f"<b>{starLevel} {subPageData.columnName}:{key}</b><br>"), dir="rtl")
+
+            createSubPageHTML(subPageHTML, value, heading_level+1)
+        with subPageHTML:
+            if heading_level<7:
+                heading_tag = getattr(dominate.tags, f'h{heading_level}')
+                heading_tag(f'جمع‌بندی {subPageData.columnName}', dir="rtl")
+            else:
+                starLevel = "*"*(heading_level-6)
+                p(raw(f"<b>{starLevel} جمع‌بندی {subPageData.columnName}</b><br>"), dir="rtl")
+            with div():
+                raw(subPageData.summarycsv.to_html(index=False, border=2))         
+    else:
+        with subPageHTML:
+            with div():
+                raw(subPageData.summarycsv.to_html(index=False, border=2))
+    
+def pageDataToHTML(clusterName,scenarioName,mainPageData) -> []: #return list of dominate.document
+    #section 1
+    
+    #section 2
+    pagesHTML = []
+    mainPageHTML = dominate.document(title=f'{clusterName}--{scenarioName}')
+    total_rows = sum(df.shape[0] for df in mainPageData.values())
+    with mainPageHTML:
+        p(raw(f"در این سناریو مجموعا <b>{total_rows}</b> تست وجود دارد که در <b>{len(mainPageData)}</b> دسته طبقه‌بندی شده‌اند. در ادامه هر دسته در یک بخش جداگانه آورده شده است."), dir="rtl")
+    for pageName, pageData in mainPageData.items():
+        subPageData = subPage(text="", columnName=None, subcsv={}, summarycsv=pageData)
+        createSubPageData(subPageData)
+        subPageHTML = dominate.document(title=f'{clusterName}--{scenarioName}--{pageName}')
+        createSubPageHTML(subPageHTML, subPageData)
+        pagesHTML.append(subPageHTML)
+        pageData[timeColumn]= infocsv[timeColumn]
+        with mainPageHTML:
+            h2(pageName)
+            p(raw(f"در این دسته مجموعا <b>{len(pageData)}</b> تست وجود دارد که در جدول زیر نشان داده شده‌ است:"), dir="rtl")
+            with div():
+                raw(pageData.to_html(index=False, border=2))
+            a('نمایش جزئیات', href=f'./subpages/{clusterName}--{scenarioName}--{pageName}.html', target='_blank')
+    pagesHTML.append(mainPageHTML)
+    return pagesHTML
+        
+def createPagesHTML(clusterName,scenarioName) -> []: #return list of dominate.document
+    global detailcsv,testPerPageLimit
+    maindata = subdf(subcsv=infocsv.drop(columns=[timeColumn]),csvinfo={}, bestColumnforDivider = None, dividerNumber=len(infocsv)+1, l=len(infocsv), value=None)
+    detailcsv = detailcsv.drop(columns=[col for col in infocsv.columns if col != timeColumn])
+
+    # Convert each row to a tuple and count occurrences
+    row_counts = maindata.subcsv.apply(tuple, axis=1).value_counts()
+    most_duplicated_count = row_counts.max()   # Count of the most duplicated row
+    if most_duplicated_count>testPerPageLimit:
+        testPerPageLimit=most_duplicated_count
+        print(f"Notice: The threshold has been automatically adjusted to {testPerPageLimit} to avoid errors.")
+    
+    createcsvinfo(maindata)
+    divider(maindata)
+    mainPageData = createMainPageData(maindata)
+    pagesHTML = pageDataToHTML(clusterName,scenarioName,mainPageData)  
+    return pagesHTML
+
+
+#infocsv = pd.read_csv('./merged_info_affinity.csv') #global_variable
+#detailcsv = pd.read_csv('./merged_affinity.csv') #global_variable
+#testPerPageLimit = 12 #global_variable
+infocsv = None
+detailcsv = None
+testPerPageLimit = None
 def create_test_htmls(template_content, html_output, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir, data_loaded): #page_title = cluster_name + scenario_name
+    global infocsv, detailcsv, testPerPageLimit
     logging.info("report_recorder - Executing create_test_htmls function")
-    htmls_dict = test_page_maker(merged_file, merged_info_file, all_test_dir, cluster_name, scenario_name, data_loaded)
-    for html_key,html_value in htmls_dict.items():
-        with open(os.path.join(html_output+"/"+html_key+".html"), 'w') as html_file:
-            html_file.write(html_value)
-            print(f"HTML template saved to: {html_output+'/'+html_key+'.html'}") 
-            logging.info(f"report_recorder - HTML template saved to: {html_output+'/'+html_key+'.html'}") 
-    return htmls_dict
+    infocsv = pd.read_csv(merged_info_file)
+    detailcsv = pd.read_csv(merged_file)
+    testPerPageLimit = 12
+    pagesHTML = createPagesHTML(cluster_name,scenario_name)
+
+    for page in pagesHTML:
+        with open(os.path.join(html_output+"/"+page.title+".html"), 'w') as html_file:
+            html_file.write(page.render())
+            print(f"HTML template saved to: {html_output+'/'+page.title+'.html'}") 
+            logging.info(f"report_recorder - HTML template saved to: {html_output+'/'+page.title+'.html'}") 
+    return pagesHTML
 
 #### upload data and make wiki page ####
 def convert_html_to_wiki(html_content):
@@ -382,13 +517,14 @@ def main(input_template, htmls_path, cluster_name, scenario_name, configs_direct
                 print(f"\033[91minput backup File not found for make hardware or software pages\033[0m")
                 logging.warning(f"report_recorder - input backup File not found for make hardware or software pages")
         if input_template:
+            #add htmls_dict.update for create SW and HW pages:!!!!!!!!!!!!!!!!!!!<code33>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             with open(input_template, 'r') as template_content:
                 if create_hardware_page:
                     htmls_dict = create_sw_hw_htmls(template_content.read(), htmls_path, cluster_name+'--HW', data_loaded) 
                 if create_software_page:
-                    htmls_dict = create_sw_hw_htmls(template_content.read(), htmls_path, cluster_name+'--'+scenario_name+'--SW', data_loaded)
+                    htmls_dict= create_sw_hw_htmls(template_content.read(), htmls_path, cluster_name+'--'+scenario_name+'--SW', data_loaded)
         if create_mtest_page:
-            htmls_dict.update(create_test_htmls("",htmls_path, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir, data_loaded)) 
+            scenario_pages = create_test_htmls("",htmls_path, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir, data_loaded)
     elif upload_operation:
         for html_file in os.listdir(htmls_path):
             with open(os.path.join(htmls_path,html_file), 'r', encoding='utf-8') as file:
@@ -403,6 +539,11 @@ def main(input_template, htmls_path, cluster_name, scenario_name, configs_direct
             title_content_dict[title] = wiki_content
             # Upload images to the wiki
             upload_images(site, content)
+        for page in scenario_pages:
+            wiki_content = convert_html_to_wiki(page.body)
+            title_content_dict[page.title] = wiki_content
+            # Upload images to the wiki
+            upload_images(site, page.body)
         # Upload converted data to the wiki
         check_data(site, title_content_dict)
     logging.info("\033[92m****** report_recorder main function end ******\033[0m")
