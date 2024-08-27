@@ -281,6 +281,9 @@ def pageDataToHTML(clusterName,scenarioName,mainPageData) -> []: #return list of
     mainPageHTML = dominate.document(title=f'{clusterName}--{scenarioName}')
     total_rows = sum(df.shape[0] for df in mainPageData.values())
     with mainPageHTML:
+        p("برای مشاهده مشخصات سخت‌افزاری کلاستر به سند ",a(f'مشخصات سخت‌افزاری {clusterName}', href=f'./{clusterName}--HW.html', target='_blank'),"مراجعه کنید.")
+        p("برای مشاهده تنظیمات و مشخصات نرم‌افزاری کلاستر به سند ",a(f'مشخصات نرم‌افزاری سناریو {scenarioName} در کلاستر {clusterName}', href=f'./{clusterName}--{scenarioName}--SW.html', target='_blank'),"مراجعه کنید.")
+        h2("نتایج تست های کارایی")
         p(raw(f"در این سناریو مجموعا <b>{total_rows}</b> تست وجود دارد که در <b>{len(mainPageData)}</b> دسته طبقه‌بندی شده‌اند. در ادامه هر دسته در یک بخش جداگانه آورده شده است."), dir="rtl")
     for pageName, pageData in mainPageData.items():
         subPageData = subPage(text="", columnName=None, subcsv={}, summarycsv=pageData)
@@ -330,9 +333,13 @@ def create_test_htmls(template_content, html_output, cluster_name, scenario_name
     detailcsv = pd.read_csv(merged_file)
     testPerPageLimit = 12
     pagesHTML = createPagesHTML(cluster_name,scenario_name)
-
+    if not os.path.exists(os.path.join(html_output+"/subpages")):
+        os.mkdir(os.path.join(html_output+"/subpages"))
     for page in pagesHTML:
-        with open(os.path.join(html_output+"/"+page.title+".html"), 'w') as html_file:
+        pathPrefix = "subpages/"
+        if page.title == f"{cluster_name}--{scenario_name}":
+            pathPrefix = ""
+        with open(os.path.join(html_output+"/"+pathPrefix+page.title+".html"), 'w') as html_file:
             html_file.write(page.render())
             print(f"HTML template saved to: {html_output+'/'+page.title+'.html'}") 
             logging.info(f"report_recorder - HTML template saved to: {html_output+'/'+page.title+'.html'}") 
