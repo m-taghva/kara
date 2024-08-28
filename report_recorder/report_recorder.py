@@ -391,7 +391,7 @@ def convert_html_to_wiki(html_content):
     for img_tag in soup.find_all('img'):
         if 'src' in img_tag.attrs:
             img_tag.replace_with(f"[[File:{os.path.basename(img_tag['src'])}|border|center|800px|{os.path.basename(img_tag['src'])}]]")
-    # Remove <body>, <thead>, and <tbody> tags but keep their content
+    # Remove <body>, <thead>, and <tbody> tags
     for tag_name in ['body', 'thead', 'tbody']:
         for tag in soup.find_all(tag_name):
             tag.unwrap()  # Remove the tag but keep its content
