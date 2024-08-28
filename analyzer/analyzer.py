@@ -293,7 +293,7 @@ def get_conf (server, confType, serverType = None):
             for pattern, replacement in pattern_replacements:
                 conf[i] = re.sub(pattern, replacement, conf[i])
     if confType == "systemctl":
-        conf = [" ".join(i.replace("  " , "").split(" ")[:3]) for i in load ("configs/" + server + "/software/system/systemctl.txt") if i != "\n"]
+        conf = [" ".join(i.replace("  " , "").split(" ")[:3]) for i in load ("/configs/" + server + "/software/system/systemctl.txt") if i != "\n"]
     if confType == "lsof":
         conf = [i.replace("\n" , "") for i in load ("/configs/" + server + "/software/system/lsof.txt") if i != "\n"]
     if confType == "lsmod":
