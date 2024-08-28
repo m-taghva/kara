@@ -533,12 +533,12 @@ def main(software_template, hardware_template, output_htmls_path, cluster_name, 
                 print(f"\033[91minput backup File not found for make hardware or software pages\033[0m")
                 logging.warning(f"report_recorder - input backup File not found for make hardware or software pages")
                 exit(1)
-        if hardware_template:
-            with open(hardware_template, 'r') as template_content:
-                htmls_dict = create_sw_hw_htmls(template_content.read(), output_htmls_path, cluster_name+'--HW', data_loaded) 
-        if software_template:
-            with open(software_template, 'r') as template_content:
-                htmls_dict.update(create_sw_hw_htmls(template_content.read(), output_htmls_path, cluster_name+'--'+scenario_name+'--SW', data_loaded))
+            if hardware_template:
+                with open(hardware_template, 'r') as template_content:
+                    htmls_dict = create_sw_hw_htmls(template_content.read(), output_htmls_path, cluster_name+'--HW', data_loaded) 
+            if software_template:
+                with open(software_template, 'r') as template_content:
+                    htmls_dict.update(create_sw_hw_htmls(template_content.read(), output_htmls_path, cluster_name+'--'+scenario_name+'--SW', data_loaded))
         if create_test_page:
             scenario_pages = create_test_htmls("",output_htmls_path, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir, data_loaded)
     elif upload_operation:
