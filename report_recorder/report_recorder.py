@@ -293,7 +293,6 @@ def createPagesHTML(clusterName,scenarioName): #return list of dominate.document
     global detailcsv,testPerPageLimit
     maindata = subdf(subcsv=infocsv.drop(columns=[timeColumn]),csvinfo={}, bestColumnforDivider = None, dividerNumber=len(infocsv)+1, l=len(infocsv), value=None)
     detailcsv = detailcsv.drop(columns=[col for col in infocsv.columns if col != timeColumn])
-
     # Convert each row to a tuple and count occurrences
     row_counts = maindata.subcsv.apply(tuple, axis=1).value_counts()
     most_duplicated_count = row_counts.max()   # Count of the most duplicated row
