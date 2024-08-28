@@ -380,8 +380,7 @@ def convert_html_to_wiki(html_content):
         raise
     # Convert <a> tags to wiki links
     for a_tag in soup.find_all('a'):
-        href = a_tag.get('href', '').replace(' ', '_')
-        href = href.replace(".html", '', 1)
+        href = a_tag.get('href', '').replace(' ', '_').replace(".html", '', 1)
         if href.startswith('./subpages/'):
             href = href.replace('./subpages/', kateb_url, 1)
         elif href.startswith('./'):
