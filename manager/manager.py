@@ -445,17 +445,17 @@ def report_recorder_agent(config_params, backup_to_report):
     # for HW report
     if config_params.get('hardware').get('report') is True:
         hw_template = config_params.get('hardware').get('template')
-        report_recorder.main(input_template=hw_template, htmls_path=output_path, cluster_name=cluster_name, scenario_name=scenario_name, configs_directory=backup_to_report, upload_operation=upload_to_kateb, create_html_operation=create_html, merged_file=None, merged_info_file=None, all_test_dir=None, create_hardware_page=True, create_software_page=None, create_mtest_page=None)
+        report_recorder.main(software_template=None, hardware_template=hw_template, output_htmls_path=output_path, cluster_name=cluster_name, scenario_name=scenario_name, configs_directory=backup_to_report, upload_operation=upload_to_kateb, create_html_operation=create_html, merged_file=None, merged_info_file=None, all_test_dir=None, create_test_page=None)
     # for SW report
     if config_params.get('software').get('report') is True:
         sw_template = config_params.get('software').get('template')
-        report_recorder.main(input_template=sw_template, htmls_path=output_path, cluster_name=cluster_name, scenario_name=scenario_name, configs_directory=backup_to_report, upload_operation=upload_to_kateb, create_html_operation=create_html, merged_file=None, merged_info_file=None, all_test_dir=None, create_hardware_page=None, create_software_page=True, create_mtest_page=None) 
+        report_recorder.main(software_template=sw_template, hardware_template=None, output_htmls_path=output_path, cluster_name=cluster_name, scenario_name=scenario_name, configs_directory=backup_to_report, upload_operation=upload_to_kateb, create_html_operation=create_html, merged_file=None, merged_info_file=None, all_test_dir=None, create_test_page=None) 
     # for test report
     if config_params.get('monster_test').get('report') is True:
         merged = config_params.get('monster_test').get('merged')
         merged_info = config_params.get('monster_test').get('merged_info')
         tests_dir = config_params.get('monster_test').get('tests_dir')
-        report_recorder.main(input_template=None, htmls_path=output_path, cluster_name=cluster_name, scenario_name=scenario_name, configs_directory=None, upload_operation=upload_to_kateb, create_html_operation=create_html, merged_file=merged, merged_info_file=merged_info, all_test_dir=tests_dir, create_hardware_page=None, create_software_page=None, create_mtest_page=True)
+        report_recorder.main(software_template=None, hardware_template=None, output_htmls_path=output_path, cluster_name=cluster_name, scenario_name=scenario_name, configs_directory=None, upload_operation=upload_to_kateb, create_html_operation=create_html, merged_file=merged, merged_info_file=merged_info, all_test_dir=tests_dir, create_test_page=True)
    
 def main(config_file):
     log_level = load_config(config_file)['log'].get('level')
