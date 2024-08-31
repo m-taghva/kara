@@ -424,12 +424,12 @@ def status_analyzer_agent(config_params):
     merge_csv = config_params.get('merge_csv')
     analyze = config_params.get('analyze', True)
     analyze_csv = config_params.get('analyze_csv')
-    transform_dir = config_params.get('transform')
+    keep_source_columns = config_params.get('keep_source_columns', False)
     if merge:
-        analyzer.main(merge=True, analyze=False, graph=False, csv_original=None, transformation_directory=None, output_directory=result_dir, selected_csv=merge_csv, x_column=None, y_column=None)
+        analyzer.main(merge=True, analyze=False, graph=False, csv_original=None, output_directory=result_dir, selected_csv=merge_csv, x_column=None, y_column=None, keep_column=None)
         time.sleep(10)
     if analyze:
-        analyzer.main(merge=False, analyze=True, graph=False, csv_original=analyze_csv, transformation_directory=transform_dir, output_directory=None, selected_csv=None, x_column=None, y_column=None)
+        analyzer.main(merge=False, analyze=True, graph=False, csv_original=analyze_csv, output_directory=None, selected_csv=None, x_column=None, y_column=None, keep_column=keep_source_columns)
 
 def report_recorder_agent(config_params, backup_to_report):
     if not os.path.exists(f"./user-config.py"):
