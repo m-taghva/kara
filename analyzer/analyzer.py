@@ -384,7 +384,7 @@ def analyze_and_save_csv(csv_original, keep_column, data_loaded):
     source_csv = pd.read_csv(csv_original)
     selected_column_names = set()
     for group_name, group_content in data_loaded['transformation_groups'].items():
-        final_output_csv_name = f"{os.path.splitext(os.path.basename(csv_original))[0]}-{os.path.basename(group_name)}.csv"
+        final_output_csv_name = f"{os.path.splitext(os.path.basename(csv_original))[0]}-{group_name}.csv"
         final_output_csv_path = os.path.join(os.path.dirname(csv_original), final_output_csv_name)
         for new_column_name, column_content in group_content.items():
             operation = column_content['operation']
