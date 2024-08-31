@@ -24,7 +24,7 @@ config_file = "/etc/kara/report_recorder.conf"
 kateb_url = "https://kateb.burna.ir/wiki/"
 log_path = "/var/log/kara/"
 
-pageNameDelimiter = "; "
+pageNameDelimiter = ";_"
 valueDelimiter = ","
 timeColumn = "cosbench.run_time"
 
