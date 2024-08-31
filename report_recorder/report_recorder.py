@@ -210,8 +210,7 @@ def createMainPageData(maindata,prefixstr=""):
         else:
             doclist[prefixstr+currentstr] = item.subcsv
     return doclist
-
-def createSubPageData(subPageData: subPage):
+def createSubPageData(subPageData:subPage):
     # Convert each row to a tuple and count occurrences
     if not subPageData.summarycsv.empty:
         most_duplicated_count = subPageData.summarycsv.apply(tuple, axis=1).value_counts().max() # Count of the most duplicated row 
@@ -235,7 +234,8 @@ def createSubPageData(subPageData: subPage):
     subPageData.summarycsv = pd.merge(subPageData.summarycsv, detailcsv, on=timeColumn)
     subPageData.summarycsv.columns = subPageData.summarycsv.columns.str.replace('.', '. ', regex=False)
 
-def createSubPageHTML(subPageHTML: dominate.document, subPageData :subPage, heading_level=2):
+
+def createSubPageHTML(subPageHTML:dominate.document, subPageData:subPage, heading_level=2):
     with subPageHTML:
         p(raw(subPageData.text), dir="rtl")
     if subPageData.columnName:
@@ -519,8 +519,14 @@ def main(software_template, hardware_template, output_htmls_path, cluster_name, 
         merged_info_file = data_loaded['tests_info'].get('merged_info')
     if all_test_dir is None:
         all_test_dir = data_loaded['tests_info'].get('tests_dir')
+    if output_htmls_path is None:
+        output_htmls_path = data_loaded['output_path']
     if configs_directory is None:
         configs_directory = data_loaded['configs_dir']
+    if software_template is None and data_loaded['software_template']:
+            software_template = data_loaded['software_template']
+    if hardware_template is None and data_loaded['hardware_template']:
+        hardware_template = data_loaded['hardware_template']
     if create_html_operation:
         if configs_directory is not None:
             if os.path.exists(configs_directory):
@@ -553,11 +559,12 @@ def main(software_template, hardware_template, output_htmls_path, cluster_name, 
             title_content_dict[title] = wiki_content
             # Upload images to the wiki
             upload_images(site, content)
-        for page in scenario_pages:
-            wiki_content = convert_html_to_wiki(page.body)
-            title_content_dict[page.title] = wiki_content
-            # Upload images to the wiki
-            upload_images(site, page.body)
+        if create_test_page:
+            for page in scenario_pages:
+                wiki_content = convert_html_to_wiki(page.body)
+                title_content_dict[page.title] = wiki_content
+                # Upload images to the wiki
+                upload_images(site, page.body)
         # Upload converted data to the wiki
         check_data(site, title_content_dict)
     logging.info("\033[92m****** report_recorder main function end ******\033[0m")
