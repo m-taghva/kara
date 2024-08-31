@@ -1,5 +1,7 @@
 import os
 import re
+import sys
+import yaml
 import subprocess
 import logging
 import argparse
@@ -11,11 +13,21 @@ from collections import Counter
 
 # variables
 log_path = "/var/log/kara/"
+config_file = "/etc/kara/analyzer.conf"
 
 BOLD = "\033[1m"
 RESET = "\033[0m"
 YELLOW = "\033[1;33m"
 
+def load_config(config_file):
+    with open(config_file, "r") as stream:
+        try:
+            data_loaded = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(f"Error loading the configuration: {exc}")
+            sys.exit(1)
+    return data_loaded
+    
 def conf_dir(config_dir):
     global configs_dir
     configs_dir = config_dir
