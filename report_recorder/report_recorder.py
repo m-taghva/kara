@@ -210,7 +210,6 @@ def createMainPageData(maindata,prefixstr=""):
         else:
             doclist[prefixstr+currentstr] = item.subcsv
     return doclist
-
 def createSubPageData(subPageData:subPage):
     # Convert each row to a tuple and count occurrences
     if not subPageData.summarycsv.empty:
@@ -234,6 +233,7 @@ def createSubPageData(subPageData:subPage):
     subPageData.summarycsv[timeColumn]= infocsv[timeColumn]
     subPageData.summarycsv = pd.merge(subPageData.summarycsv, detailcsv, on=timeColumn)
     subPageData.summarycsv.columns = subPageData.summarycsv.columns.str.replace('.', '. ', regex=False)
+
 
 def createSubPageHTML(subPageHTML:dominate.document, subPageData:subPage, heading_level=2):
     with subPageHTML:
@@ -511,6 +511,8 @@ def main(software_template, hardware_template, output_htmls_path, cluster_name, 
         cluster_name = data_loaded['naming_tag'].get('cluster_name')
     if scenario_name is None:
         scenario_name = data_loaded['naming_tag'].get('scenario_name')
+    if output_htmls_path is None:
+        output_htmls_path = data_loaded['output_path']
     if merged_file is None:
         merged_file = data_loaded['tests_info'].get('merged')
     if merged_info_file is None:
