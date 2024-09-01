@@ -106,7 +106,7 @@ def csv_to_html(csv_file):
     html_csv += "</table>"
     return html_csv
 
-def create_sw_hw_htmls(template_content, html_output, page_title, data_loaded): #HW_page_title = cluster_name #SW_page_title = cluster_name + scenario_name
+def create_sw_hw_htmls(template_content, html_output, page_title): #HW_page_title = cluster_name #SW_page_title = cluster_name + scenario_name
     logging.info("report_recorder - Executing create_sw_hw_htmls function")
     htmls_dict={}
     hw_info_dict = {}
@@ -145,9 +145,8 @@ def create_sw_hw_htmls(template_content, html_output, page_title, data_loaded): 
         else:
             software_html = dict_html_software(analyzer.generate_confs(sconfigs[0],None if len(sconfigs)== 1 else sconfigs[1]),sconfigs[0])
         html_data = html_data.replace(sconfig_placeholder, software_html)
-    logging.info(f"report_recorder - wiki tag for all htmls:{data_loaded['naming_tag'].get('tags')}")
     htmls_dict.update({page_title:html_data})
-    htmls_dict.update(sub_pages_maker(html_data,page_title,hw_info_dict,data_loaded))
+    htmls_dict.update(sub_pages_maker(html_data,page_title,hw_info_dict))
     for html_key,html_value in htmls_dict.items():
         with open(os.path.join(html_output+"/"+html_key+".html"), 'w') as html_file:
             html_file.write(html_value)
@@ -306,7 +305,7 @@ def createPagesHTML(clusterName,scenarioName): #return list of dominate.document
 infocsv = None
 detailcsv = None
 testPerPageLimit = None
-def create_test_htmls(template_content, html_output, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir, data_loaded): #page_title = cluster_name + scenario_name
+def create_test_htmls(html_output, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir): #page_title = cluster_name + scenario_name
     global infocsv, detailcsv, testPerPageLimit
     logging.info("report_recorder - Executing create_test_htmls function")
     infocsv = pd.read_csv(merged_info_file)
@@ -325,26 +324,26 @@ def create_test_htmls(template_content, html_output, cluster_name, scenario_name
             logging.info(f"report_recorder - HTML template saved to: {html_output+'/'+page.title+'.html'}") 
     return pagesHTML
 
-def sub_pages_maker(template_content , page_title ,hw_info_dict,data_loaded):
+def sub_pages_maker(template_content , page_title ,hw_info_dict):
     logging.info("report_recorder - Executing sub_pages_maker function")
     global configs_dir
     htmls_list={}
     c_dir = configs_dir
     sub_dir_path = os.path.join(c_dir,'configs/{serverName}/hardware/')
     if page_title + "--CPU" in template_content:
-        htmls_list.update({page_title + "--CPU":one_sub_page_maker(sub_dir_path+'cpu/',hw_info_dict['cpu'],data_loaded)})
+        htmls_list.update({page_title + "--CPU":one_sub_page_maker(sub_dir_path+'cpu/',hw_info_dict['cpu'])})
     if page_title + "--Memory" in template_content:
-        htmls_list.update({page_title + "--Memory":one_sub_page_maker(sub_dir_path+'memory/',hw_info_dict['memory'],data_loaded)})
+        htmls_list.update({page_title + "--Memory":one_sub_page_maker(sub_dir_path+'memory/',hw_info_dict['memory'])})
     if page_title + "--Network" in template_content:
-        htmls_list.update({page_title + "--Network":one_sub_page_maker(sub_dir_path+'net/',hw_info_dict['net'],data_loaded)})
+        htmls_list.update({page_title + "--Network":one_sub_page_maker(sub_dir_path+'net/',hw_info_dict['net'])})
     if page_title + "--Disk" in template_content:
-        htmls_list.update({page_title + "--Disk":one_sub_page_maker(sub_dir_path+'disk/',hw_info_dict['disk'],data_loaded)})
+        htmls_list.update({page_title + "--Disk":one_sub_page_maker(sub_dir_path+'disk/',hw_info_dict['disk'])})
     if page_title + "--PCI" in template_content:
-        #htmls_list.update({page_title + "--PCI":sub_page_maker(sub_dir_path+'pci/',hw_info_dict['pci'],data_loaded)})
-        htmls_list.update({page_title + "--PCI":one_sub_page_maker(sub_dir_path+'pci/',hw_info_dict['cpu'],data_loaded)})
+        #htmls_list.update({page_title + "--PCI":sub_page_maker(sub_dir_path+'pci/',hw_info_dict['pci'])})
+        htmls_list.update({page_title + "--PCI":one_sub_page_maker(sub_dir_path+'pci/',hw_info_dict['cpu'])})
     return htmls_list
 
-def one_sub_page_maker(path_to_files,spec_dict,data_loaded):
+def one_sub_page_maker(path_to_files,spec_dict):
     logging.info("report_recorder - Executing one_sub_page_maker function")
     html_content = ""
     for i in os.listdir(path_to_files.replace("{serverName}",next(iter(spec_dict.values()))[0])):
@@ -536,12 +535,12 @@ def main(software_template, hardware_template, output_htmls_path, cluster_name, 
                 exit(1)
             if hardware_template:
                 with open(hardware_template, 'r') as template_content:
-                    htmls_dict = create_sw_hw_htmls(template_content.read(), output_htmls_path, cluster_name+'--HW', data_loaded) 
+                    htmls_dict = create_sw_hw_htmls(template_content.read(), output_htmls_path, cluster_name+'--HW') 
             if software_template:
                 with open(software_template, 'r') as template_content:
-                    htmls_dict.update(create_sw_hw_htmls(template_content.read(), output_htmls_path, cluster_name+'--'+scenario_name+'--SW', data_loaded))
+                    htmls_dict.update(create_sw_hw_htmls(template_content.read(), output_htmls_path, cluster_name+'--'+scenario_name+'--SW'))
         if create_test_page:
-            scenario_pages = create_test_htmls("",output_htmls_path, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir, data_loaded)
+            scenario_pages = create_test_htmls(output_htmls_path, cluster_name, scenario_name, merged_file, merged_info_file, all_test_dir)
     elif upload_operation:
         for html_file in os.listdir(output_htmls_path):
             with open(os.path.join(output_htmls_path,html_file), 'r', encoding='utf-8') as file:
