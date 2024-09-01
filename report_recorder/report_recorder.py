@@ -145,8 +145,6 @@ def create_sw_hw_htmls(template_content, html_output, page_title, data_loaded): 
         else:
             software_html = dict_html_software(analyzer.generate_confs(sconfigs[0],None if len(sconfigs)== 1 else sconfigs[1]),sconfigs[0])
         html_data = html_data.replace(sconfig_placeholder, software_html)
-    html_data += "<p> </p>"
-    html_data += data_loaded['naming_tag'].get('tags')
     logging.info(f"report_recorder - wiki tag for all htmls:{data_loaded['naming_tag'].get('tags')}")
     htmls_dict.update({page_title:html_data})
     htmls_dict.update(sub_pages_maker(html_data,page_title,hw_info_dict,data_loaded))
@@ -361,12 +359,10 @@ def one_sub_page_maker(path_to_files,spec_dict,data_loaded):
                     html_content += f"<p>{file_content.replace(' ','&nbsp;')}</p>"
             else:
                 html_content += "<p> فایل مربوطه یافت نشد </p>"
-    html_content += "<p> </p>"
-    html_content += data_loaded['naming_tag'].get('tags')
     return html_content
 
 #### upload data and make wiki page ####
-def convert_html_to_wiki(html_content):
+def convert_html_to_wiki(html_content, data_loaded):
     logging.info("report_recorder - Executing convert_html_to_wiki function")
     # Convert dominate document to a string if needed
     if isinstance(html_content, document):
@@ -394,6 +390,7 @@ def convert_html_to_wiki(html_content):
     for tag_name in ['body', 'thead', 'tbody']:
         for tag in soup.find_all(tag_name):
             tag.unwrap()  # Remove the tag but keep its content
+    soup.append(data_loaded['naming_tag'].get('tags'))
     return str(soup)
 
 def check_data(site, title_content_dict):
@@ -555,13 +552,13 @@ def main(software_template, hardware_template, output_htmls_path, cluster_name, 
         site.login()
         title_content_dict = {}
         for title,content in htmls_dict.items():
-            wiki_content = convert_html_to_wiki(content)
+            wiki_content = convert_html_to_wiki(content, data_loaded)
             title_content_dict[title] = wiki_content
             # Upload images to the wiki
             upload_images(site, content)
         if create_test_page:
             for page in scenario_pages:
-                wiki_content = convert_html_to_wiki(page.body)
+                wiki_content = convert_html_to_wiki(page.body, data_loaded)
                 title_content_dict[page.title] = wiki_content
                 # Upload images to the wiki
                 upload_images(site, page.body)
