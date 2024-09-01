@@ -2,60 +2,60 @@ scenario:
       
       - Config_gen:
             conf_templates: 
-                        - /root/monster/kara/config_gen/workloads.xml__1
-                        - /root/monster/kara/config_gen/configs.conf
-                        - /root/monster/kara/config_gen/workloads.xml__2
-                        #- /root/monster/kara/config_gen/object_swift.conf
-            output_path: /root/monster/kara/config_gen/out/
+                        - /home/kara/config_gen/workloads.xml__1
+                        #- /home/kara/config_gen/configs.conf
+                        #- /home/kara/config_gen/workloads.xml__2
+                        #- /home/kara/config_gen/object_swift.conf
+            output_path: /home/kara/config_gen/out/
 
       - Mrbench:
-            output_path: /root/monster/kara/results/
-            Status_Reporter: csv # values = none - csv - csv,img
-            monstaver: none # values = none , backup,info - backup - info
-            #conf_dir: /root/monster/kara/config_gen/out/
-            ring_dirs: 
-                  - /root/monster/kara/mrbench/ring/r1/
-                  - /root/monster/kara/mrbench/ring/r2/
-            #      - /root/monster/kara/mrbench/ring/r3/
+            output_path: /home/kara/results/
+            Status_Reporter: csv,img # values = none - csv - csv,img
+            monstaver: info # values = none , backup,info - backup - info
+            #conf_dir: /home/kara/config_gen/out/
+            #ring_dirs: 
+            #      - /home/kara/mrbench/ring/r1/
+            #      - /home/kara/mrbench/ring/r2/
+            #      - /home/kara/mrbench/ring/r3/
 
       #- Status-Reporter: 
-      #      times: ./times.txt
-      #      image: True
-      #      output_path: ./results
+      #     times: ./times.txt
+      #     image: True
+      #     output_path: ./results
 
       #- Monstaver:
-      #      input_path: ./../results
-      #      times: ./times.txt
-      #      batch_mode: True # value = True for all backup modes and False for restore
-      #      operation: backup # values = restore , backup,info - backup - info
+      #     input_path: ./../results
+      #     times: ./times.txt
+      #     batch_mode: True # value = True for all backup modes and False for restore
+      #     operation: backup # values = restore , backup,info - backup - info
       
-      #- Status_Analyzer:
-      #      output_path: /root/monster/kara/results/analyzed/
-      #      merge: True
-      #      merge_csv: "./../result/*"  # list of csv file --> '/path/csv1,/path/csv3,/path/csv3,' or /path/*
-      #      analyze: True
-      #      analyze_csv: "/root/monster/kara/results/analyzed/merged.csv"
-      #      transform: /root/monster/kara/analyzer/transform_dir/transformation-cpu
+      - Status_Analyzer:
+      #     output_path: /home/kara/results/analyzed/
+      #     merge: True
+      #     merge_csv: "./../result/*"  # list of csv file --> '/path/csv1,/path/csv3,/path/csv3,' or /path/*
+            analyze: True
+            keep_source_columns: False
+            analyze_csv: "/home/kara/results/analyzed/merged.csv"
 
-      #- Report_Recorder:
-      #      create_html: True
-      #      hardware:
-      #            report: True
-      #            template: /root/monster/kara/report_recorder/input_templates/hardware.html
-      #      software:
-      #            report: True
-      #            template: /root/monster/kara/report_recorder/input_templates/software.html   
-      #      monster_test:
-      #            report: True
-      #            merged: /home/kara/results/analyzed/merged.csv 
-      #            merged_info: /home/kara/results/analyzed/merged_info.csv
-      #            tests_dir: /home/kara/results/    
+      - Report_Recorder:
+            create_html: True
+            hardware:
+                 report: True
+                 template: /home/kara/report_recorder/input_templates/hardware.html
+            software:
+                 report: True
+                 template: /home/kara/report_recorder/input_templates/software.html   
+            monster_test:
+                 report: True
+                 merged: /home/kara/results/analyzed/merged.csv 
+                 merged_info: /home/kara/results/analyzed/merged_info.csv
+                 tests_dir: /home/kara/results/    
 
-      #      output_path: /root/monster/kara/report_recorder/output_htmls/
-      #      configs_dir: /tmp/influxdb-backup/240415T100000_240415T100500/
-      #      upload_to_kateb: True
-      #      cluster_name: SADA
-      #      scenario_name: performance
+            output_path: /home/kara/report_recorder/output_htmls/
+            configs_dir: /tmp/influxdb-backup/240415T100000_240415T100500/
+            upload_to_kateb: True
+            cluster_name: kara1
+            scenario_name: performance_test_1
 
 log: 
    level: info  # values = debug - info - warning - error - critical
