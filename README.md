@@ -3,7 +3,7 @@
 <img src="kara_chart.gif" width="800" height="500"/>
     <img src="kara_tools.gif" width="800" height="500"/>
       
-    installing kara:
+    1. installing kara:
         Step 1: Installing CosBench First, you need to install the CosBench tool. For familiarization and installation guidance, you can refer to the document Cloud_Object_Storage_Benchmark_(COSBench).
             After installation, go to the main directory and make the cli.sh script executable with the following commands, and create a soft link in the /usr/bin path:
                 sudo chmod +x /home/user/cosbench/0.4.2.c4/cli.sh
