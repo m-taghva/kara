@@ -1,3 +1,0 @@
-avg:cpu.io
-mean_system.cpu.idle
-mean_system.cpu.iowait
