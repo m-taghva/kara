@@ -1,2 +1,4 @@
 netdata.system.cpu.iowait
 netdata.system.cpu.idle
+#/netdata.system.cpu.*/
+#/netdata.disk_ops.sd[abc].reads/

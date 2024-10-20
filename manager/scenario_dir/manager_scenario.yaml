@@ -1,61 +1,84 @@
 scenario:
       
-      - Config_gen:
-            conf_templates: 
-                        - /home/kara/config_gen/workloads.xml__1
-                        #- /home/kara/config_gen/configs.conf
-                        #- /home/kara/config_gen/workloads.xml__2
-                        #- /home/kara/config_gen/object_swift.conf
-            output_path: /home/kara/config_gen/out/
+    - Config_gen:
+            conf_templates:    # list of cosbench and swift config file
+                - /path/to/kara/config_gen/workloads.xml__1
+                - /path/to/kara/config_gen/workloads.xml__2
+                - /path/to/kara/config_gen/configs.conf
+                - /path/to/kara/config_gen/object_swift.conf
 
-      - Mrbench:
-            output_path: /home/kara/results/
-            Status_Reporter: csv,img # values = none - csv - csv,img
-            monstaver: info # values = none , backup,info - backup - info
-            #conf_dir: /home/kara/config_gen/out/
-            #ring_dirs: 
-            #      - /home/kara/mrbench/ring/r1/
-            #      - /home/kara/mrbench/ring/r2/
-            #      - /home/kara/mrbench/ring/r3/
+            output_path: /path/to/kara/config_gen/out/
 
-      #- Status-Reporter: 
-      #     times: ./times.txt
-      #     image: True
-      #     output_path: ./results
+    - Mrbench:
+            output_path: /path/to/kara/results/
 
-      #- Monstaver:
-      #     input_path: ./../results
-      #     times: ./times.txt
-      #     batch_mode: True # value = True for all backup modes and False for restore
-      #     operation: backup # values = restore , backup,info - backup - info
-      
-      - Status_Analyzer:
-      #     output_path: /home/kara/results/analyzed/
-      #     merge: True
-      #     merge_csv: "./../result/*"  # list of csv file --> '/path/csv1,/path/csv3,/path/csv3,' or /path/*
+            # call status_reporetr and monstaver for each test
+            status_reporter: csv,img    # values = none - csv - csv,img
+            monstaver: backup,info    # values = none , backup,info - backup - info
+
+            #conf_dir: /path/to/kara/config_gen/out/
+            ring_dirs:    # list of directory include ring files
+                - /path/to/kara/mrbench/ring/r1/
+                - /path/to/kara/mrbench/ring/r2/
+                - /path/to/kara/mrbench/ring/r3/
+
+    - Status-Reporter: 
+            time_list:
+                #- now-4h,now
+                #- now-3d,now-2d
+                #- "2023-09-11 00:00:00,2023-09-11 23:59:59"
+                #- ./time.txt
+            image: True
+            analyze_csv: True    # analyze each result csv and merge them
+            report_recorder:    # report each time range to kateb
+                output_htmls_path: "/path/to/kara/report_recorder/output_htmls/"
+                cluster_name: "تستی"
+                kateb_tags:
+                    - "تست"
+                    - "کارایی"
+                    - "گزارش‌ها"
+                kateb_list_page: "لیست گزارشات روزانه"    # append all pages title to this kateb page
+            output_path: ./../results/
+
+    - Monstaver:
+            input_path: ./../results/
+            time_list:  
+                #- now-1h,now
+                #- now-3d,now-2d
+                #- "2023-09-11 00:00:00,2023-09-11 23:59:59"
+                #- ./time.txt
+            batch_mode: True # value = True for all backup modes and False for restore
+            operation: backup # values = restore , backup,info - backup - info
+     
+    - Status_Analyzer:
+            output_path: /path/to/kara/results/analyzed/
+            merge: True
+            merge_csv: "./../result/*"  # list of csv file --> '/path/csv1,/path/csv3,/path/csv3,' or /path/*
+
             analyze: True
-            keep_source_columns: False
-            analyze_csv: "/home/kara/results/analyzed/merged.csv"
+            keep_source_columns: False    # keep original columns in source csv file
+            make_analyzed_graph: True
+            analyze_csv: "/path/to/kara/results/analyzed/merged.csv"
 
-      - Report_Recorder:
+    - Report_Recorder:
             create_html: True
-            hardware:
-                 report: True
-                 template: /home/kara/report_recorder/input_templates/hardware.html
-            software:
-                 report: True
-                 template: /home/kara/report_recorder/input_templates/software.html   
-            monster_test:
-                 report: True
-                 merged: /home/kara/results/analyzed/merged.csv 
-                 merged_info: /home/kara/results/analyzed/merged_info.csv
-                 tests_dir: /home/kara/results/    
 
-            output_path: /home/kara/report_recorder/output_htmls/
-            configs_dir: /tmp/influxdb-backup/240415T100000_240415T100500/
+            hardware_template: /path/to/kara/report_recorder/input_templates/hardware.html
+            software_template: /path/to/kara/report_recorder/input_templates/software.html   
+
+            monster_test:
+                report: True
+                merged: /path/to/kara/manager/merged.csv
+                merged_info: /path/to/kara/manager/merged_info.csv
+                images_path: /path/to/kara/results/
+
+            output_path: /path/to/kara/report_recorder/output_htmls/
+            configs_dir: /tmp/influxdb-backup/backup_dir/
+
             upload_to_kateb: True
-            cluster_name: kara1
-            scenario_name: performance_test_1
+            cluster_name: kara
+            scenario_name: performance
+            kateb_list_page: "name of page"  # append all pages title to this kateb page
 
 log: 
    level: info  # values = debug - info - warning - error - critical

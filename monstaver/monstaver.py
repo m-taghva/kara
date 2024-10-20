@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 import time
 import os
 import subprocess
@@ -9,6 +9,8 @@ import pytz
 import yaml
 import json
 import requests
+from pathlib import Path
+import getpass
 import concurrent.futures
 from alive_progress import alive_bar
 
@@ -25,6 +27,106 @@ def load_config(config_file):
             sys.exit(1)
     return data_loaded
 
+def read_yaml_and_generate_keys(data_loaded):
+    # Process 'swift' section
+    if 'swift' in data_loaded:
+        for server_name, details in data_loaded['swift'].items():
+            ip = details.get('ip')
+            ssh_user = details.get('ssh_user')
+            ssh_port = details.get('ssh_port')
+            if ip and ssh_user and ssh_port:
+                generate_and_copy_key(ssh_user, ip, ssh_port, server_name)
+    # Process 'db_sources' section
+    if 'db_sources' in data_loaded:
+        for server_name, details in data_loaded['db_sources'].items():
+            ip = details.get('ip')
+            ssh_user = details.get('ssh_user')
+            ssh_port = details.get('ssh_port')
+            if ip and ssh_user and ssh_port:
+                generate_and_copy_key(ssh_user, ip, ssh_port, server_name)
+    # Process 'influxdbs_restore' section
+    if 'influxdbs_restore' in data_loaded:
+        for server_name, details in data_loaded['influxdbs_restore'].items():
+            ip = details.get('ip')
+            ssh_user = details.get('ssh_user')
+            ssh_port = details.get('ssh_port')
+            if ip and ssh_user and ssh_port:
+                generate_and_copy_key(ssh_user, ip, ssh_port, server_name)
+
+def generate_and_copy_key(username, ip, port, server_name):
+    print(f"Processing SSH in server: \033[1;33m{server_name}\033[0m ...")
+    # Define paths
+    home_dir = Path(f'/home/{username}')
+    ssh_dir = home_dir / '.ssh'
+    ssh_key_path = ssh_dir / 'id_rsa'
+    # Check if SSH key already exists
+    if ssh_key_path.exists():
+        print(f"SSH key already exists for {username} at {ssh_key_path}.")
+    else:
+        # Create .ssh directory if it doesn't exist
+        ssh_dir.mkdir(mode=0o700, exist_ok=True)
+        # Generate SSH key
+        subprocess.run(['sudo', '-u', username, 'ssh-keygen', '-t', 'rsa', '-b', '2048', '-f', str(ssh_key_path), '-N', ''], check=True)
+        print(f"SSH key generated for {username} at {ssh_key_path}")
+    public_key_path = str(ssh_key_path) + '.pub'
+    if not Path(public_key_path).exists():
+        print("Public key not found.")
+        return
+    # Check if the public key already exists on the remote server
+    try:
+        with open(public_key_path, 'r') as pub_key_file:
+            public_key = pub_key_file.read().strip()
+        # SSH to the remote server and check for the public key in authorized_keys
+        check_key_command = f"ssh -p {port} {username}@{ip} 'grep -q \"{public_key}\" ~/.ssh/authorized_keys'"
+        subprocess.run(check_key_command, shell=True)
+        if subprocess.call(check_key_command, shell=True) == 0:
+            print(f"Public key already exists on {ip}. Skipping...")
+            return  # Skip this server if the key exists
+    except Exception as e:
+        print(f"Failed to check existing keys on {ip}: {e}")
+        return
+    password = getpass.getpass(f"Enter password for {username}@{ip}: ")
+    try:
+        # Use sshpass to provide the password non-interactively
+        #subprocess.run(f"ssh-copy-id -p {port} {username}@{ip}", shell=True, check=True)
+        subprocess.run(['sshpass', '-p', password, 'ssh-copy-id', '-p', str(port), '-i', public_key_path, f"{username}@{ip}"], check=True)
+        print(f"SSH key copied to {ip}")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to copy SSH key to {ip}: {e}")
+
+def unix_to_tehran_time(unix_timestamp):
+    # Convert the Unix timestamp to a formatted UTC time string
+    utc_time_str = datetime.utcfromtimestamp(unix_timestamp).strftime("%Y-%m-%dT%H:%M:%SZ") 
+    tehran_tz = pytz.timezone('Asia/Tehran')
+    # Localize the UTC time and convert to Tehran time
+    tehran_time = pytz.utc.localize(datetime.strptime(utc_time_str, "%Y-%m-%dT%H:%M:%SZ")).astimezone(tehran_tz)
+    # Format the Tehran time without timezone information
+    tehran_time_str = tehran_time.strftime("%Y-%m-%d %H:%M:%S")
+    return tehran_time_str
+
+# Function to convert "now-nh", "now-nd", or "now" format to timestamp
+def parse_time(tehran_timestamp):
+    if tehran_timestamp == "now":
+        now_time_timestamp = int(datetime.now().timestamp())
+        return now_time_timestamp
+    elif tehran_timestamp.startswith("now-") and (tehran_timestamp.endswith("h") or tehran_timestamp.endswith("d")):
+        try:
+            time_value = int(tehran_timestamp.split("-")[1][:-1])
+            if tehran_timestamp.endswith("h"):
+                # Subtract hours
+                now_time_subtract = datetime.now() - timedelta(hours=time_value)
+            elif tehran_timestamp.endswith("d"):
+                # Subtract days
+                now_time_subtract = datetime.now() - timedelta(days=time_value)
+            now_time_timestamp = int(now_time_subtract.timestamp())
+            return now_time_timestamp
+        except ValueError:
+            print("\033[91mInvalid time range format. Expected format: 'now-nh' for hours or 'now-nd' for days where n is a number\033[0m")
+            exit()
+    else:
+        print("\033[91mInvalid time range format. Expected format: 'now', 'now-nh', or 'now-nd' where n is a number\033[0m")
+        exit()
+
 def tehran_time_to_utc(tehran_time_str):
     logging.info("monstaver - Executing tehran_time_to_utc function")
     tehran_tz = pytz.timezone('Asia/Tehran')
@@ -35,14 +137,14 @@ def tehran_time_to_utc(tehran_time_str):
 
 def convert_time(start_time_str, end_time_str, margin_start, margin_end):
     logging.info("monstaver - Executing convert_time function")
-    start_datetime = datetime.datetime.strptime(start_time_str, "%Y-%m-%d %H:%M:%S")
-    end_datetime = datetime.datetime.strptime(end_time_str, "%Y-%m-%d %H:%M:%S")
+    start_datetime = datetime.strptime(start_time_str, "%Y-%m-%d %H:%M:%S")
+    end_datetime = datetime.strptime(end_time_str, "%Y-%m-%d %H:%M:%S")
     # Convert Tehran time to UTC
     start_datetime_utc = tehran_time_to_utc(start_datetime)
     end_datetime_utc = tehran_time_to_utc(end_datetime)
     # Add the margins to datetime objects
-    start_datetime_utc -= datetime.timedelta(seconds=margin_start)
-    end_datetime_utc += datetime.timedelta(seconds=margin_end)
+    start_datetime_utc -= timedelta(seconds=margin_start)
+    end_datetime_utc += timedelta(seconds=margin_end)
     # Convert the UTC datetime objects back to strings
     start_datetime_utc_str = start_datetime_utc.strftime("%Y-%m-%d %H:%M:%S")
     end_datetime_utc_str = end_datetime_utc.strftime("%Y-%m-%d %H:%M:%S")
@@ -134,7 +236,8 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
     mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/motherboard/ ; "
     mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/hardware/server-manufacturer ; "
     mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-host/ ; " 
-    mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/ "
+    mkdir_hwoss_output += f"sudo mkdir -p {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/{container_name}-etc-container/ ; "
+    mkdir_hwoss_output += f"sudo chown -R {user}:{user} {backup_dir}/{time_dir_name}"
     mkdir_hwoss_process = subprocess.run(mkdir_hwoss_output, shell=True)
     if mkdir_hwoss_process.returncode == 0:
         logging.info("monstaver - make hardware/software sub directories successful")
@@ -554,6 +657,8 @@ def restore(data_loaded):
 ##### BACKUP PARTS #####
 def backup(time_range, inputs, delete, data_loaded, hardware_info, software_info, swift_info, influx_backup):
     logging.info("Executing monstaver backup function")
+    start_time_str = None
+    end_time_str = None
     if time_range is None:
         time_range = data_loaded['default'].get('time')
     if inputs is not None:
@@ -576,6 +681,9 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, software_info
     logging.info(f"monstaver - hardware / software / swift backup options: {hardware_info}/{software_info}/{swift_info}")
     backup_dir = data_loaded['default'].get('backup_output')
     start_time_str, end_time_str = time_range.split(',')
+    if time_range.startswith("now") or time_range.endswith("h") or time_range.endswith("d"):
+        start_time_unix = parse_time(start_time_str); end_time_unix = parse_time(end_time_str)
+        start_time_str = unix_to_tehran_time(start_time_unix); end_time_str = unix_to_tehran_time(end_time_unix)
     logging.info(f"monstaver - start time & end time of backup: {start_time_str}, {end_time_str}")
     margin_start, margin_end = map(int, data_loaded['default'].get('time_margin').split(',')) 
     start_time_backup, end_time_backup, time_dir_name = convert_time(start_time_str, end_time_str, margin_start, margin_end)
@@ -696,7 +804,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, software_info
             for key,value in data_loaded['swift'].items():
                 container_name = key
                 user = value['ssh_user']
-                ip = value['ip_swift']
+                ip = value['ip']
                 port = value['ssh_port']
                 future = info_executor.submit(info_collector, port, user, ip, backup_dir, time_dir_name, container_name, bar, swift_info, hardware_info, software_info)
                 info_futures_list.append(future)
@@ -765,6 +873,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, software_info
 
 def main(time_range, inputs, delete, backup_restore, hardware_info, software_info, swift_info, influx_backup):
     data_loaded = load_config(config_file)
+    read_yaml_and_generate_keys(data_loaded)
     log_level = data_loaded['log'].get('level')
     if log_level is not None:
         log_level_upper = log_level.upper()

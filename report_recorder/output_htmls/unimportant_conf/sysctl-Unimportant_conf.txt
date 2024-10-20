@@ -1,0 +1,10 @@
+kernel.random.boot_id
+fs.quotap.syncs
+domain0.max_newidle_lb_cost
+kernel.pty.nr
+fs.dentry-state
+kernel.random.uuid
+fs.inode-nr
+net.netfilter.nf_conntrack_count
+fs.inode-state
+kernel.ns_last_pid

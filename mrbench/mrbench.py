@@ -11,6 +11,8 @@ import json
 import select
 import logging
 import concurrent.futures
+from pathlib import Path
+import getpass
 
 # variables
 config_file = "/etc/kara/mrbench.conf"
@@ -31,6 +33,57 @@ def load_config(config_file):
            print(f"Error loading the configuration: {exc}")
            sys.exit(1)
     return data_loaded
+
+def read_yaml_and_generate_keys(data_loaded):
+    # Process 'swift' section
+    if 'swift' in data_loaded:
+        for server_name, details in data_loaded['swift'].items():
+            ip = details.get('ip')
+            ssh_user = details.get('ssh_user')
+            ssh_port = details.get('ssh_port')
+            if ip and ssh_user and ssh_port:
+                generate_and_copy_key(ssh_user, ip, ssh_port, server_name)
+
+def generate_and_copy_key(username, ip, port, server_name):
+    print(f"Processing SSH in server: \033[1;33m{server_name}\033[0m ...")
+    # Define paths
+    home_dir = Path(f'/home/{username}')
+    ssh_dir = home_dir / '.ssh'
+    ssh_key_path = ssh_dir / 'id_rsa'
+    # Check if SSH key already exists
+    if ssh_key_path.exists():
+        print(f"SSH key already exists for {username} at {ssh_key_path}.")
+    else:
+        # Create .ssh directory if it doesn't exist
+        ssh_dir.mkdir(mode=0o700, exist_ok=True)
+        # Generate SSH key
+        subprocess.run(['sudo', '-u', username, 'ssh-keygen', '-t', 'rsa', '-b', '2048', '-f', str(ssh_key_path), '-N', ''], check=True)
+        print(f"SSH key generated for {username} at {ssh_key_path}")
+    public_key_path = str(ssh_key_path) + '.pub'
+    if not Path(public_key_path).exists():
+        print("Public key not found.")
+        return
+    # Check if the public key already exists on the remote server
+    try:
+        with open(public_key_path, 'r') as pub_key_file:
+            public_key = pub_key_file.read().strip()
+        # SSH to the remote server and check for the public key in authorized_keys
+        check_key_command = f"ssh -p {port} {username}@{ip} 'grep -q \"{public_key}\" ~/.ssh/authorized_keys'"
+        subprocess.run(check_key_command, shell=True)
+        if subprocess.call(check_key_command, shell=True) == 0:
+            print(f"Public key already exists on {ip}. Skipping...")
+            return  # Skip this server if the key exists
+    except Exception as e:
+        print(f"Failed to check existing keys on {ip}: {e}")
+        return
+    password = getpass.getpass(f"Enter password for {username}@{ip}: ")
+    try:
+        # Use sshpass to provide the password non-interactively
+        #subprocess.run(f"ssh-copy-id -p {port} {username}@{ip}", shell=True, check=True)
+        subprocess.run(['sshpass', '-p', password, 'ssh-copy-id', '-p', str(port), '-i', public_key_path, f"{username}@{ip}"], check=True)
+        print(f"SSH key copied to {ip}")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to copy SSH key to {ip}: {e}")
 
 def conf_ring_thread(swift_configs, port, user, ip, container_name, key_to_extract): 
     logging.info("mrbench - Executing conf_ring_thread function")   
@@ -122,13 +175,36 @@ def conf_ring_thread(swift_configs, port, user, ip, container_name, key_to_extra
             while True:
                 check_container_result = subprocess.run(f"ssh -p {port} {user}@{ip} 'sudo docker ps -f name={container_name}'", shell=True, capture_output=True, text=True, check=True)
                 if "Up" in check_container_result.stdout and "healthy" in check_container_result.stdout:
-                    check_services_result = subprocess.run(f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} service --status-all'", shell=True, capture_output=True, text=True, check=True)
-                    if "[ + ]  swift-account\n" or "[ + ]  swift-container\n" or "[ + ]  swift-object\n" or "[ + ]  swift-proxy\n" in check_services_result:
-                        time.sleep(30)
-                        print("")
-                        logging.info(f"mrbench - container {container_name} successfully restart")
-                        print(f"\033[92mcontainer {container_name} successfully restart\033[0m")
-                        break
+                    check_services = subprocess.run(f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-init main status'", shell=True, capture_output=True, text=True, check=True)
+                    service_status_lines = check_services.stdout.splitlines()
+                    expected_services_conf = ["/etc/swift/container-server.conf","/etc/swift/proxy-server.conf","/etc/swift/account-server.conf","/etc/swift/object-server.conf"]
+                    all_services_up = True
+                    # Check each line for service status
+                    for line in service_status_lines:
+                        if line.startswith("No"):
+                            all_services_up = False
+                            # Find the corresponding service that is down and print it
+                            for service_conf in expected_services_conf:
+                                if service_conf in line:
+                                    print(f"\033[91m{service_conf} is not running!\033[0m")
+                                    logging.error(f"{service_conf} is not running")
+                                    service_name = service_conf.split("/")[-1].replace(".conf", "")
+                                    start_services = subprocess.run(f"ssh -p {port} {user}@{ip} 'sudo docker exec {container_name} swift-init start {service_name}'", shell=True, capture_output=True, text=True, check=True)
+                                    time.sleep(10)
+                                    if start_services.returncode == 0:
+                                        print(f"\033[92m{service_name} restarted successfully.\033[0m")
+                                        logging.info(f"{service_name} restarted successfully")
+                                    else:
+                                        print(f"\033[91mFailed to restart {service_name}.\033[0m")
+                                        logging.error(f"Failed to restart {service_name}")
+                    # If all services are running, log success
+                    if all_services_up:
+                        time.sleep(30)  # Delay before continuing
+                        print(f"\033[92mContainer {container_name} successfully restarted\033[0m")
+                        logging.info(f"mrbench - Container {container_name} successfully restarted")
+                    else:
+                        print(f"\033[91mSome monster services are not running in container {container_name}\033[0m")
+                        logging.warning(f"Some monster services are not running in container {container_name}")
         else:
             logging.info(f"mrbench - container {container_name} failed to reatsrt")
             print(f"\033[91mcontainer {container_name} failed to reatsrt\033[0m")
@@ -146,13 +222,16 @@ def copy_swift_conf(swift_configs):
         logging.info("mrbench - Error there isn't any item in swift section (mrbench.conf) so ring and conf can't set.")
         print(f"Error there isn't any item in \033[91mswift\033[0m section (mrbench.conf) so ring and conf can't set.")
         exit(1)
-    
+    read_yaml_and_generate_keys(data_loaded)
     futures = []
     with concurrent.futures.ThreadPoolExecutor() as executor:
         for key,value in data_loaded['swift'].items():
             container_name = key
             user = value['ssh_user']
-            ip = value['ip_swift']
+            if "ip" in value:
+                ip = value['ip']
+            else:
+                print("somethig is wrong! mrbench can't find 'ip_swift', please check your config file")
             port = value['ssh_port']
             key_to_extract = "com.docker.compose.project.working_dir"
             # run in multithread 
@@ -245,8 +324,8 @@ def submit(workload_config_path, output_path):
             archive_workload_dir_name = f"{workload_id}-swift-sample"  
             cosbench_data = save_cosinfo(f"{archive_path}{archive_workload_dir_name}/{archive_workload_dir_name}.csv")
             if cosbench_data and cosbench_data['start_time'] and cosbench_data['end_time']:
-                test_time_dir = f"{cosbench_data['start_time']}_{cosbench_data['end_time']}"
-                result_path = os.path.join(output_path, test_time_dir.replace(" ","_"))
+                test_time_dir = f"{cosbench_data['start_time']}__{cosbench_data['end_time']}"
+                result_path = os.path.join(output_path, test_time_dir.replace(" ","_").replace(":","-"))
                 if not os.path.exists(result_path):
                     os.mkdir(result_path) 
                 print(f"Result Path: {result_path}")

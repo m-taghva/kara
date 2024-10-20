@@ -326,6 +326,31 @@ def generate_confs (confType, serverType = None):
     compared_dict ["servers"] = confType + "  " + (serverType if serverType != None else "")
     return compared_dict
 
+def partitioning (confOfServers , confType , unimportantconfDir):
+    if os.path.exists(unimportantconfDir+"/"+confType+"-Unimportant_conf.txt"):
+        with open( unimportantconfDir+"/"+confType+"-Unimportant_conf.txt", 'r') as f:
+            unimportantConfs = f.readlines() # reads list of important configs here
+        unimportantConfs = [unimportantConf.strip() for unimportantConf in unimportantConfs]  # to remove /n at the end of lines
+        for server in listOfServers:
+            if server in confOfServers:
+                unImportantList = []
+                importantList = list (confOfServers[server])
+
+                for conf in confOfServers[server]:  # searches to find important configs in all configs of server
+                    for unimportantConf in unimportantConfs:
+                        if unimportantConf in conf:
+                            unImportantList.append(conf)
+                            importantList.remove(conf)
+                finalList = []
+                if len(importantList) !=0:
+                    finalList = ["************* Important Confs *************" ]
+                    finalList = finalList + importantList
+                if len(unImportantList) != 0:
+                    finalList.append("************* Other Confs *************")
+                    finalList.extend(unImportantList)
+                confOfServers[server] = finalList
+    return confOfServers
+
 ####### MERGER #######
 def merge_csv(csv_file, output_directory, mergedinfo_dict, merged_dict):
     logging.info("status_analyzer - Executing merge_csv function")
@@ -352,75 +377,144 @@ def merge_csv(csv_file, output_directory, mergedinfo_dict, merged_dict):
     except FileNotFoundError:
         logging.info(f"status_analyzer - File '{csv_file}' not found. Skipping")
         print(f"File '{csv_file}' not found. Skipping...")
+    return f'{output_directory}/merged.csv'
 
-def merge_process(output_directory, selected_csv):
+def merge_process(output_directory, selected_CSVs):
     logging.info("status_analyzer - Executing merge_process function")
-    if '*' in selected_csv:    
-        selected_csv = glob(selected_csv)
-        for file in selected_csv:
-            merge_csv(file, output_directory, mergedinfo_dict=None, merged_dict=None)
+    if '*' in selected_CSVs:    
+        selected_CSVs = glob(selected_CSVs)
+        for file in selected_CSVs:
+            merged_file = merge_csv(file, output_directory, mergedinfo_dict=None, merged_dict=None)
     else:
-        for file in selected_csv:
+        for file in selected_CSVs:
             if os.path.exists(file):
-                merge_csv(file, output_directory, mergedinfo_dict=None, merged_dict=None)
+                merged_file = merge_csv(file, output_directory, mergedinfo_dict=None, merged_dict=None)
             else:
                 print(f"\033[91mThis CSV file doesn't exist:\033[0m{file}")
                 logging.info(f"status_analyzer - This CSV file doesn't exist:{file}")
                 exit(1)
+    return merged_file
                 
 ####### ANALYZER #######
-def process_csv_file(csv_data, operation, new_column_name, selected_columns):
+def make_all_row(source_csv, row_operations, all_row_data):
+    for operation in row_operations:
+        row_data = {}
+        for column in source_csv.columns:
+            if column != "Host_name" and column != "cosbench.run_time":
+                if operation == 'sum':
+                    row_data[column] = source_csv[column].sum()
+                elif operation == 'avg':
+                    row_data[column] = source_csv[column].mean()
+        row_data['Host_name'] = operation.upper()
+        all_row_data[operation] = row_data
+    return all_row_data
+
+def process_csv_file(source_csv, operation, new_column_name, selected_columns):
     logging.info("Executing status_analyzer process_csv_file function")
     if operation == 'sum':
         new_column_name = f"sum.{new_column_name}"
-        csv_data[new_column_name] = csv_data[selected_columns].sum(axis=1)
+        source_csv[new_column_name] = source_csv[selected_columns].sum(axis=1)
     elif operation == 'avg':
         new_column_name = f"avg.{new_column_name}"
-        csv_data[new_column_name] = csv_data[selected_columns].mean(axis=1)
-    return csv_data
-
-def analyze_and_save_csv(csv_original, keep_column, data_loaded):
-    logging.info("status_analyzer - Executing analyze_and_save_csv function")
-    source_csv = pd.read_csv(csv_original)
-    selected_column_names = set()
-    for group_name, group_content in data_loaded['transformation_groups'].items():
-        final_output_csv_name = f"{os.path.splitext(os.path.basename(csv_original))[0]}-{group_name}.csv"
-        final_output_csv_path = os.path.join(os.path.dirname(csv_original), final_output_csv_name)
-        for new_column_name, column_content in group_content.items():
-            operation = column_content['operation']
-            selected_columns = [line.strip() for line in column_content.get('selected_columns', [])]
-            source_csv = process_csv_file(source_csv, operation, new_column_name, selected_columns)
-            selected_column_names.update(selected_columns)
-        if keep_column:
-            csv_final = source_csv
+        source_csv[new_column_name] = source_csv[selected_columns].mean(axis=1)
+    elif operation == 'mul':
+        new_column_name = f"mul.{new_column_name}"
+        result = 1
+        for selected_col in selected_columns:
+            if isinstance(selected_col, (int, float)):
+                result *= selected_col  # Multiply by the constant
+            elif selected_col in source_csv.columns:
+                result *= source_csv[selected_col]  # Multiply by the column values
+            else:
+                print(f"\033[91mColumn\033[0m '{selected_col}' \033[91mdoes not exist in the CSV file or it's type is not number!\033[0m")
+                exit()
+        source_csv[new_column_name] = result
+    elif operation == 'div':
+        new_column_name = f"div.{new_column_name}"
+        if len(selected_columns) == 2:
+            source_csv[new_column_name] = source_csv[selected_columns[0]] / source_csv[selected_columns[1]]
         else:
-            keep_columns = [col for col in source_csv.columns if col not in selected_column_names]
-            csv_final = source_csv[keep_columns]
-        csv_final.to_csv(final_output_csv_path, index=False)
-        print(f"\n{BOLD}Analyzed CSV file:{RESET}{YELLOW} '{final_output_csv_path}' {RESET}{BOLD}has been created with the extracted values.{RESET}\n")
+            print("\033[91mDivision requires exactly two selected columns\033[0m")
+    return source_csv
+
+def analyze_and_save_csv(csv_original, keep_column, output_directory, data_loaded):
+    logging.info("status_analyzer - Executing analyze_and_save_csv function")
+    source_csv = pd.read_csv(csv_original, usecols=lambda column: column.strip() != "")
+    selected_column_names = set()
+    all_row_data = {}
+    for section_name, content in data_loaded['transformation'].items():
+        if 'csv' in section_name:
+            final_output_csv_name = f"{os.path.splitext(os.path.basename(csv_original))[0]}_analyzed.csv"
+            final_output_csv_path = os.path.join(output_directory, final_output_csv_name)
+            if 'columns' in content:
+                for new_column_name, column_content in content.get('columns', {}).items():
+                    operation = column_content['operation']
+                    selected_columns = [line for line in column_content.get('selected_columns', [])]
+                    if not operation or not selected_columns:
+                        print(f"\033[91moperation or selected columns missing for transformation in file {final_output_csv_name} \033[0m")
+                        exit()
+                    # Ensure that all selected columns exist before creating the new column
+                    missing_columns = [col for col in selected_columns if col not in source_csv.columns]
+                    if missing_columns:
+                        for miss_col in missing_columns:
+                            if not isinstance(miss_col, (int, float)):
+                                print(f"\033[91mSelected columns missing:\033[0m {missing_columns} \033[91mfor new column\033[0m '{new_column_name}'")
+                    source_csv = process_csv_file(source_csv, operation, new_column_name, selected_columns)
+                    selected_column_names.update(selected_columns)
+            # Process 'rows' section for operations on all columns
+            row_operations = content.get('rows', [])
+            if row_operations:
+                all_row_data = make_all_row(source_csv, row_operations, all_row_data)
+                for operation, row_data in all_row_data.items():
+                    all_row = pd.DataFrame([row_data])
+                    source_csv = pd.concat([source_csv, all_row], ignore_index=True)
+            if keep_column:
+                csv_final = source_csv
+            else:
+                keep_columns = [col for col in source_csv.columns if col not in selected_column_names]
+                csv_final = source_csv[keep_columns]
+    csv_final.to_csv(final_output_csv_path, index=False)
+    print(f"\n{BOLD}Analyzed CSV file:{RESET}{YELLOW} '{final_output_csv_path}' {RESET}{BOLD}has been created with the extracted values.{RESET}\n")
+    return final_output_csv_path
 
 ###### Make graph and image ######
-def plot_and_save_graph(selected_csv, x_column, y_column):
+def plot_and_save_graph(csv_original, output_directory, data_loaded):
     logging.info("status_analyzer - Executing plot_and_save_graph function")
-    # Read CSV file into a DataFrame
-    data = pd.read_csv(selected_csv)
-    # Extract x and y values from DataFrame
-    x_values = data[x_column]
-    y_values = data[y_column]
-    # Plot the data
-    plt.plot(x_values, y_values, marker='o')
-    # Set plot labels and title
-    plt.xlabel(x_column)
-    plt.ylabel(y_column)
-    file_name = os.path.basename(selected_csv)
-    time_of_graph = file_name.replace('.csv','')
-    title = f'Time of Report: {time_of_graph}'
-    plt.title(title)
-    # Save the plot as an image in the same directory as the CSV file
-    image_file_path = selected_csv.replace('.csv', '_graph.png')
-    plt.savefig(image_file_path)
+    csv_data = pd.read_csv(csv_original, usecols=lambda column: column.strip() != "")
+    image_dict = {}
+    for group_name, group_data in data_loaded['transformation']['graph'].items():
+        filter_data = group_data.get('filter', {})
+        selected_columns = group_data.get('selected_columns', [])
+        temp_csv = csv_data
+        for filter_column, filter_values in filter_data.items():
+            if filter_column in temp_csv.columns:
+                temp_csv = temp_csv[temp_csv[filter_column].isin(filter_values)]
+        for column_pair in selected_columns:
+            for x_column, y_column in column_pair.items():
+                if x_column in temp_csv.columns and y_column in temp_csv.columns:
+                    # Extract x and y values from DataFrame
+                    x_values = temp_csv[x_column]
+                    y_values = temp_csv[y_column]
+                    # Plot the data
+                    plt.plot(x_values, y_values, marker='o')
+                    # Set plot labels and title
+                    plt.xlabel(x_column)
+                    plt.ylabel(y_column)
+                    title = f"name of csv: {os.path.basename(csv_original).replace('.csv', ' ')}"
+                    plt.title(title)
+                    plt.grid(True)
+                    plt.tight_layout()
+                    image_name = os.path.basename(csv_original).replace('.csv', f'_{group_name}_{x_column}_{y_column}.png')
+                    image_file_path = os.path.join(output_directory, image_name)
+                    plt.savefig(image_file_path)
+                    print(f"{YELLOW}image of analyzed graph save:{RESET} {BOLD}'{image_file_path}'{RESET}")
+                    image_dict[image_name] = image_file_path
+                    plt.clf()
+                else:
+                    print(f"\033[91mcheck config file, mybe these seleceted columns are not existed on csv file:\033[0m '{x_column}' \033[91mand\033[0m '{y_column}'  \033[91mso graph of them can't create!\033[0m")
+    return image_dict
 
-def main(merge, analyze, graph, csv_original, output_directory, selected_csv, x_column, y_column, keep_column):
+def main(merge, analyze, graph, csv_original, output_directory, selected_CSVs, keep_column):
     data_loaded = load_config(config_file)
     log_level = data_loaded['log'].get('level')
     if log_level is not None:
@@ -434,52 +528,52 @@ def main(merge, analyze, graph, csv_original, output_directory, selected_csv, x_
     else:
         print(f"\033[91mPlease enter log_level in the configuration file.\033[0m")
     logging.info("\033[92m****** status_analyzer main function start ******\033[0m")
+    if output_directory is None:
+        output_directory = data_loaded['output_path']
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
     if analyze:
-        analyze_and_save_csv(csv_original, keep_column, data_loaded)
+        final_output_csv_path = analyze_and_save_csv(csv_original, keep_column, output_directory, data_loaded)
     if merge:
-        if not os.path.exists(output_directory):
-            os.makedirs(output_directory) 
-        merge_process(output_directory, selected_csv)
-    if graph:
-        plot_and_save_graph(selected_csv, x_column, y_column)
+        merged_file = merge_process(output_directory, selected_CSVs)
+    if graph: 
+        plot_and_save_graph(csv_original, output_directory, data_loaded)
     logging.info("\033[92m****** status_analyzer main function end ******\033[0m")
+    return final_output_csv_path
            
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Perform CSV operations and merge files.')
     parser.add_argument('-M', '--merge', action='store_true', help='Merge CSV files')
     parser.add_argument('-o', '--output_directory', help='Path to the directory containing CSV files or output for merged csv file (required for -M)')
-    parser.add_argument('-sc', '--selected_csv', help='Name of the selected CSV files or "*.csv" (required for -M)')
+    parser.add_argument('-sc', '--selected_CSVs', help='Name of the selected CSV files or "*.csv" (required for -M)')
     parser.add_argument('-A', '--analyze', action='store_true', help='Analyze CSV files')
     parser.add_argument('-c', '--csv_org', help='Custom CSV file for analysis (required for -A)')
     parser.add_argument('-k', '--keep_column', action='store_true', help='keep column of orginal_CSV file')
     parser.add_argument('-G', '--graph', action='store_true', help='make graph of CSV file')
-    parser.add_argument('-x', '--x_column', type=str, help='Name of the X column (required for -G)')
-    parser.add_argument('-y', '--y_column', type=str, help='Name of the Y column (required for -G)')
     args = parser.parse_args()
     # Check required arguments based on operation
-    if args.merge and (args.output_directory is None or args.selected_csv is None):
-        print("Error: Both -o (--input_directory) and -sc (--selected_csv) switches are required for merge operation -M")
+    if args.merge and (args.output_directory is None or args.selected_CSVs is None):
+        print("Error: Both -o (--input_directory) and -sc (--selected_CSVs) switches are required for merge operation -M")
         exit(1)
     if args.analyze and (args.csv_org is None):
         print("Error: -c (--csv_org) switche is required for analyze operation -A")
         exit(1)
-    if args.graph and (args.x_column is None or args.y_column is None or args.selected_csv is None):
-        print("Error: these switch -x (--x_column) and -y (--y_column) and sc (--selected_csv) are required for make graph operation -G")
+    if args.graph and (args.csv_org is None and args.output_directory is None):
+        print("Error: these switchs sc (--csv_org) and -o (--output_directory) are required for make graph operation -G")
         exit(1)
     # Set values to None if not provided
     merge = args.merge ; analyze = args.analyze ; keep_column = args.keep_column ; graph = args.graph
-    x_column = args.x_column ; y_column = args.y_column
     csv_original = args.csv_org.strip() if args.csv_org else None
     output_directory = args.output_directory.strip() if args.output_directory else None
-    selected_csv = args.selected_csv if args.selected_csv else None
+    selected_CSVs = args.selected_CSVs if args.selected_CSVs else None
     if merge:
-        if selected_csv:
-            if '*' in selected_csv:
-                selected_csv = args.selected_csv.strip()
+        if selected_CSVs:
+            if '*' in selected_CSVs:
+                selected_CSVs = args.selected_CSVs.strip()
             else:
-                selected_csv = args.selected_csv.split(',')         
+                selected_CSVs = args.selected_CSVs.split(',')         
         else:
-            selected_csv = None
+            selected_CSVs = None
             print(f'\033[91mplease select correct csv file your file is wrong: {args.selected_csv}\033[0m')
             exit(1)
-    main(merge, analyze, graph, csv_original, output_directory, selected_csv, x_column, y_column, keep_column)
+    main(merge, analyze, graph, csv_original, output_directory, selected_CSVs, keep_column)

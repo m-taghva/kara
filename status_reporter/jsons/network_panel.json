@@ -1,0 +1,185 @@
+{
+  "id": 28,
+  "gridPos": {
+    "h": 7,
+    "w": 8,
+    "x": 8,
+    "y": 14
+  },
+  "type": "graph",
+  "title": "Network Bandwidth2",
+  "datasource": {
+    "type": "influxdb",
+    "uid": "7x0fGlCIk"
+  },
+  "thresholds": [],
+  "pluginVersion": "9.3.6",
+  "legend": {
+    "avg": false,
+    "current": false,
+    "max": false,
+    "min": false,
+    "show": true,
+    "total": false,
+    "values": false
+  },
+  "aliasColors": {},
+  "bars": true,
+  "dashLength": 10,
+  "fieldConfig": {
+    "defaults": {
+      "links": []
+    },
+    "overrides": []
+  },
+  "fill": 1,
+  "linewidth": 1,
+  "nullPointMode": "null",
+  "options": {
+    "alertThreshold": true
+  },
+  "pointradius": 2,
+  "renderer": "flot",
+  "seriesOverrides": [],
+  "spaceLength": 10,
+  "stack": true,
+  "targets": [
+    {
+      "alias": "recieved",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "7x0fGlCIk"
+      },
+      "groupBy": [
+        {
+          "params": [
+            "$timeVariable"
+          ],
+          "type": "time"
+        },
+        {
+          "params": [
+            "null"
+          ],
+          "type": "fill"
+        }
+      ],
+      "measurement": "netdata.system.net.received",
+      "orderByTime": "ASC",
+      "policy": "default",
+      "refId": "A",
+      "resultFormat": "time_series",
+      "select": [
+        [
+          {
+            "params": [
+              "value"
+            ],
+            "type": "field"
+          },
+          {
+            "params": [],
+            "type": "mean"
+          }
+        ]
+      ],
+      "tags": [
+        {
+          "key": "host",
+          "operator": "=~",
+          "value": "/^$hostIs$/"
+        }
+      ]
+    },
+    {
+      "alias": "sent",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "7x0fGlCIk"
+      },
+      "groupBy": [
+        {
+          "params": [
+            "$timeVariable"
+          ],
+          "type": "time"
+        },
+        {
+          "params": [
+            "null"
+          ],
+          "type": "fill"
+        }
+      ],
+      "measurement": "netdata.system.net.sent",
+      "orderByTime": "ASC",
+      "policy": "default",
+      "refId": "B",
+      "resultFormat": "time_series",
+      "select": [
+        [
+          {
+            "params": [
+              "value"
+            ],
+            "type": "field"
+          },
+          {
+            "params": [],
+            "type": "mean"
+          },
+          {
+            "params": [
+              "*-1"
+            ],
+            "type": "math"
+          }
+        ]
+      ],
+      "tags": [
+        {
+          "key": "host",
+          "operator": "=~",
+          "value": "/^$hostIs$/"
+        }
+      ]
+    }
+  ],
+  "timeRegions": [],
+  "tooltip": {
+    "shared": true,
+    "sort": 0,
+    "value_type": "individual"
+  },
+  "xaxis": {
+    "mode": "time",
+    "show": true,
+    "values": [],
+    "name": null,
+    "buckets": null
+  },
+  "yaxes": [
+    {
+      "format": "Kbits",
+      "logBase": 1,
+      "show": true
+    },
+    {
+      "format": "short",
+      "logBase": 1,
+      "show": true
+    }
+  ],
+  "yaxis": {
+    "align": false
+  },
+  "dashes": false,
+  "fillGradient": 0,
+  "hiddenSeries": false,
+  "lines": false,
+  "percentage": false,
+  "points": false,
+  "steppedLine": false,
+  "timeFrom": null,
+  "timeShift": null
+}

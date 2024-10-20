@@ -4,7 +4,7 @@ class Family(family.Family):  # noqa: D101
 
     name = 'kateb'
     langs = {
-        'fa': 'user:pass@URL',  # uesr:pass of web server authentication
+        'fa': 'user:pass@kateb-URL',  # uesr:pass of web server@kateb_domain  Attention!! do not type '#' in user or pass here, replace it with Ascii code "%23"
     }
 
     def scriptpath(self, code):
