@@ -55,18 +55,18 @@
         2.3. Changing the Shard in the Database
             After the initial setup of Kara using one of the two mentioned methods, go to the /manager/db_shard directory and first configure the db_shard.conf file according to the MC servers or InfluxDB host servers to change the shard to a 1-hour data storage interval. This increases performance and accuracy during backup and reporting processes in Kara and only needs to be done once. Once this section is executed by the db_shard_script.py tool, the shard in all specified databases will be changed to 1 hour.
 
-        Note: After changing the shard in the database, you must wait at least 2 hours for proper data storage, and after that, you can run other Kara tools related to the database.
+                Note: After changing the shard in the database, you must wait at least 2 hours for proper data storage, and after that, you can run other Kara tools related to the database.
         
-            database_info: # this part of the config is for changing shard hour in databases
-              mc:
-                ip: 0.0.0.0
-                ssh_port: 22
-                ssh_user: user
-                container_name: influxdb
-                databases: # list of databases
-                  - opentsdb
-              
-            Running the Tool:
-            python3 db_shard_script.py
+                database_info: # this part of the config is for changing shard hour in databases
+                  mc:
+                    ip: 0.0.0.0
+                    ssh_port: 22
+                    ssh_user: user
+                    container_name: influxdb
+                    databases: # list of databases
+                      - opentsdb
+                  
+                Running the Tool:
+                python3 db_shard_script.py
 
     
