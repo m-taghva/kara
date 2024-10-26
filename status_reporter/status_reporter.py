@@ -342,7 +342,7 @@ def get_report(data_loaded, metric_file, path_dir, time_range, img=False):
             dashboard_rm = config['grafana_dashboards'].get('remove_dashboards', True)
             dashboards_json = config['grafana_dashboards'].get('dashboards_name', [])
             customized_panles = config['grafana_dashboards'].get('custom_panels', [])
-            if 'report_images' in config['grafana_dashboards']:
+            if config['grafana_dashboards']['report_images']:
                 if 'panels_per_row' in config['grafana_dashboards']['report_images']:
                     panels_per_row = int(config['grafana_dashboards']['report_images'].get('panels_per_row'))
                 else:
@@ -367,6 +367,12 @@ def get_report(data_loaded, metric_file, path_dir, time_range, img=False):
                     panel_height = config['grafana_dashboards']['report_images'].get('panel_height')
                 else:
                     panel_height = "400"
+            else:
+                panels_per_row = int("3") ; panels_per_column = int("3")
+                max_panels = panels_per_row * panels_per_column
+                if max_panels < panels_per_column:
+                    panels_per_column = max_panels
+                panel_width = "800" ; panel_height = "400"
 
             logging.info(f"status_reporter - user need dashboard and images")
             dashboard_data_dict = dashboard_import(dashboards_json, api_key, grafana_url, customized_panles)
