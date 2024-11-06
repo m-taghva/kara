@@ -614,9 +614,7 @@ def upload_data(site, title_content_dict, kateb_list, cluster_name, scenario_nam
         list_page_title = kateb_list 
         list_page = pywikibot.Page(site, list_page_title)
         # Check if the page exists
-        if not list_page.exists():
-            print(f"The page '{list_page_title}' does not exist.")
-        else:
+        if list_page.exists():
             # Get the current content of the page
             current_content = list_page.text
             # Define the new page name to append
@@ -627,9 +625,19 @@ def upload_data(site, title_content_dict, kateb_list, cluster_name, scenario_nam
             if text_to_append not in current_content:
                 new_content = current_content + text_to_append
                 list_page.text = new_content
-                list_page.save(summary="kara append main page title to this page", force=True, quiet=False, botflag=True)
+                list_page.save(summary="kara append new page title to this page", force=True, quiet=False, botflag=True)
                 print(f"Successfully updated the page '{list_page_title}'")
-
+        else:
+            # Define the new page name to append
+            if scenario_name:
+                text_to_append = f"\n* [[{cluster_name}--{scenario_name}|{cluster_name}--{scenario_name}]]"
+            else:
+                text_to_append = f"\n* [[{cluster_name}|{cluster_name}]]"
+            if text_to_append:
+                list_page.text = text_to_append
+                list_page.save(summary="Uploaded by KARA", force=True, quiet=False, botflag=True)
+                print(f"Successfully updated the page '{list_page_title}'")
+                
 def upload_images(site, html_content):
     logging.info("report_recorder - Executing upload_images function")
     # Convert dominate document to a string if needed
@@ -787,6 +795,9 @@ def create_daily_html(dfdict,imgsdict,output_dir,timeVariable):
         for group,csv in dfdict.items():
             h3(f"{group}", dir="rtl")
             with div():
+                csv.columns = csv.columns.str.replace(r'_.*?\.', '.', 1,regex=True)
+                csv.columns = csv.columns.str.replace('.', ' .', regex=False)
+                csv = csv.round(2)
                 raw(csv.dropna(axis=1, how='all').to_html(index=False, border=2))
         h2(f"داشبوردهای گرافانا با تایم فریم {timeVariable}", dir="rtl")
         for group,hosts in imgsdict[list(imgsdict.keys())[0]].items():
@@ -802,7 +813,8 @@ def create_daily_html(dfdict,imgsdict,output_dir,timeVariable):
 def main2(output_dir, cluster_name, kateb_list, kateb_tags, csv_address, imgsdict, timeVariable):
     title = f"{cluster_name}:گزارش وضعیت کلاستر:from {list(imgsdict.keys())[0].replace('__',' to ')}"
     if not os.path.exists(os.path.join(output_dir+"/imgs/")):
-        os.mkdir(os.path.join(output_dir+"/imgs/"))
+        #os.mkdir(os.path.join(output_dir+"/imgs/"))
+        subprocess.run(f"mkdir -p {output_dir}/imgs/", shell=True)
     move_images(imgsdict,os.path.join(output_dir,'imgs'))
     dfdict = {}
     for group,csv_path in csv_address.items():
