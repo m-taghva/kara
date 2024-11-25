@@ -1,0 +1,35 @@
+# ~/kara/docker-compose.yaml
+version: "3.8"
+
+services:
+  kara:
+    image: kara:1.0.1
+    container_name: kara
+    hostname: kara
+    init: true
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - $PWD/backup:/tmp/influxdb-backup
+      - $PWD/scenario_dir:/home/kara/manager/scenario_dir
+      - $PWD/results:/home/kara/results
+      - $PWD/kara-configs:/etc/kara
+      - $PWD/jsons:/home/kara/status_reporter/jsons
+      - $PWD/metrics:/home/kara/status_reporter/metrics
+      - $PWD/rings:/home/kara/mrbench/rings
+      - $PWD/workloads-configs:/home/kara/config_gen/workloads-configs
+    ports:
+      - "19088:19088"
+      - "18088:18088"
+    healthcheck:
+      test: /home/kara/docker/healthcheck.sh | grep -w "OK" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - karanet
+
+networks:
+  karanet:
+    name: karanet

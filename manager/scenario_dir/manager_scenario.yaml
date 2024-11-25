@@ -2,10 +2,10 @@ scenario:
       
     - Config_gen:
             conf_templates:    # list of cosbench and swift config file
-                - /path/to/kara/config_gen/workloads.xml__1
-                - /path/to/kara/config_gen/workloads.xml__2
-                - /path/to/kara/config_gen/configs.conf
-                - /path/to/kara/config_gen/object_swift.conf
+                - /path/to/kara/config_gen/workloads-configs/workloads.xml__1
+                - /path/to/kara/config_gen/workloads-configs/workloads.xml__2
+                - /path/to/kara/config_gen/workloads-configs/proxy-server.conf
+                - /path/to/kara/config_gen/workoads-configs/object-server.conf
 
             output_path: /path/to/kara/config_gen/out/
 
@@ -18,9 +18,9 @@ scenario:
 
             #conf_dir: /path/to/kara/config_gen/out/
             ring_dirs:    # list of directory include ring files
-                - /path/to/kara/mrbench/ring/r1/
-                - /path/to/kara/mrbench/ring/r2/
-                - /path/to/kara/mrbench/ring/r3/
+                - /path/to/kara/mrbench/rings/r1/
+                - /path/to/kara/mrbench/rings/r2/
+                - /path/to/kara/mrbench/rings/r3/
 
     - Status-Reporter: 
             time_list:
@@ -68,8 +68,8 @@ scenario:
 
             monster_test:
                 report: True
-                merged: /path/to/kara/manager/merged.csv
-                merged_info: /path/to/kara/manager/merged_info.csv
+                merged: /path/to/kara/results/analyzed/merged.csv
+                merged_info: /path/to/kara/results/analyzed/merged_info.csv
                 images_path: /path/to/kara/results/
 
             output_path: /path/to/kara/report_recorder/output_htmls/

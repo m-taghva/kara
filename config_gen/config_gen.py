@@ -6,7 +6,7 @@ import argparse
 import logging
 import subprocess
 
-# variables
+### variables
 log_path = "/var/log/kara/"
 conf_number = 0 # define global variable
 

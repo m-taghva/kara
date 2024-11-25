@@ -50,10 +50,10 @@ done
 ### copy config files to /etc/kara
 # Source directory where your files are located
 source_dir="./sample_configs"
-# Destination directory where you want to move the files
+#Destination directory where you want to copy the files
 destination_dir="/etc/kara"
 mkdir -p "$destination_dir"
-cp -r "$source_dir"/* "$destination_dir"/
+cp -r "$source_dir"/*.conf "$destination_dir"/
 # Check if files are successfully moved
 if [ $? -eq 0 ]; then
     echo -e "${YELLOW}Config files moved successfully to $destination_dir${RESET}"
@@ -65,9 +65,9 @@ fi
 zip_file="$KARA_DIR/kara/report_recorder/report_recorder_bot.zip"
 zip_destination="/usr/local/lib/$PYTHON_DIR/dist-packages/"
 if unzip -o "$zip_file" -d "$zip_destination"  > /dev/null 2>&1; then
-   echo -e "${BOLD}Unzip and move${RESET} ${YELLOW}report_recoder_bot${RESET} ${BOLD}to${RESET} ${YELLOW}${zip_destination}${RESET} ${BOLD}dir successful${RESET}"
+    echo -e "${BOLD}Unzip and move${RESET} ${YELLOW}report_recoder_bot${RESET} ${BOLD}to${RESET} ${YELLOW}${zip_destination}${RESET} ${BOLD}dir successful${RESET}"
 else
-  echo -e "${RED}report_recoder_bot unzip failed${RESET}"
+    echo -e "${RED}report_recoder_bot unzip failed${RESET}"
 fi
  
 ### copy user-config.py to manager dir
@@ -85,11 +85,11 @@ fi
 
 ### install dependency
 sudo apt update
-sudo apt install -y xfsprogs python pip
-Install Python libraries using pip
-pip install pytz datetime matplotlib pandas alive_progress BeautifulSoup4 wikitextparser mwparserfromhell sshpass
+sudo apt install -y python pip sshpass
+#Install Python libraries using pip
+pip install pytz jdatetime datetime matplotlib pandas alive_progress BeautifulSoup4 wikitextparser mwparserfromhell
 if [ $? -eq 0 ]; then
- echo -e "${YELLOW}All installations were successful${RESET}"
+    echo -e "${YELLOW}All installations were successful${RESET}"
 else
- echo -e "${RED}There was an error during the installations${RESET}"
+    echo -e "${RED}There was an error during the installations${RESET}"
 fi

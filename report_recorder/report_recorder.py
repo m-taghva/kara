@@ -15,6 +15,7 @@ import dominate
 from dominate.tags import *
 from dominate.util import raw
 from dominate.document import document
+import jdatetime
 python_ver_dir = subprocess.run(f'find /usr/local/lib/ -maxdepth 1 -type d -name "python*" -exec basename {{}} \\; | sort -V | tail -n 1', shell=True, capture_output=True, text=True).stdout.strip()
 pywiki_path = os.path.abspath(f"/usr/local/lib/{python_ver_dir}/dist-packages/report_recorder_bot/")
 if pywiki_path not in sys.path:
@@ -179,7 +180,6 @@ class testClassification:
         subPageData.summarycsv = pd.merge(subPageData.summarycsv, self.detailcsv, on=self.timeColumn)
         #subPageData.summarycsv.columns = subPageData.summarycsv.columns.str.replace('.', '. ', regex=False)
 
-
     def createSubPageHTML(self, subPageHTML: dominate.document, subPageData :subPage, heading_level=2):
         with subPageHTML:
             p(raw(subPageData.text), dir="rtl")
@@ -205,14 +205,16 @@ class testClassification:
         else:
             with subPageHTML:
                 with div():
+                    subPageData.summarycsv = subPageData.summarycsv.round(2)
                     raw(subPageData.summarycsv.dropna(axis=1, how='all').to_html(index=False, border=2))
                 if (subPageData.summarycsv[self.timeColumn].iloc[0] in self.imgsdict):
-                    for host,dashboards in self.imgsdict[subPageData.summarycsv[self.timeColumn].iloc[0]].items():
-                        for dashboard,imgList in dashboards.items():
-                            p(raw(f"<b>{host}_{dashboard}</b><br>"), dir="rtl")
-                            for image in imgList:
-                                img(src=f"./imgs/{image}", alt=f"{self.clusterName}--{self.scenarioName}")
-        
+                    for group,hosts in self.imgsdict[subPageData.summarycsv[self.timeColumn].iloc[0]].items():
+                        for host,dashboards in hosts.items():
+                            for dashboard,imgList in dashboards.items():
+                                p(raw(f"<b>{group}_{host}_{dashboard}</b><br>"), dir="rtl")
+                                for image in imgList:
+                                    img(src=f"./subpages/imgs/{image}", alt=f"{self.clusterName}--{self.scenarioName}")
+    
     def pageDataToHTML(self,mainPageData, heading_level): #return list of dominate.document
         pagesHTML = []
         total_rows = sum(df.shape[0] for df in mainPageData.values())
@@ -307,7 +309,7 @@ def load_config(config_file):
 def path_to_dict(img_path_or_dict):
     imgs_path_to_dict = {}
     for time_dir in os.listdir(img_path_or_dict):
-        filter_tests_dir = {':','_','-'}
+        filter_tests_dir = {'_','-'}
         if all(char in time_dir for char in filter_tests_dir):
             time_path = os.path.join(img_path_or_dict, time_dir)
             if os.path.isdir(time_path):
@@ -316,7 +318,10 @@ def path_to_dict(img_path_or_dict):
                     if "-images" in host_dir:
                         host_path = os.path.join(time_path, host_dir)
                         if os.path.isdir(host_path):
-                            imgs_path_to_dict[time_dir][host_dir] = {}
+                            group_name = host_dir.split("_", 1)[0]
+                            host_name = host_dir.split("_")[1].replace('-images','')
+                            imgs_path_to_dict[time_dir].setdefault(group_name, {})
+                            imgs_path_to_dict[time_dir][group_name][host_name] = {}
                             # Collect all images in the host directory
                             all_images = [os.path.join(host_path, img_file) for img_file in os.listdir(host_path) if img_file.endswith('.png')]
                             # Separate dashboard images from others
@@ -324,11 +329,8 @@ def path_to_dict(img_path_or_dict):
                             if dashboards:
                                 dashboard_name = os.path.splitext(os.path.basename(dashboards[0]))[0]
                                 dashboard_name_clean = re.sub(r'__\d+$', '', dashboard_name)
-                                # Use full path for dashboard images and other images
-                                imgs_path_to_dict[time_dir][host_dir][dashboard_name_clean] = dashboards
-                            else:
-                                # If no dashboard images are found, just map an empty key or a placeholder
-                                imgs_path_to_dict[time_dir][host_dir]["no_dashboard_image"] = dashboards
+                                # Add dashboards to the host dictionary
+                                imgs_path_to_dict[time_dir][group_name][host_name][dashboard_name_clean] = dashboards
     return imgs_path_to_dict 
 
 #### make HTML template ####
@@ -634,11 +636,11 @@ def upload_data(site, title_content_dict, kateb_list, cluster_name, scenario_nam
             else:
                 text_to_append = f"\n* [[{cluster_name}|{cluster_name}]]"
             if text_to_append:
-                list_page.text = text_to_append
+                list_page.text = text_to_append + '\n[[رده:فهرست]]\n'
                 list_page.save(summary="Uploaded by KARA", force=True, quiet=False, botflag=True)
                 print(f"Successfully updated the page '{list_page_title}'")
                 
-def upload_images(site, html_content):
+def upload_images(site, html_content, output_htmls_path):
     logging.info("report_recorder - Executing upload_images function")
     # Convert dominate document to a string if needed
     if isinstance(html_content, document):
@@ -653,6 +655,8 @@ def upload_images(site, html_content):
     image_paths = [img['src'] for img in soup.find_all('img') if 'src' in img.attrs]
     # Upload each image to the wiki
     for image_path in image_paths:
+        if "./" in image_path:
+            image_path = image_path.replace("./", f"{str(output_htmls_path)}/")
         image_filename = os.path.basename(image_path)
         page = pywikibot.FilePage(site, f'File:{image_filename}')
         if not page.exists():
@@ -711,7 +715,7 @@ def main(software_template, hardware_template, output_htmls_path, cluster_name, 
         output_htmls_path = data_loaded['output_path']
 
     if not os.path.exists(os.path.join(output_htmls_path+"/subpages/imgs/")):
-        os.mkdir(os.path.join(output_htmls_path+"/subpages/imgs/"))
+        subprocess.run(f"mkdir -p {output_htmls_path}/subpages/imgs/", shell=True)
 
     if configs_directory is None:
         configs_directory = data_loaded['hw_sw_info']['configs_dir']
@@ -776,22 +780,32 @@ def main(software_template, hardware_template, output_htmls_path, cluster_name, 
             wiki_content = convert_html_to_wiki(content)
             title_content_dict[title] = wiki_content
             # Upload images to the wiki
-            upload_images(site, content)
+            upload_images(site, content, output_htmls_path)
         if create_test_page:
             for page in scenario_pages:
                 wiki_content = convert_html_to_wiki(page.body)
                 title_content_dict[page.title] = wiki_content
                 # Upload images to the wiki
-                upload_images(site, page.body)
+                upload_images(site, page.body, output_htmls_path)
         # Upload converted data to the wiki
         check_data(site, title_content_dict, kateb_list, cluster_name, scenario_name)
     logging.info("\033[92m****** report_recorder main function end ******\033[0m")
 
 ################# temp code of daily report ##################################
-def create_daily_html(dfdict,imgsdict,output_dir,timeVariable):
+def convert_to_shamsi(miladi_date):
+    shamsi = {}
+    shamsi['y'] = int(miladi_date.split('-')[0])
+    shamsi['m'] = int(miladi_date.split('-')[1])
+    shamsi['d'] = int(miladi_date.split('-')[2])
+    shamsi_date = jdatetime.date.fromgregorian(day=shamsi['d'],month=shamsi['m'],year=shamsi['y'])
+    shamsi_date_str = shamsi_date.strftime("%Y-%m-%d")
+    return shamsi_date_str
+
+def create_daily_html(dfdict,imgsdict,output_dir,timeVariable,cluster_name,report_time,start_date,end_date,start_time,end_time):
     pageHTML = dominate.document(title=f'title')
     with pageHTML:
-        h2(f"در یک نگاه", dir="rtl")
+        p(raw(f"در این سند گزارش روزانه کلاستر {cluster_name} در بازه زمانی از تاریخ <span dir='rtl'>{start_date}</span>  ساعت <span dir='rtl'>{report_time.split('__')[0].split('_')[1]}</span> تا تاریخ <span dir='rtl'>{end_date}</span> ساعت <span dir='rtl'>{report_time.split('__')[1].split('_')[1]}</span> آورده شده است.<br>"))#, dir="rtl"
+        h2(f"نتایج گزارش روزانه در یک نگاه", dir="rtl")
         for group,csv in dfdict.items():
             h3(f"{group}", dir="rtl")
             with div():
@@ -799,27 +813,34 @@ def create_daily_html(dfdict,imgsdict,output_dir,timeVariable):
                 csv.columns = csv.columns.str.replace('.', ' .', regex=False)
                 csv = csv.round(2)
                 raw(csv.dropna(axis=1, how='all').to_html(index=False, border=2))
-        h2(f"داشبوردهای گرافانا با تایم فریم {timeVariable}", dir="rtl")
-        for group,hosts in imgsdict[list(imgsdict.keys())[0]].items():
-            h3(f"{group}", dir="rtl")
-            for host,dashboards in hosts.items():
-                h4(f"{host}", dir="rtl")
-                for dashboard,imgList in dashboards.items():
-                    h5(dashboard, dir="rtl")
-                    for image in imgList:
-                        img(src=f"{output_dir}/imgs/{image}", alt=f"Daily-{image}")
+        if (imgsdict[report_time][list(imgsdict[report_time].keys())[0]]):
+            h2(f"داشبوردهای گرافانا با تایم فریم {timeVariable}", dir="rtl")
+            for group,hosts in imgsdict[report_time].items():
+                h3(f"{group}", dir="rtl")
+                for host,dashboards in hosts.items():
+                    h4(f"{host}", dir="rtl")
+                    for dashboard,imgList in dashboards.items():
+                        h5(dashboard, dir="rtl")
+                        for image in imgList:
+                            img(src=f"./imgs/{image}", alt=f"Daily-{cluster_name}-{image}")
     return pageHTML
 
 def main2(output_dir, cluster_name, kateb_list, kateb_tags, csv_address, imgsdict, timeVariable):
-    title = f"{cluster_name}:گزارش وضعیت کلاستر:from {list(imgsdict.keys())[0].replace('__',' to ')}"
+
+    report_time = str(list(imgsdict.keys())[0])
+    start_date = convert_to_shamsi(report_time.split('__')[0].split('_')[0])
+    end_date = convert_to_shamsi(report_time.split('__')[1].split('_')[0])
+    start_time = report_time.split('__')[0].split('_')[1]
+    end_time = report_time.split('__')[1].split('_')[1]
+    
+    title = f"{cluster_name}:گزارش وضعیت کلاستر from {start_date}_{start_time} to {end_date}_{end_time}"
     if not os.path.exists(os.path.join(output_dir+"/imgs/")):
-        #os.mkdir(os.path.join(output_dir+"/imgs/"))
         subprocess.run(f"mkdir -p {output_dir}/imgs/", shell=True)
     move_images(imgsdict,os.path.join(output_dir,'imgs'))
     dfdict = {}
     for group,csv_path in csv_address.items():
         dfdict[group] = pd.read_csv(csv_path)
-    content = create_daily_html(dfdict,imgsdict,output_dir,timeVariable)
+    content = create_daily_html(dfdict,imgsdict,output_dir,timeVariable,cluster_name,report_time,start_date,end_date,start_time,end_time)
     with open(os.path.join(output_dir,f"{title}.html"),'w') as f:
         f.write(content.render())
     site = pywikibot.Site()
@@ -827,7 +848,7 @@ def main2(output_dir, cluster_name, kateb_list, kateb_tags, csv_address, imgsdic
     title_content_dict = {}
     wiki_content = convert_html_to_wiki(str(content.body)+convertTagList(kateb_tags))
     title_content_dict[title] = wiki_content
-    upload_images(site, content)
+    upload_images(site, content, output_dir)
     check_data(site, title_content_dict, kateb_list, title, scenario_name=None)
 
 if __name__ == "__main__":

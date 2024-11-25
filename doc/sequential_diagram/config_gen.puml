@@ -1,0 +1,9 @@
+@startuml
+title config-gen functions
+client -> main :  [template file, output dir]
+main -> replace_tags : [output dir, template data, conf_name]
+replace_tags -> replace_tags : [output dir, template data, conf_name]
+replace_tags -> replace_vars : [output dir, template data, conf_name]
+replace_vars -> replace_vars : [output dir, template data, conf_name]
+main -> client : [some files]
+@enduml

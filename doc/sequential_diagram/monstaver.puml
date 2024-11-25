@@ -1,0 +1,10 @@
+@startuml
+title monstaver functions
+client -> main :  [time range, input dirs, \n(Delete,Backup,restore,hardware,software,swift)args]
+main -> backup : [config data, time range, input dirs, \n(Delete,Backup,hardware,software,swift)args]
+backup -> info_collector : [mc server info, (hardware,software,swift)args]
+backup -> backup_data_collector : [influxdb info, output dir]
+backup -> main : [backup dir]
+main -> restore : [config file data]
+main -> client : [Backup file, restored data to new DB]
+@enduml

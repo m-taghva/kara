@@ -35,30 +35,36 @@ def load_config(config_file):
     return data_loaded
 
 def read_yaml_and_generate_keys(data_loaded):
-    # Process 'swift' section
-    if 'swift' in data_loaded:
-        for server_name, details in data_loaded['swift'].items():
+    # Process 'monster' section
+    if 'monster' in data_loaded:
+        for server_name, details in data_loaded['monster'].items():
             ip = details.get('ip')
             ssh_user = details.get('ssh_user')
             ssh_port = details.get('ssh_port')
             if ip and ssh_user and ssh_port:
                 generate_and_copy_key(ssh_user, ip, ssh_port, server_name)
 
-def generate_and_copy_key(username, ip, port, server_name):
+def generate_and_copy_key(ssh_user, ip, port, server_name):
     print(f"Processing SSH in server: \033[1;33m{server_name}\033[0m ...")
+    whoami = subprocess.check_output("whoami", text=True).strip()
+    if whoami == 'root':
+        local_username = 'root'
+        home_dir = Path(f'/{local_username}')
+    else:
+        local_username = whoami
+        home_dir = Path(f'/home/{local_username}')
     # Define paths
-    home_dir = Path(f'/home/{username}')
     ssh_dir = home_dir / '.ssh'
     ssh_key_path = ssh_dir / 'id_rsa'
     # Check if SSH key already exists
     if ssh_key_path.exists():
-        print(f"SSH key already exists for {username} at {ssh_key_path}.")
+        print(f"SSH key already exists for '{local_username}' at {ssh_key_path}")
     else:
         # Create .ssh directory if it doesn't exist
-        ssh_dir.mkdir(mode=0o700, exist_ok=True)
+        subprocess.run(f"sudo mkdir -p {ssh_dir} && sudo chmod -R 777 {ssh_dir}", shell=True)
         # Generate SSH key
-        subprocess.run(['sudo', '-u', username, 'ssh-keygen', '-t', 'rsa', '-b', '2048', '-f', str(ssh_key_path), '-N', ''], check=True)
-        print(f"SSH key generated for {username} at {ssh_key_path}")
+        subprocess.run(['sudo', '-u', local_username, 'ssh-keygen', '-t', 'rsa', '-b', '2048', '-f', str(ssh_key_path), '-N', ''], check=True)
+        print(f"SSH key generated for '{local_username}' at {ssh_key_path}")
     public_key_path = str(ssh_key_path) + '.pub'
     if not Path(public_key_path).exists():
         print("Public key not found.")
@@ -68,7 +74,7 @@ def generate_and_copy_key(username, ip, port, server_name):
         with open(public_key_path, 'r') as pub_key_file:
             public_key = pub_key_file.read().strip()
         # SSH to the remote server and check for the public key in authorized_keys
-        check_key_command = f"ssh -p {port} {username}@{ip} 'grep -q \"{public_key}\" ~/.ssh/authorized_keys'"
+        check_key_command = f"ssh -p {port} {ssh_user}@{ip} 'grep -q \"{public_key}\" ~/.ssh/authorized_keys'"
         subprocess.run(check_key_command, shell=True)
         if subprocess.call(check_key_command, shell=True) == 0:
             print(f"Public key already exists on {ip}. Skipping...")
@@ -76,11 +82,11 @@ def generate_and_copy_key(username, ip, port, server_name):
     except Exception as e:
         print(f"Failed to check existing keys on {ip}: {e}")
         return
-    password = getpass.getpass(f"Enter password for {username}@{ip}: ")
+    password = getpass.getpass(f"Enter password for {ssh_user}@{ip}: ")
     try:
         # Use sshpass to provide the password non-interactively
         #subprocess.run(f"ssh-copy-id -p {port} {username}@{ip}", shell=True, check=True)
-        subprocess.run(['sshpass', '-p', password, 'ssh-copy-id', '-p', str(port), '-i', public_key_path, f"{username}@{ip}"], check=True)
+        subprocess.run(['sudo', 'sshpass', '-p', password, 'ssh-copy-id', '-p', str(port), '-i', public_key_path, f"{ssh_user}@{ip}"], check=True)
         print(f"SSH key copied to {ip}")
     except subprocess.CalledProcessError as e:
         print(f"Failed to copy SSH key to {ip}: {e}")
@@ -198,13 +204,15 @@ def conf_ring_thread(swift_configs, port, user, ip, container_name, key_to_extra
                                         print(f"\033[91mFailed to restart {service_name}.\033[0m")
                                         logging.error(f"Failed to restart {service_name}")
                     # If all services are running, log success
-                    if all_services_up:
+                    if all_services_up is True:
                         time.sleep(30)  # Delay before continuing
                         print(f"\033[92mContainer {container_name} successfully restarted\033[0m")
                         logging.info(f"mrbench - Container {container_name} successfully restarted")
+                        break
                     else:
                         print(f"\033[91mSome monster services are not running in container {container_name}\033[0m")
                         logging.warning(f"Some monster services are not running in container {container_name}")
+                        time.sleep(30)  # Delay before continuing
         else:
             logging.info(f"mrbench - container {container_name} failed to reatsrt")
             print(f"\033[91mcontainer {container_name} failed to reatsrt\033[0m")
@@ -214,24 +222,25 @@ def copy_swift_conf(swift_configs):
     logging.info("mrbench - Executing copy_swift_conf function")
     ring_dict = {}
     data_loaded = load_config(config_file)
-    if not 'swift' in data_loaded:
+    if not 'monster' in data_loaded:
         logging.info("mrbench - Error there isn't swift section in mrbench.conf so ring and conf can't set.")
-        print(f"Error there isn't \033[91mswift\033[0m section in mrbench.conf so ring and conf can't set.")
+        print(f"Error there isn't \033[91mmonster\033[0m section in mrbench.conf so ring and conf can't set.")
         exit(1)
-    if not data_loaded['swift']:
+    if not data_loaded['monster']:
         logging.info("mrbench - Error there isn't any item in swift section (mrbench.conf) so ring and conf can't set.")
-        print(f"Error there isn't any item in \033[91mswift\033[0m section (mrbench.conf) so ring and conf can't set.")
+        print(f"Error there isn't any item in \033[91mmonster\033[0m section (mrbench.conf) so ring and conf can't set.")
         exit(1)
     read_yaml_and_generate_keys(data_loaded)
+    time.sleep(5)
     futures = []
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        for key,value in data_loaded['swift'].items():
+        for key,value in data_loaded['monster'].items():
             container_name = key
             user = value['ssh_user']
             if "ip" in value:
                 ip = value['ip']
             else:
-                print("somethig is wrong! mrbench can't find 'ip_swift', please check your config file")
+                print("somethig is wrong! mrbench can't find 'ip', please check your config file")
             port = value['ssh_port']
             key_to_extract = "com.docker.compose.project.working_dir"
             # run in multithread 

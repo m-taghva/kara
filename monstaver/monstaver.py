@@ -27,7 +27,33 @@ def load_config(config_file):
             sys.exit(1)
     return data_loaded
 
+def DB_shard(data_loaded):
+    logging.info("monstaver - Executing DB_shard function")
+    default_rp_name = "autogen"
+    database_names = [db_name for config in data_loaded.get('db_sources', {}).values() if isinstance(config, dict) and 'databases' in config for db_name in config['databases']]
+    for mc_server, config in data_loaded.get('db_sources', {}).items(): 
+        ip_influxdb = config.get('ip')
+        ssh_port = config.get('ssh_port')
+        ssh_user = config.get('ssh_user')
+        container_name = config.get('container_name')
+        for db_name in database_names:
+            # Change rp part         
+            policy_changer_command = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} \"sudo docker exec -i -u root {container_name} influx -execute 'alter retention policy {default_rp_name} on {db_name} shard duration 1h default'\""
+            policy_changer_process = subprocess.run(policy_changer_command, shell=True)
+            if policy_changer_process.returncode == 0:
+                print(f"\033[92mShard group duration in '{mc_server}' database: '{db_name}' changed to 1h successfully\033[0m")
+                logging.info(f"monstaver - Shard group duration in '{mc_server}' database: '{db_name}' changed to 1h successfully")
+                print("")
+                print("\033[1;33m*-*-*-*-*-*-*-*-*-*-*-*-*-* ATTENTION *-*-*-*-*-*-*-*-*-*-*-*-*-*-*\033[0m")
+                print("\033[1;33mDO NOT USE influxDB after running this script for at least 2 HOURS\033[0m")
+                print("\033[1;33m*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\033[0m")
+                print("")
+            else:
+                print(f"\033[91mchanging DB shard failed in '{mc_server}' database: '{db_name}'\033[0m")
+                logging.info(f"monstaver - changing DB shard failed in '{mc_server}' database: '{db_name}'")
+
 def read_yaml_and_generate_keys(data_loaded):
+    logging.info("monstaver - Executing read_yaml_and_generate_keys function")
     # Process 'swift' section
     if 'swift' in data_loaded:
         for server_name, details in data_loaded['swift'].items():
@@ -53,21 +79,28 @@ def read_yaml_and_generate_keys(data_loaded):
             if ip and ssh_user and ssh_port:
                 generate_and_copy_key(ssh_user, ip, ssh_port, server_name)
 
-def generate_and_copy_key(username, ip, port, server_name):
+def generate_and_copy_key(ssh_user, ip, port, server_name):
+    logging.info("monstaver - Executing generate_and_copy_key function")
     print(f"Processing SSH in server: \033[1;33m{server_name}\033[0m ...")
+    whoami = subprocess.check_output("whoami", text=True).strip()
+    if whoami == 'root':
+        local_username = 'root'
+        home_dir = Path(f'/{local_username}')
+    else:
+        local_username = whoami
+        home_dir = Path(f'/home/{local_username}')
     # Define paths
-    home_dir = Path(f'/home/{username}')
     ssh_dir = home_dir / '.ssh'
     ssh_key_path = ssh_dir / 'id_rsa'
     # Check if SSH key already exists
     if ssh_key_path.exists():
-        print(f"SSH key already exists for {username} at {ssh_key_path}.")
+        print(f"SSH key already exists for '{local_username}' at {ssh_key_path}")
     else:
         # Create .ssh directory if it doesn't exist
-        ssh_dir.mkdir(mode=0o700, exist_ok=True)
+        subprocess.run(f"sudo mkdir -p {ssh_dir} && sudo chmod -R 777 {ssh_dir}", shell=True)
         # Generate SSH key
-        subprocess.run(['sudo', '-u', username, 'ssh-keygen', '-t', 'rsa', '-b', '2048', '-f', str(ssh_key_path), '-N', ''], check=True)
-        print(f"SSH key generated for {username} at {ssh_key_path}")
+        subprocess.run(['sudo', '-u', local_username, 'ssh-keygen', '-t', 'rsa', '-b', '2048', '-f', str(ssh_key_path), '-N', ''], check=True)
+        print(f"SSH key generated for '{local_username}' at {ssh_key_path}")
     public_key_path = str(ssh_key_path) + '.pub'
     if not Path(public_key_path).exists():
         print("Public key not found.")
@@ -77,7 +110,7 @@ def generate_and_copy_key(username, ip, port, server_name):
         with open(public_key_path, 'r') as pub_key_file:
             public_key = pub_key_file.read().strip()
         # SSH to the remote server and check for the public key in authorized_keys
-        check_key_command = f"ssh -p {port} {username}@{ip} 'grep -q \"{public_key}\" ~/.ssh/authorized_keys'"
+        check_key_command = f"ssh -p {port} {ssh_user}@{ip} 'grep -q \"{public_key}\" ~/.ssh/authorized_keys'"
         subprocess.run(check_key_command, shell=True)
         if subprocess.call(check_key_command, shell=True) == 0:
             print(f"Public key already exists on {ip}. Skipping...")
@@ -85,11 +118,11 @@ def generate_and_copy_key(username, ip, port, server_name):
     except Exception as e:
         print(f"Failed to check existing keys on {ip}: {e}")
         return
-    password = getpass.getpass(f"Enter password for {username}@{ip}: ")
+    password = getpass.getpass(f"Enter password for {ssh_user}@{ip}: ")
     try:
         # Use sshpass to provide the password non-interactively
         #subprocess.run(f"ssh-copy-id -p {port} {username}@{ip}", shell=True, check=True)
-        subprocess.run(['sshpass', '-p', password, 'ssh-copy-id', '-p', str(port), '-i', public_key_path, f"{username}@{ip}"], check=True)
+        subprocess.run(['sudo', 'sshpass', '-p', password, 'ssh-copy-id', '-p', str(port), '-i', public_key_path, f"{ssh_user}@{ip}"], check=True)
         print(f"SSH key copied to {ip}")
     except subprocess.CalledProcessError as e:
         print(f"Failed to copy SSH key to {ip}: {e}")
@@ -329,7 +362,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             time.sleep(1)
         elif "command not found" in lshw_process.stderr:
             logging.info(f"monstaver - lshw is not installed. Please install it on {container_name} host")
-            print("\033[91mlshw is not installed. Please install it.\033[0m")
+            print("\033[91mlshw is not installed. Please install it on monster hosts.\033[0m")
         else:
             logging.error(f"monstaver - lshw failed on {container_name} host")
             print(f"\033[91m lshw failed on {container_name} host\033[0m")
@@ -340,7 +373,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             time.sleep(1)
         elif "command not found" in lscpu_process.stderr:
             logging.info(f"monstaver - lscpu is not installed. Please install it on {container_name} host")
-            print("\033[91mlscpu is not installed. Please install it.\033[0m")
+            print("\033[91mlscpu is not installed. Please install it on monster hosts.\033[0m")
         else:
             logging.error(f"monstaver - lscpu failed on {container_name} host")
             print(f"\033[91m lscpu failed on {container_name} host\033[0m")
@@ -351,7 +384,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             time.sleep(1)
         elif "command not found" in lsmem_process.stderr:
             logging.info(f"monstaver - lsmem is not installed. Please install it on {container_name} host")
-            print("\033[91mlsmem is not installed. Please install it.\033[0m")
+            print("\033[91mlsmem is not installed. Please install it on monster hosts.\033[0m")
         else:
             logging.error(f"monstaver - lsmem failed on {container_name} host")
             print(f"\033[91m lamem failed on {container_name} host\033[0m")
@@ -362,7 +395,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             time.sleep(1)
         elif "command not found" in lspci_process.stderr:
             logging.info(f"monstaver - lspci is not installed. Please install it on {container_name} host")
-            print("\033[91m lspci is not installed. Please install it.\033[0m")
+            print("\033[91m lspci is not installed. Please install it on monster hosts.\033[0m")
         else:
             logging.error(f"monstaver - lspci failed on {container_name} host")
             print(f"\033[91m lspci failed on {container_name} host\033[0m")
@@ -375,7 +408,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             time.sleep(1)
         elif "command not found" in dmidecode_process.stderr:
             logging.info(f"monstaver - dmidecode is not installed. Please install it on {container_name} host")
-            print("\033[91m dmidecode is not installed. Please install it.\033[0m")
+            print("\033[91m dmidecode is not installed. Please install it on monster hosts.\033[0m")
         else:
             logging.error(f"monstaver - dmidecode failed on {container_name} host")
             print(f"\033[91m dmidecode failed on {container_name} host\033[0m")
@@ -422,7 +455,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             time.sleep(1)
         elif "command not found" in lsmod_process.stderr:
             logging.info(f"monstaver - lsmod is not installed. Please install it on {container_name}")
-            print("\033[91mlsmod is not installed. Please install it.\033[0m")
+            print("\033[91mlsmod is not installed. Please install it on monster hosts.\033[0m")
         else:
             logging.error(f"monstaver - lsmod failed on {container_name}")
             print(f"\033[91mlsmod failed on {container_name}\033[0m")
@@ -435,7 +468,7 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             time.sleep(1)
         elif "command not found" in lsof_process.stderr:
             logging.info(f"monstaver - lsof is not installed. Please install it on {container_name}")
-            print("\033[91mlsof is not installed. Please install it.\033[0m")
+            print("\033[91mlsof is not installed. Please install it on monster hosts.\033[0m")
         else:
             logging.error(f"monstaver - lsof failed on {container_name}")
             print(f"\033[91mlsof failed on {container_name}\033[0m")
@@ -454,21 +487,25 @@ def info_collector(port, user, ip, backup_dir, time_dir_name, container_name, ba
             time.sleep(1)
         elif "command not found" in lsblk.stderr:
             logging.info(f"monstaver - lsblk is not installed. Please install it on {container_name}")
-            print("\033[91m lsblk is not installed. Please install it.\033[0m")
+            print("\033[91m lsblk is not installed. Please install it on monster hosts.\033[0m")
         else:
             logging.error(f"monstaver - lsblk failed on {container_name}")
             print(f"\033[91m lsblk failed on {container_name}\033[0m")
 
-        xfs_info = subprocess.run(f"ssh -p {port} {user}@{ip} sudo lsblk -o name,fstype | grep -oP '\\w+.*(?=\\s+xfs)' | sed 's/\\(.*\\)-/mapper\\/\\1-/' | xargs -I {{}} bash -c 'echo --------------------; ssh -p {port} {user}@{ip} sudo xfs_info /dev/{{}};' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/xfs_info.txt", shell=True)
-        if xfs_info.returncode == 0:                              
-           logging.info(f"monstaver - lsblk_xfs_info successful on {container_name}")
-           time.sleep(1)
-        elif "command not found" in xfs_info.stderr:
-           logging.info(f"monstaver - lsblk/sed/xargs is not installed. Please install it on {container_name}")
-           print("\033[91m lsblk/sed/xargs is not installed. Please install it.\033[0m")
+        xfsprogs = subprocess.run(f"ssh -p {port} {user}@{ip} sudo apt install -y xfsprogs > /dev/null 2>&1", shell=True)
+        if xfsprogs.returncode == 0:
+            xfs_info = subprocess.run(f"ssh -p {port} {user}@{ip} sudo lsblk -o name,fstype | grep -oP '\\w+.*(?=\\s+xfs)' | sed 's/\\(.*\\)-/mapper\\/\\1-/' | xargs -I {{}} bash -c 'echo --------------------; ssh -p {port} {user}@{ip} sudo xfs_info /dev/{{}};' > {backup_dir}/{time_dir_name}/configs/{container_name}/software/system/xfs_info.txt", shell=True)
+            if xfs_info.returncode == 0:                              
+                logging.info(f"monstaver - lsblk_xfs_info successful on {container_name}")
+                time.sleep(1)
+            elif "command not found" in xfs_info.stderr:
+                logging.info(f"monstaver - lsblk/sed/xargs is not installed. Please install it on {container_name}")
+                print("\033[91m lsblk/sed/xargs is not installed. Please install it on monster hosts.\033[0m")
+            else:
+                logging.error(f"monstaver - lsblk_xfs_info failed on {container_name}")
+                print(f"\033[91m lsblk_xfs_info failed on {container_name}\033[0m")
         else:
-           logging.error(f"monstaver - lsblk_xfs_info failed on {container_name}")
-           print(f"\033[91m lsblk_xfs_info failed on {container_name}\033[0m")
+            print("\033[91m xfsprogs is not installed. Please install it on monster hosts.\033[0m")
 
     # remove /influxdb-backup/time_dir from container and host
     rm_cont_host_dir_process = subprocess.run(f"ssh -p {port} {user}@{ip} sudo rm -rf {backup_dir}-tmp/* ; ssh -p {port} {user}@{ip} sudo docker exec {container_name} rm -rf {backup_dir}-tmp/* ", shell=True)
@@ -690,94 +727,115 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, software_info
     logging.debug(f"monstaver - converted time to utc and dir name: {start_time_backup}, {end_time_backup}, {time_dir_name}")
     influx_steps = 6 if influx_backup else 0
     total_steps = (len(data_loaded['db_sources']) * influx_steps + sum([len(data_loaded["db_sources"][x]["databases"]) for x in data_loaded["db_sources"]]) + len(data_loaded['swift']) * 6) - 1
-    with alive_bar(total_steps, title=f'\033[1mProcessing Backup\033[0m:\033[92m {start_time_str} - {end_time_str}\033[0m') as bar:
-        #create dbs-swif-other_info sub dirs in {time} directory 
-        subprocess.run(f"sudo mkdir -p {backup_dir}", shell=True)
-        os.makedirs(f"{backup_dir}/{time_dir_name}", exist_ok=True)
-        os.makedirs(f"{backup_dir}/{time_dir_name}/dbs", exist_ok=True)
-        os.makedirs(f"{backup_dir}/{time_dir_name}/other_info", exist_ok=True)
-        os.makedirs(f"{backup_dir}/{time_dir_name}/configs", exist_ok=True)
-        subprocess.run(f"sudo chmod -R 777 {backup_dir}", shell=True)
-        if influx_backup:
-            logging.info(f"monstaver - user select switch -ib for backup") 
-            database_names = [db_name for config in data_loaded.get('db_sources', {}).values() if isinstance(config, dict) and 'databases' in config for db_name in config['databases']]
-            logging.debug(f"monstaver - db name: {database_names}")
-            for mc_server, config in data_loaded.get('db_sources', {}).items(): 
-                ip_influxdb = config.get('ip')
-                ssh_port = config.get('ssh_port')
-                ssh_user = config.get('ssh_user')
-                container_name = config.get('container_name')
-                influx_volume = config.get('influx_volume')
-                for db_name in database_names:
-                    # Perform backup using influxd backup command
-                    start_time = time.time()
-                    backup_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd backup -portable -db {db_name} -start {start_time_backup} -end {end_time_backup} {influx_volume}/{time_dir_name}/{container_name}/{db_name} > /dev/null 2>&1'", shell=True, check=True, timeout=240)
-                    end_time = time.time() 
-                    response_time = end_time - start_time
-                    if response_time > 120:  # Check if the time taken exceeds 2 minutes (120 seconds)
-                        print("\033[91mBackup process took more than 2 minutes. let me check something,there is a problem in your influxdb\033[0m")
-                        # ping MC server
-                        ping_process = subprocess.Popen(["ping", "-c", "1", ip_influxdb], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                        ping_output, ping_error = ping_process.communicate()
-                        if ping_process.returncode == 0:
-                            logging.info(f"monstaver - Server {ip_influxdb} is reachable")
-                            print(f"Server {ip_influxdb} is reachable.")
-                            # check influxdb container
-                            check_container = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker ps -f name={container_name}'"
-                            try:
-                                check_container_result = subprocess.run(check_container, shell=True, capture_output=True, text=True, check=True)
-                                if check_container_result.stdout:
-                                    if "Up" in check_container_result.stdout:
-                                        logging.info(f"monstaver - Container: {container_name} is up and running")
-                                        print(f"Container: {container_name} is up and running.")
-                                        # check influxdb service
-                                        check_influx_service_result = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec {container_name} service influxdb status'", shell=True, check=True, capture_output=True, text=True)
-                                        if "is running [ OK ]" in check_influx_service_result.stdout:
-                                            logging.info("monstaver - influxdb service is up and running")
-                                            print("influxdb service is up and running")
-                                             # check database inside influx
-                                            check_db_command_result = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} \"sudo docker exec -i -u root {container_name} influx -execute 'SHOW DATABASES'\"", shell=True, check=True, capture_output=True, text=True)
-                                            if db_name in check_db_command_result.stdout:
-                                                logging.info(f"monstaver - database: {db_name} exists in influxdb")
-                                                print(f"database: {db_name} exists in influxdb")
+    if swift_info or hardware_info or software_info or influx_backup:
+        with alive_bar(total_steps, title=f'\033[1mProcessing Backup\033[0m:\033[92m {start_time_str} - {end_time_str}\033[0m') as bar:
+            #create dbs-swif-other_info sub dirs in {time} directory 
+            subprocess.run(f"sudo mkdir -p {backup_dir}", shell=True)
+            os.makedirs(f"{backup_dir}/{time_dir_name}", exist_ok=True)
+            os.makedirs(f"{backup_dir}/{time_dir_name}/dbs", exist_ok=True)
+            os.makedirs(f"{backup_dir}/{time_dir_name}/other_info", exist_ok=True)
+            os.makedirs(f"{backup_dir}/{time_dir_name}/configs", exist_ok=True)
+            subprocess.run(f"sudo chmod -R 777 {backup_dir}", shell=True)
+            if influx_backup:
+                logging.info(f"monstaver - user select switch -ib for backup") 
+                database_names = [db_name for config in data_loaded.get('db_sources', {}).values() if isinstance(config, dict) and 'databases' in config for db_name in config['databases']]
+                logging.debug(f"monstaver - db name: {database_names}")
+                for mc_server, config in data_loaded.get('db_sources', {}).items(): 
+                    ip_influxdb = config.get('ip')
+                    ssh_port = config.get('ssh_port')
+                    ssh_user = config.get('ssh_user')
+                    container_name = config.get('container_name')
+                    influx_volume = config.get('influx_volume')
+                    for db_name in database_names:
+                        # Perform backup using influxd backup command
+                        start_time = time.time()
+                        backup_process = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec -i -u root {container_name} influxd backup -portable -db {db_name} -start {start_time_backup} -end {end_time_backup} {influx_volume}/{time_dir_name}/{container_name}/{db_name} > /dev/null 2>&1'", shell=True, check=True, timeout=240)
+                        end_time = time.time() 
+                        response_time = end_time - start_time
+                        if response_time > 120:  # Check if the time taken exceeds 2 minutes (120 seconds)
+                            print("\033[91mBackup process took more than 2 minutes. let me check something,there is a problem in your influxdb\033[0m")
+                            # ping MC server
+                            ping_process = subprocess.Popen(["ping", "-c", "1", ip_influxdb], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                            ping_output, ping_error = ping_process.communicate()
+                            if ping_process.returncode == 0:
+                                logging.info(f"monstaver - Server {ip_influxdb} is reachable")
+                                print(f"Server {ip_influxdb} is reachable.")
+                                # check influxdb container
+                                check_container = f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker ps -f name={container_name}'"
+                                try:
+                                    check_container_result = subprocess.run(check_container, shell=True, capture_output=True, text=True, check=True)
+                                    if check_container_result.stdout:
+                                        if "Up" in check_container_result.stdout:
+                                            logging.info(f"monstaver - Container: {container_name} is up and running")
+                                            print(f"Container: {container_name} is up and running.")
+                                            # check influxdb service
+                                            check_influx_service_result = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} 'sudo docker exec {container_name} service influxdb status'", shell=True, check=True, capture_output=True, text=True)
+                                            if "is running [ OK ]" in check_influx_service_result.stdout:
+                                                logging.info("monstaver - influxdb service is up and running")
+                                                print("influxdb service is up and running")
+                                                # check database inside influx
+                                                check_db_command_result = subprocess.run(f"ssh -p {ssh_port} {ssh_user}@{ip_influxdb} \"sudo docker exec -i -u root {container_name} influx -execute 'SHOW DATABASES'\"", shell=True, check=True, capture_output=True, text=True)
+                                                if db_name in check_db_command_result.stdout:
+                                                    logging.info(f"monstaver - database: {db_name} exists in influxdb")
+                                                    print(f"database: {db_name} exists in influxdb")
+                                                else:
+                                                    logging.error(f"monstaver - database: {db_name} didn't exists in influxdb")
+                                                    print(f"database: {db_name} didn't exists in influxdb")
                                             else:
-                                                logging.error(f"monstaver - database: {db_name} didn't exists in influxdb")
-                                                print(f"database: {db_name} didn't exists in influxdb")
+                                                logging.error("monstaver - influxdb service is down or not exists")
+                                                print("influxdb service is down or not exists")
                                         else:
-                                            logging.error("monstaver - influxdb service is down or not exists")
-                                            print("influxdb service is down or not exists")
-                                    else:
-                                        logging.critical(f"monstaver - Container: {container_name} is not running or exists")
-                                        print(f"Container: {container_name} is not running or exists.")
-                            except subprocess.CalledProcessError as e:
-                                logging.critical(f"monstaver - Error executing SSH command")
-                                print(f"Error executing SSH command: {e}")
+                                            logging.critical(f"monstaver - Container: {container_name} is not running or exists")
+                                            print(f"Container: {container_name} is not running or exists.")
+                                except subprocess.CalledProcessError as e:
+                                    logging.critical(f"monstaver - Error executing SSH command")
+                                    print(f"Error executing SSH command: {e}")
+                            else:
+                                logging.critical(f"monstaver - Server {ip_influxdb} is unreachable")
+                                print(f"Server {ip_influxdb} is unreachable.")
+                        if backup_process.returncode == 0:
+                            logging.info("monstaver - backup successful")
+                            print("backup successful")
+                            bar()
                         else:
-                            logging.critical(f"monstaver - Server {ip_influxdb} is unreachable")
-                            print(f"Server {ip_influxdb} is unreachable.")
-                    if backup_process.returncode == 0:
-                        logging.info("monstaver - backup successful")
-                        print("backup successful")
-                        bar()
-                    else:
-                        logging.critical("monstaver - backup failed")
-                        print("\033[91mBackup failed.\033[0m")
+                            logging.critical("monstaver - backup failed")
+                            print("\033[91mBackup failed.\033[0m")
 
-                    # run in multithread 
-                    backup_futures_list = []
-                    backup_executor = concurrent.futures.ThreadPoolExecutor()
-                    #with concurrent.futures.ThreadPoolExecutor() as backup_executor:
-                    backup_future = backup_executor.submit(backup_data_collector, ssh_port, ssh_user, ip_influxdb, container_name, influx_volume, time_dir_name, bar, backup_dir)
-                    backup_futures_list.append(backup_future)
-            backup_results_list = []
-            for backup_future in concurrent.futures.as_completed(backup_futures_list):
-                try:
-                    backup_result = backup_future.result()
-                    backup_results_list.append(backup_result)
-                except Exception as exc:
-                    print(f"Task generated an exception: {exc}")
-            backup_executor.shutdown()
+                        # run in multithread 
+                        backup_futures_list = []
+                        backup_executor = concurrent.futures.ThreadPoolExecutor()
+                        #with concurrent.futures.ThreadPoolExecutor() as backup_executor:
+                        backup_future = backup_executor.submit(backup_data_collector, ssh_port, ssh_user, ip_influxdb, container_name, influx_volume, time_dir_name, bar, backup_dir)
+                        backup_futures_list.append(backup_future)
+                backup_results_list = []
+                for backup_future in concurrent.futures.as_completed(backup_futures_list):
+                    try:
+                        backup_result = backup_future.result()
+                        backup_results_list.append(backup_result)
+                    except Exception as exc:
+                        print(f"Task generated an exception: {exc}")
+                backup_executor.shutdown()
             
+        if swift_info or hardware_info or software_info:
+            # run in multithread 
+            info_futures_list = []
+            with concurrent.futures.ThreadPoolExecutor() as info_executor:
+                # copy ring and config to output
+                for key,value in data_loaded['swift'].items():
+                    container_name = key
+                    user = value['ssh_user']
+                    ip = value['ip']
+                    port = value['ssh_port']
+                    future = info_executor.submit(info_collector, port, user, ip, backup_dir, time_dir_name, container_name, bar, swift_info, hardware_info, software_info)
+                    info_futures_list.append(future)
+                info_results_list = []
+                for future in concurrent.futures.as_completed(info_futures_list):
+                    try:
+                        info_result = future.result()
+                        info_results_list.append(info_result)
+                    except Exception as exc:
+                        print(f"Task generated an exception: {exc}")
+
         #copy other files
         for path in inputs:
             other_dir_process = subprocess.run(f"sudo cp -rp {path} {backup_dir}/{time_dir_name}/other_info/", shell=True)
@@ -796,25 +854,6 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, software_info
         else:
             logging.error(f"monstaver - copy monstaver config file to {backup_dir}/{time_dir_name}/other_info/ failed")
             print("\033[91mcopy monstaver config failed.\033[0m")
-        
-        # run in multithread 
-        info_futures_list = []
-        with concurrent.futures.ThreadPoolExecutor() as info_executor:
-            # copy ring and config to output
-            for key,value in data_loaded['swift'].items():
-                container_name = key
-                user = value['ssh_user']
-                ip = value['ip']
-                port = value['ssh_port']
-                future = info_executor.submit(info_collector, port, user, ip, backup_dir, time_dir_name, container_name, bar, swift_info, hardware_info, software_info)
-                info_futures_list.append(future)
-            info_results_list = []
-            for future in concurrent.futures.as_completed(info_futures_list):
-                try:
-                    info_result = future.result()
-                    info_results_list.append(info_result)
-                except Exception as exc:
-                    print(f"Task generated an exception: {exc}")
         
         # tar all result inside output dir
         tar_output_process = subprocess.run(f"sudo tar -C {backup_dir} -cf {backup_dir}/{time_dir_name}.tar.gz {time_dir_name}", shell=True)
@@ -871,7 +910,7 @@ def backup(time_range, inputs, delete, data_loaded, hardware_info, software_info
     backup_to_report = f"{backup_dir}/{time_dir_name}/"
     return backup_to_report
 
-def main(time_range, inputs, delete, backup_restore, hardware_info, software_info, swift_info, influx_backup):
+def main(time_range, inputs, delete, backup_restore, hardware_info, software_info, swift_info, influx_backup, shard):
     data_loaded = load_config(config_file)
     read_yaml_and_generate_keys(data_loaded)
     log_level = data_loaded['log'].get('level')
@@ -887,6 +926,8 @@ def main(time_range, inputs, delete, backup_restore, hardware_info, software_inf
         print(f"\033[91mPlease enter log_level in the configuration file.\033[0m")
 
     logging.info("****** Monstaver main function start ******")
+    if shard:
+        DB_shard(data_loaded)
     if backup_restore: 
         restore(data_loaded)
         return None
@@ -904,5 +945,6 @@ if __name__ == "__main__":
     argParser.add_argument("-sw", "--software_info", action="store_true", help="take os/software info from monster")
     argParser.add_argument("-s", "--swift_info", action="store_true", help="take swift info from monster")
     argParser.add_argument("-ib", "--influx_backup", action="store_true", help="take backup from influxdb")
+    argParser.add_argument("-shard", "--shard", action="store_true", help="change DB shard")
     args = argParser.parse_args()
-    main(time_range=args.time_range, inputs=args.inputs.split(',') if args.inputs is not None else args.inputs, delete=args.delete, backup_restore=args.restore, hardware_info=args.hardware_info, software_info=args.software_info, swift_info=args.swift_info, influx_backup=args.influx_backup)
+    main(time_range=args.time_range, inputs=args.inputs.split(',') if args.inputs is not None else args.inputs, delete=args.delete, backup_restore=args.restore, hardware_info=args.hardware_info, software_info=args.software_info, swift_info=args.swift_info, influx_backup=args.influx_backup, shard=args.shard)

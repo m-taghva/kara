@@ -1,5 +1,6 @@
 import sys
 import os
+import re
 import select
 import subprocess
 import time
@@ -362,11 +363,11 @@ def mrbench_agent(config_params, config_file, config_output):
                     dashborads_dict = None
                 if run_monstaver != 'none':
                     if run_monstaver == 'backup,info':
-                        backup_to_report = monstaver.main(time_range=f"{cosbench_data['start_time']},{cosbench_data['end_time']}", inputs=[result_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=True)
+                        backup_to_report = monstaver.main(time_range=f"{cosbench_data['start_time']},{cosbench_data['end_time']}", inputs=[result_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=True, shard=False)
                     if run_monstaver == 'backup':
-                        monstaver.main(time_range=f"{cosbench_data['start_time']},{cosbench_data['end_time']}", inputs=[result_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, software_info=False, swift_info=False, influx_backup=None)
+                        monstaver.main(time_range=f"{cosbench_data['start_time']},{cosbench_data['end_time']}", inputs=[result_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, software_info=False, swift_info=False, influx_backup=None, shard=False)
                     if run_monstaver == 'info':
-                        backup_to_report = monstaver.main(time_range=f"{cosbench_data['start_time']},{cosbench_data['end_time']}", inputs=[result_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=False)
+                        backup_to_report = monstaver.main(time_range=f"{cosbench_data['start_time']},{cosbench_data['end_time']}", inputs=[result_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=False, shard=False)
                 else:
                     backup_to_report = None
             W = 0 
@@ -428,7 +429,7 @@ def status_reporter_agent(config_params):
             formated_list = []
             for group_name,analyzed_file in analyzed_csv_dict.items():
                 if group_name in os.path.basename(analyzed_file):
-                    time_range = os.path.basename(analyzed_file).replace("_analyzed"," ").replace(".csv"," ").replace(f"{group_name}_", "")
+                    time_range = re.sub(rf'^.*?({group_name})', r'\1', os.path.basename(analyzed_file)).replace("_analyzed","").replace(".csv","").replace(f"{group_name}_", "")
                 df = pd.read_csv(analyzed_file)
                 df.insert(0, 'Time_range', time_range)
                 df.to_csv(analyzed_file, index=False)
@@ -460,33 +461,33 @@ def monstaver_agent(config_params, config_file, start_time, end_time, time_list)
                         logging.debug(f"manager - monstaver_agent: time range is {time_range}")
                         start_time, end_time = time_range.strip().split(',')
                         if operation == "backup,info":
-                            backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=False,  backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=True)
+                            backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=False,  backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=True, shard=False)
                         elif operation == 'backup':
-                            monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, software_info=False, swift_info=False, influx_backup=True)
+                            monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, software_info=False, swift_info=False, influx_backup=True, shard=False)
                         elif operation == 'info':
-                            backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=False)
+                            backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=False, shard=False)
                         elif operation == "restore":
-                            monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True, hardware_info=False, software_info=False, swift_info=False, influx_backup=False)
+                            monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True, hardware_info=False, software_info=False, swift_info=False, influx_backup=False, shard=False)
             else:
                 logging.debug(f"manager - monstaver_agent: time is {time}")
                 start_time, end_time = time.strip().split(',')
                 if operation == "backup,info":
-                    backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=False,  backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=True)
+                    backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=False,  backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=True, shard=False)
                 elif operation == 'backup':
-                    monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, software_info=False, swift_info=False, influx_backup=True)
+                    monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, software_info=False, swift_info=False, influx_backup=True, shard=False)
                 elif operation == 'info':
-                    backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=False)
+                    backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=False, shard=False)
                 elif operation == "restore":
-                    monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True, hardware_info=False, software_info=False, swift_info=False, influx_backup=False)
+                    monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True, hardware_info=False, software_info=False, swift_info=False, influx_backup=False, shard=False)
     elif batch_mode:
         if operation == "backup,info":
-           backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=False,  backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=True)
+           backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=False,  backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=True, shard=False)
         elif operation == 'backup':
-            monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, software_info=False, swift_info=False, influx_backup=True)
+            monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=True, backup_restore=None, hardware_info=False, software_info=False, swift_info=False, influx_backup=True, shard=False)
         elif operation == 'info':
-            backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=False)
+            backup_to_report = monstaver.main(time_range=f"{start_time},{end_time}", inputs=[input_path,config_file,kara_config_files], delete=False, backup_restore=None, hardware_info=None, software_info=None, swift_info=None, influx_backup=False, shard=False)
     elif operation == "restore":
-        monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True, hardware_info=False, software_info=False, swift_info=False, influx_backup=False)
+        monstaver.main(time_range=None, inputs=None, delete=None, backup_restore=True, hardware_info=False, software_info=False, swift_info=False, influx_backup=False, shard=False)
     else:
         print("\033[91myou should select batch mode or time_list for use monstaver so fix your scenario file\033[0m")
         exit()
@@ -527,7 +528,7 @@ def report_recorder_agent(config_params, backup_to_report, dashborads_dict):
     else:
         sw_template = None
     merged = config_params.get('monster_test').get('merged')
-    if 'merged_info' in config_params:
+    if 'merged_info' in config_params.get('monster_test'):
         merged_info = config_params.get('monster_test').get('merged_info')
     else:
         merged_info = None
@@ -546,63 +547,72 @@ def report_recorder_agent(config_params, backup_to_report, dashborads_dict):
     if sw_template or hw_template or monster_test_report is True:
         report_recorder.main(software_template=sw_template, hardware_template=hw_template, output_htmls_path=output_path, cluster_name=cluster_name, scenario_name=scenario_name, configs_directory=backup_to_report, upload_operation=upload_to_kateb, create_html_operation=create_html, merged_file=merged, merged_info_file=merged_info, create_test_page=monster_test_report, kateb_list=kateb_list_page, img_path_or_dict=dashborads_dict)
 
-def main(config_file):
-    data_loaded = load_config(config_file)
-    log_level = data_loaded['log'].get('level')
-    if log_level is not None:
-        log_level_upper = log_level.upper()
-        valid_log_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
-        if log_level_upper in valid_log_levels:
-            log_dir_run = subprocess.run(f"sudo mkdir {log_path} > /dev/null 2>&1 && sudo chmod -R 777 {log_path}", shell=True)
-            logging.basicConfig(filename= f'{log_path}all.log', level=log_level_upper, format='%(asctime)s - %(levelname)s - %(message)s')
-        else:
-            print(f"\033[91mInvalid log level:{log_level}\033[0m")
-    else:
-        print(f"\033[91mPlease enter log_level in the configuration file.\033[0m")
-
-    logging.info("****** Manager_main function start ******")
-    if 'scenario' in data_loaded:
-        config_output = None
-        first_start_time = None
-        last_end_time = None
-        backup_to_report = None
-        all_hosts_csv_dict = None
-        dashborads_dict = None
-        time_list = None
-        for task in data_loaded['scenario']:
-            if 'Config_gen' in task and task['Config_gen']:
-                config_params = task['Config_gen']
-                logging.info("**manager - main: Executing config_gen_agent function**")
-                config_output = config_gen_agent(config_params)
-            elif 'Mrbench' in task and task['Mrbench']:
-                config_params = task['Mrbench']
-                logging.info("**manager - main: Executing mrbench_agent function**")
-                first_start_time, last_end_time, backup_to_report, all_hosts_csv_dict, dashborads_dict = mrbench_agent(config_params, config_file, config_output)
-            elif 'Status-Reporter' in task and task['Status-Reporter']:
-                config_params = task['Status-Reporter']
-                logging.info("**manager - main: Executing status_reporter_agent function**")
-                dashborads_dict, all_hosts_csv_dict, time_list = status_reporter_agent(config_params)
-            elif 'Monstaver' in task and task['Monstaver']:
-                config_params = task['Monstaver']
-                logging.info("**manager - main: Executing monstaver_agent function**")
-                backup_to_report = monstaver_agent(config_params, config_file, first_start_time, last_end_time, time_list)
-            elif 'Status_Analyzer' in task and task['Status_Analyzer']:
-                config_params = task['Status_Analyzer']
-                logging.info("**manager - main: Executing status_analyzer_agent function**")
-                status_analyzer_agent(config_params)
-            elif 'Report_Recorder' in task and task['Report_Recorder']:
-                config_params = task['Report_Recorder']
-                logging.info("**manager - main: Executing report_recorder_agent function**")
-                report_recorder_agent(config_params, backup_to_report, dashborads_dict)
+def main(config_file, shard):
+    if shard:
+        monstaver.main(time_range=None, inputs=None, delete=False, backup_restore=None, hardware_info=False, software_info=False, swift_info=False, influx_backup=False, shard=True)
+    elif config_file:
+        data_loaded = load_config(config_file)
+        log_level = data_loaded['log'].get('level')
+        if log_level is not None:
+            log_level_upper = log_level.upper()
+            valid_log_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
+            if log_level_upper in valid_log_levels:
+                log_dir_run = subprocess.run(f"sudo mkdir {log_path} > /dev/null 2>&1 && sudo chmod -R 777 {log_path}", shell=True)
+                logging.basicConfig(filename= f'{log_path}all.log', level=log_level_upper, format='%(asctime)s - %(levelname)s - %(message)s')
             else:
-                print(f"Unknown task: {task}")
+                print(f"\033[91mInvalid log level:{log_level}\033[0m")
+        else:
+            print(f"\033[91mPlease enter log_level in the configuration file.\033[0m")
+
+        logging.info("****** Manager_main function start ******")
+        
+        if 'scenario' in data_loaded:
+            config_output = None
+            first_start_time = None
+            last_end_time = None
+            backup_to_report = None
+            all_hosts_csv_dict = None
+            dashborads_dict = None
+            time_list = None
+            for task in data_loaded['scenario']:
+                if 'Config_gen' in task and task['Config_gen']:
+                    config_params = task['Config_gen']
+                    logging.info("**manager - main: Executing config_gen_agent function**")
+                    config_output = config_gen_agent(config_params)
+                elif 'Mrbench' in task and task['Mrbench']:
+                    config_params = task['Mrbench']
+                    logging.info("**manager - main: Executing mrbench_agent function**")
+                    first_start_time, last_end_time, backup_to_report, all_hosts_csv_dict, dashborads_dict = mrbench_agent(config_params, config_file, config_output)
+                elif 'Status-Reporter' in task and task['Status-Reporter']:
+                    config_params = task['Status-Reporter']
+                    logging.info("**manager - main: Executing status_reporter_agent function**")
+                    dashborads_dict, all_hosts_csv_dict, time_list = status_reporter_agent(config_params)
+                elif 'Monstaver' in task and task['Monstaver']:
+                    config_params = task['Monstaver']
+                    logging.info("**manager - main: Executing monstaver_agent function**")
+                    backup_to_report = monstaver_agent(config_params, config_file, first_start_time, last_end_time, time_list)
+                elif 'Status_Analyzer' in task and task['Status_Analyzer']:
+                    config_params = task['Status_Analyzer']
+                    logging.info("**manager - main: Executing status_analyzer_agent function**")
+                    status_analyzer_agent(config_params)
+                elif 'Report_Recorder' in task and task['Report_Recorder']:
+                    config_params = task['Report_Recorder']
+                    logging.info("**manager - main: Executing report_recorder_agent function**")
+                    report_recorder_agent(config_params, backup_to_report, dashborads_dict)
+                else:
+                    print(f"Unknown task: {task}")
+        else:
+            print(f"\033[91mNo scenario found in the configuration file.\033[0m")
     else:
-        print(f"\033[91mNo scenario found in the configuration file.\033[0m")
+        print(f"\033[91mplease select your scenario file!\033[0m")
+
     logging.info("****** Manager_main function end ******")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='kara tools manager')
-    parser.add_argument('-sn', '--scenario_name', help='input scenario path')
-    args = parser.parse_args()
+    argParser = argparse.ArgumentParser(description='kara tools manager')
+    argParser.add_argument('-sn', '--scenario_name', help='input scenario path')
+    argParser.add_argument("-shard", "--shard", action="store_true", help="change DB shard")
+    args = argParser.parse_args()
     config_file = args.scenario_name
-    main(config_file)
+    shard = args.shard
+    main(config_file, shard)

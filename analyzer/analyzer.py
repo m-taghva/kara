@@ -473,6 +473,8 @@ def analyze_and_save_csv(csv_original, keep_column, output_directory, data_loade
             else:
                 keep_columns = [col for col in source_csv.columns if col not in selected_column_names]
                 csv_final = source_csv[keep_columns]
+    csv_final = csv_final.copy()
+    csv_final.replace(0.0, None, inplace=True)
     csv_final.to_csv(final_output_csv_path, index=False)
     print(f"\n{BOLD}Analyzed CSV file:{RESET}{YELLOW} '{final_output_csv_path}' {RESET}{BOLD}has been created with the extracted values.{RESET}\n")
     return final_output_csv_path
@@ -496,7 +498,7 @@ def plot_and_save_graph(csv_original, output_directory, data_loaded):
                     x_values = temp_csv[x_column]
                     y_values = temp_csv[y_column]
                     # Plot the data
-                    plt.plot(x_values, y_values, marker='o')
+                    plt.scatter(x_values, y_values, marker='o')
                     # Set plot labels and title
                     plt.xlabel(x_column)
                     plt.ylabel(y_column)
@@ -515,6 +517,7 @@ def plot_and_save_graph(csv_original, output_directory, data_loaded):
     return image_dict
 
 def main(merge, analyze, graph, csv_original, output_directory, selected_CSVs, keep_column):
+    final_output_csv_path = None
     data_loaded = load_config(config_file)
     log_level = data_loaded['log'].get('level')
     if log_level is not None:

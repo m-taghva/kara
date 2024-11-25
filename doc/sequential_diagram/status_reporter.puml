@@ -1,0 +1,11 @@
+@startuml
+title status_reporter functions
+client -> main :  [time range, output dir, image arg,  metric files path]
+main -> get_report : [time range, output dir, \nimage arg, metric files path, config file data]
+get_report -> dashboard_import : [grafana info, dashboards_jsons]
+get_report -> images_export : [grafana info, dashboard_dict, \noutput dir, host_name, time range]
+get_report -> dashboard_maker_with_imager : [images path, dashboard size, output dir]
+get_report -> remove_dashboard : [grafana info, dashboard_dict]
+get_report -> main : [dashborad_images, all_hosts_csv_dict]
+main -> client : [csv and images]
+@enduml

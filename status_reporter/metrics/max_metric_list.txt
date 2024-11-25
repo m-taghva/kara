@@ -1,5 +1,3 @@
-netdata.system.cpu.iowait
-netdata.system.cpu.idle
 #/netdata.system.cpu.*/
 #netdata.statsd_timer_swift.object_server.put.timing.events
 #netdata.statsd_timer_swift.container_server.put.timing.events

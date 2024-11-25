@@ -1,0 +1,16 @@
+@startuml
+title analyzer functions
+client -> main :  [csv list or dir/*, output dir]
+client -> main :  [csv for analyze, output dir]
+main -> analyze_and_save_csv : [config file data, output dir, csv for analyze]
+analyze_and_save_csv -> process_csv_file: [source_csv, math_operations, all_row_data]
+analyze_and_save_csv -> main: [analyzed csv]
+main -> merge_process : [output dir, csv list or dir/*]
+merge_process -> merge_csv: [csv file, output dir]
+merge_process -> main: [merged csv]
+main -> plot_and_save_graph : [output dir, config data, csv for analyze]
+plot_and_save_graph -> main: [dict of images]
+main -> client : [merged csv]
+main -> client : [analyzed csv]
+main -> client : [graph images]
+@enduml

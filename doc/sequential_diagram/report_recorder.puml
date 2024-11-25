@@ -1,0 +1,23 @@
+@startuml
+title report_recorder functions
+client -> main : [input html template, output htmls path, \nkateb page title, path to images, merged files]
+main -> create_sw_hw_htmls : [config file data, kateb page title, \ntemplate_content, output htmls path]
+create_sw_hw_htmls -> main : [htmls_dict]
+main -> create_test_htmls : [images_dict, merged files, \noutput htmls path, kateb page title]
+create_test_htmls -> testClassification : [merged files, images_dict, \nconfig data, kateb page title]
+testClassification -> __init__ : [self,infocsv, detailcsv, clusterName, \nscenarioName, imgsdict, conf]
+__init__ -> createPagesHTML : [conf["classification"],self.infocsv]
+createPagesHTML -> createPagesHTML : [categoryData,tempcsv,heading_level+1,\nprefixstr+categoryName+self.pageNameDelimiter]
+createPagesHTML -> createMainPageData : [maindata,prefixstr]
+createMainPageData -> createMainPageData : [item,prefixstr+currentstr+self.pageNameDelimiter]
+createPagesHTML -> pageDataToHTML : [mainPageData,heading_level=heading_level]
+pageDataToHTML -> createSubPageData : [subPageData]
+createSubPageData -> createSubPageData : [subPageData.subcsv[value]]
+pageDataToHTML -> createSubPageHTML : [subPageHTML, subPageData]
+createSubPageHTML -> createSubPageHTML : [subPageHTML, value, heading_level+1]
+create_test_htmls -> main : [scenario_pages]
+main -> convert_html_to_wiki : [content]
+main -> upload_images : [site, content]
+main -> check_data : [site, title_content_dict, \nkateb_list, cluster_name, scenario_name]
+main -> client : [html pages, kateb pages]
+@enduml

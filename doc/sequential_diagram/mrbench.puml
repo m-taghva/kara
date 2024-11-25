@@ -1,0 +1,14 @@
+@startuml
+title mrbench functions
+client -> main :  [workload xml file, output dir]
+client -> main :  [config and ring dir]
+main -> copy_swift_conf : [config and ring dictionary, \nmonster conatiner name]
+copy_swift_conf -> conf_ring_thread : [config and ring dictionary]
+copy_swift_conf -> main: [config and ring dictionary]
+main -> submit : [workload xml file, output dir]
+submit -> save_cosinfo: [cosbench csv]
+save_cosinfo -> submit: [cosbench info dictionary]
+submit -> copy_bench_files: [output dir, cosbench data path]
+submit -> main: [result of test in output dir, cosbench info dictionary]
+main -> client : [result of test in output dir]
+@enduml
