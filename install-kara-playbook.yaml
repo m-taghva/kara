@@ -18,7 +18,7 @@
         state: directory
         owner: root        
         group: root      
-        mode: '0755'         
+        mode: '0755'       
 
     - name: Download Docker Compose file
       get_url:
@@ -39,3 +39,22 @@
       command: docker-compose up -d
       args:
         chdir: /home/kara
+
+- name: Install dependency in monster servers
+  hosts: monster
+  become: true
+  tasks:
+    - name: Installing packages
+      apt:
+        name: 
+          - xfsprogs
+          - lsblk
+          - lsof
+          - lsmod
+          - dmidecode
+          - lspci
+          - lsmem
+          - lscpu
+          - lshw
+        state: latest
+        update_cache: yes
