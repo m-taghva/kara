@@ -1,0 +1,41 @@
+- name: Set up Docker container using Docker Compose on localhost
+  hosts: localhost
+  connection: local
+  become: true
+  tasks:
+    - name: Install required packages
+      apt:
+        name: 
+          - docker.io
+          - docker-compose
+          - wget
+        state: present
+        update_cache: yes
+
+    - name: Ensure destination directory exists
+      file:
+        path: /home/kara
+        state: directory
+        owner: root        
+        group: root      
+        mode: '0755'         
+
+    - name: Download Docker Compose file
+      get_url:
+        url: "https://drive.google.com/uc?export=download&id=1CwQHCDCUJvjDmPg4vE4FjIyG5OfCynTn"
+        dest: "/home/kara/docker-compose.yaml"
+
+    - name: Pull Docker images using Docker Compose
+      command: docker-compose pull
+      args:
+        chdir: /home/kara
+
+    - name: Run initialization script inside container
+      command: docker-compose run --rm kara /home/kara/docker/init.sh
+      args:
+        chdir: /home/kara
+
+    - name: Start Docker containers in detached mode
+      command: docker-compose up -d
+      args:
+        chdir: /home/kara
