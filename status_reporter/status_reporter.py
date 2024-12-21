@@ -21,7 +21,7 @@ log_path = "/var/log/kara/"
 jsons_dir = "./../status_reporter/jsons"
 # grafana variables
 api_timezone = "Asia%2FTehran" # timezone of grafana
-var_host = "var-hostIs"
+var_host = "var-hostls"
 var_time = "var-timeVariable"
 
 # For font style
@@ -122,6 +122,7 @@ def dashboard_maker_with_image(final_images_path_dict, output_file, panels_per_c
             result_image_name = f"{output_file}/{dashboard_org_name}_dashboard__{idx + 1}.png"
             combined_image.save(result_image_name)
             if os.path.exists(result_image_name):
+                print("")
                 print(f"kara dashboard file saved successfully: '{YELLOW}{result_image_name}{RESET}'")
             else:
                 print(f"Failed to save dashboard: '{YELLOW}{result_image_name}{RESET}'")
@@ -223,10 +224,12 @@ def remove_dashboard(grafana_url, api_key, dashboard_data_dict):
 
 ################################################################################# export panels of dashboard
 
+#### make image and export panels
+
 # Lock for thread-safe dictionary updates
 lock = threading.Lock()
 
-def image_export_threading(dash_name, values, api_key, grafana_url, start_time_utc, end_time_utc, output_parent_dir, hostList, panel_width, panel_height, time_variable, group_name):
+def image_export_threading(dash_name, values, api_key, grafana_url, start_time_utc, end_time_utc, output_parent_dir, host_name, panel_width, panel_height, time_variable, group_name):
     logging.info(f"Processing dashboard: {dash_name}")
     images_path_dict = {}
     dashboard_org_name = values[0]
@@ -235,31 +238,31 @@ def image_export_threading(dash_name, values, api_key, grafana_url, start_time_u
     start_unix = utc_to_unix_time(start_time_utc)
     end_unix = utc_to_unix_time(end_time_utc)
     panels = dashboard_data.get("panels", [])
-    host_name = "All" if len(hostList) > 1 else hostList[0]
-    each_server_path = f"{output_parent_dir}/{group_name}_{host_name}-images"
+    if isinstance(host_name, list):
+        each_server_path = f"{output_parent_dir}/{group_name}_All-images"
+        host_in_API = "".join(f"{var_host}={host}&" for host in host_name)
+    else:
+        each_server_path = f"{output_parent_dir}/{group_name}_{host_name}-images"
+        host_in_API = f"{var_host}={host_name}&"
     os.makedirs(each_server_path, exist_ok=True)
     images_path_dict[dashboard_org_name] = []
     for panel in panels:
         panel_id = panel["id"]
         panel_title = re.sub(r'[ /&$()]+', '_', panel["title"])
-        hostAPIstr = "".join(f"{var_host}={host}&" for host in hostList)
-        curl_api = (f'curl -o {each_server_path}/{dashboard_org_name}_{panel_title}.png -H "Authorization: Bearer {api_key}" "{grafana_url}/render/d-solo/{dashboard_uid_img}/{dash_name}?orgId=1&{hostAPIstr}{var_time}={time_variable}&from={start_unix}&to={end_unix}&panelId={panel_id}&width={panel_width}&height={panel_height}&tz={api_timezone}"')
+        curl_api = (f'curl -o {each_server_path}/{dashboard_org_name}_{panel_title}.png -H "Authorization: Bearer {api_key}" "{grafana_url}/render/d-solo/{dashboard_uid_img}/{dash_name}?orgId=1&{host_in_API}{var_time}={time_variable}&from={start_unix}&to={end_unix}&panelId={panel_id}&width={panel_width}&height={panel_height}&tz={api_timezone}"')
         result = subprocess.run(curl_api, shell=True, check=True, capture_output=True, text=True)
         image_path = f"{each_server_path}/{dashboard_org_name}_{panel_title}.png"
         if os.path.exists(image_path):
             images_path_dict[dashboard_org_name].append(image_path)
-            print(f"Image for panel '{YELLOW}{panel_title}{RESET}' (ID: {YELLOW}{panel_id}{RESET}) is a valid and saved successfully for server: {YELLOW}{host_name}{RESET}")
-            logging.info(f"status_reporter - Image for panel '{panel_title}' (ID: {panel_id}) is a valid and saved successfully for server: {host_name}")
-    if result.returncode == 0:
-        print("========================================")
-        print(f"{BOLD}All panels of ({dashboard_org_name}) have been processed for ({host_name}) {RESET}")
-        print("========================================")
+            print("")
+            print(f"Image for panel '{YELLOW}{panel_title}{RESET}' (ID: {YELLOW}{panel_id}{RESET}) from {YELLOW}{dashboard_org_name}{RESET} is a valid and saved successfully for server: {YELLOW}{host_name}{RESET}")
+            logging.info(f"status_reporter - Image for panel '{panel_title}' (ID: {panel_id}) from dashboard: '{dashboard_org_name}' is a valid and saved successfully for server: {host_name}")
     return images_path_dict
 
-def images_export(dashboard_data_dict, api_key, grafana_url, start_time_utc, end_time_utc, output_parent_dir, hostList, panel_width, panel_height, time_variable, group_name):
+def images_export(dashboard_data_dict, api_key, grafana_url, start_time_utc, end_time_utc, output_parent_dir, host_name, panel_width, panel_height, time_variable, group_name):
     final_images_path_dict = {}
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        future_to_dashboard = {executor.submit(image_export_threading, dash_name, values, api_key, grafana_url, start_time_utc, end_time_utc, output_parent_dir, hostList, panel_width, panel_height, time_variable, group_name): dash_name for dash_name, values in dashboard_data_dict.items()}  
+        future_to_dashboard = {executor.submit(image_export_threading, dash_name, values, api_key, grafana_url, start_time_utc, end_time_utc, output_parent_dir, host_name, panel_width, panel_height, time_variable, group_name): dash_name for dash_name, values in dashboard_data_dict.items()}  
         for future in concurrent.futures.as_completed(future_to_dashboard):
             dash_name = future_to_dashboard[future]
             try:
@@ -390,15 +393,14 @@ def get_report(data_loaded, metric_file, path_dir, time_range, img=False):
                 dashborad_images_dict[f'{start_time_csv}__{end_time_csv}'][group_name] = {}
                 if img:
                     if len(hostIsList) > 1:
-                        all_host = 'All'
                         final_images_path_dict = images_export(dashboard_data_dict, api_key, grafana_url, start_time_utc, end_time_utc, output_parent_dir, hostIsList, panel_width, panel_height, time_variable, group_name)
-                        all_img_dashboard_dict = dashboard_maker_with_image(final_images_path_dict, os.path.join(output_parent_dir,group_name+"_"+all_host+"-images"), panels_per_column, max_panels)
-                        dashborad_images_dict[f'{start_time_csv}__{end_time_csv}'][group_name][all_host] = all_img_dashboard_dict # make dictionary inside dictionary
+                        all_img_dashboard_dict = dashboard_maker_with_image(final_images_path_dict, os.path.join(output_parent_dir,group_name+"_All-images"), panels_per_column, max_panels)
+                        dashborad_images_dict[f'{start_time_csv}__{end_time_csv}'][group_name]['All'] = all_img_dashboard_dict # make dictionary inside dictionary
                 output_csv_str = ["Host_name"]  # name of the first column in csv
                 csvi = 0
                 for host_name in hostIsList:
                     if img:
-                        final_images_path_dict = images_export(dashboard_data_dict, api_key, grafana_url, start_time_utc, end_time_utc, output_parent_dir, [host_name], panel_width, panel_height, time_variable, group_name)
+                        final_images_path_dict = images_export(dashboard_data_dict, api_key, grafana_url, start_time_utc, end_time_utc, output_parent_dir, host_name, panel_width, panel_height, time_variable, group_name)
                         img_dashboard_dict = dashboard_maker_with_image(final_images_path_dict, os.path.join(output_parent_dir,group_name+"_"+host_name+"-images"), panels_per_column, max_panels)
                         dashborad_images_dict[f'{start_time_csv}__{end_time_csv}'][group_name][host_name] = img_dashboard_dict # make dictionary inside dictionary
                     output_csv_str.append(host_name)  # value inside the first column of csv
@@ -430,6 +432,7 @@ def get_report(data_loaded, metric_file, path_dir, time_range, img=False):
                                         values = [str(v[1]) for v in values]
                                         output_csv_str[csvi] += "," + ",".join(values)
                                         if values:
+                                            print("")
                                             print(f"{BOLD}Add metric {RESET}'{YELLOW}{final_metric_name}{RESET}' {BOLD}server{RESET} '{YELLOW}{host_name}{RESET}'{BOLD} to CSV file{RESET}")
                                             null_result = 0
                                         else:
@@ -521,9 +524,9 @@ def main(metric_file, path_dir, time_range, img):
     metric_file= metric_file.split(',') if metric_file else []
     path_dir = path_dir or data_loaded.get('output_path') or "." 
     time_range = time_range if time_range else data_loaded.get('time', [])['time_range']
-    dashborad_images, all_hosts_csv_dict = get_report(data_loaded, metric_file, path_dir, time_range, img)
+    dashborad_images_dict, all_hosts_csv_dict = get_report(data_loaded, metric_file, path_dir, time_range, img)
     logging.info("\033[92m****** status reporter main function end ******\033[0m")
-    return dashborad_images, all_hosts_csv_dict, data_loaded['influxdbs'][list(data_loaded['influxdbs'])[0]]['grafana_dashboards']['time_variable'] # it is temp remove it ########
+    return dashborad_images_dict, all_hosts_csv_dict, data_loaded['influxdbs'][list(data_loaded['influxdbs'])[0]]['grafana_dashboards']['time_variable'] # it is temp remove it ########
 
 if __name__ == "__main__":
     # Parse command-line arguments for your new script
