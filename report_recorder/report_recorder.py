@@ -642,7 +642,7 @@ def upload_data(site, title_content_dict, kateb_list, cluster_name, scenario_nam
                 
 def upload_images(site, html_content, output_htmls_path):
     logging.info("report_recorder - Executing upload_images function")
-    # Convert dominate document to a string if needed
+    # Convert dominate document to string if needed
     if isinstance(html_content, document):
         html_content = html_content.render()
     elif not isinstance(html_content, str):
@@ -652,27 +652,33 @@ def upload_images(site, html_content, output_htmls_path):
     except Exception as e:
         logging.error(f"Error parsing HTML content: {e}")
         raise
+
+    # Extract image paths
     image_paths = [img['src'] for img in soup.find_all('img') if 'src' in img.attrs]
-    # Upload each image to the wiki
+    # Upload each image
     for image_path in image_paths:
         if "./" in image_path:
             image_path = image_path.replace("./", f"{str(output_htmls_path)}/")
         image_filename = os.path.basename(image_path)
         page = pywikibot.FilePage(site, f'File:{image_filename}')
-        if not page.exists():
-            file_page = pywikibot.FilePage(site, page.title())
-            if file_page.exists():
-                raise ValueError("File already exists!")
-            success = file_page.upload(image_path, comment=f"Uploaded image '{image_filename}' by KARA")
+        # Check if the file already exists
+        if page.exists():
+            print(f"Image \033[91m'{image_filename}'\033[0m already exists on the wiki.")
+            logging.info(f"report_recorder - Image '{image_filename}' already exists on the wiki. Skipping upload.")
+            continue
+
+        # Attempt to upload the image
+        try:
+            success = page.upload(image_path, comment=f"Uploaded image '{image_filename}' by KARA", ignore_warnings=True)
             if success:
                 print(f"File \033[1;33m'{image_filename}'\033[0m uploaded successfully!")
                 logging.info(f"report_recorder - Image '{image_filename}' uploaded successfully.")
             else:
-                print(f"\033[91mUpload this image '{image_filename}' failed\033[0m")
-                logging.warning(f"report_recorder - Upload this image '{image_filename}' failed.")
-        else:
-            print(f"Image'\033[91m{image_filename}\033[0m'already exists on the wiki.")
-            logging.warning(f"report_recorder - Image '{image_filename}' already exists on the wiki.")
+                print(f"\033[91mFailed to upload image '{image_filename}'\033[0m")
+                logging.warning(f"report_recorder - Failed to upload image '{image_filename}'.")
+        except Exception as upload_error:
+            logging.error(f"Error uploading image '{image_filename}': {upload_error}")
+            print(f"\033[91mError uploading image '{image_filename}'\033[0m")
 
 def convertTagList(tagList):
     tagstr = ""
