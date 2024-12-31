@@ -21,7 +21,7 @@ log_path = "/var/log/kara/"
 jsons_dir = "./../status_reporter/jsons"
 # grafana variables
 api_timezone = "Asia%2FTehran" # timezone of grafana
-var_host = "var-hostls"
+var_host = "var-host"
 var_time = "var-timeVariable"
 
 # For font style
